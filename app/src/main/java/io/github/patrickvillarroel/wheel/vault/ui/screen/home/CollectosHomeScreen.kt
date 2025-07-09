@@ -31,24 +31,25 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BrandCard
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.CarCard
-import io.github.patrickvillarroel.wheel.vault.ui.screen.component.TopHeader
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
 fun CollectorsHomeScreen(modifier: Modifier = Modifier) {
+    val closeMenu = stringResource(R.string.close) + stringResource(R.string.menu)
     var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }
     BackHandler(fabMenuExpanded) { fabMenuExpanded = false }
-    val items = remember { listOf(Icons.Filled.Add to "Agregar", Icons.Filled.Search to "Buscar") }
+    val items = remember { listOf(Icons.Filled.Add to R.string.add, Icons.Filled.Search to R.string.search) }
 
     Scaffold(
         modifier = modifier,
@@ -66,24 +67,23 @@ fun CollectorsHomeScreen(modifier: Modifier = Modifier) {
                     }
                     Icon(
                         imageVector,
-                        contentDescription = "Agregar",
-                        modifier = Modifier.animateIcon({
-                            checkedProgress
-                        }),
+                        contentDescription = stringResource(R.string.search),
+                        modifier = Modifier.animateIcon({ checkedProgress }),
+                        tint = Color.White,
                     )
                 }
             }) {
                 items.forEachIndexed { i, (image, description) ->
                     FloatingActionButtonMenuItem(
                         onClick = { fabMenuExpanded = false },
-                        icon = { Icon(image, description) },
-                        text = { Text(description) },
+                        icon = { Icon(image, stringResource(description)) },
+                        text = { Text(stringResource(description)) },
                         modifier = Modifier.semantics {
                             isTraversalGroup = true
                             if (i == items.size - 1) {
                                 customActions = listOf(
                                     CustomAccessibilityAction(
-                                        label = "Close menu",
+                                        label = closeMenu,
                                         action = {
                                             fabMenuExpanded = false
                                             true
@@ -96,22 +96,20 @@ fun CollectorsHomeScreen(modifier: Modifier = Modifier) {
                 }
             }
         },
-        containerColor = Color(0xFF1A1A1A),
     ) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
         ) {
-            item { TopHeader() }
+            item { TopHeader(onProfileClick = {}) }
 
             item { Spacer(modifier = Modifier.height(16.dp)) }
 
             // Sección de marcas
             item {
                 Text(
-                    text = "Marcas",
-                    color = Color.White,
+                    text = stringResource(R.string.brands),
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(start = 16.dp),
                 )
@@ -145,8 +143,7 @@ fun CollectorsHomeScreen(modifier: Modifier = Modifier) {
             // Sección de recientes
             item {
                 Text(
-                    text = "Agregados recientes",
-                    color = Color.White,
+                    text = stringResource(R.string.recently_added),
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(start = 16.dp),
                 )
@@ -169,8 +166,7 @@ fun CollectorsHomeScreen(modifier: Modifier = Modifier) {
 
             item {
                 Text(
-                    text = "Agregados recientes",
-                    color = Color.White,
+                    text = stringResource(R.string.recently_added),
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(start = 16.dp),
                 )
@@ -179,7 +175,7 @@ fun CollectorsHomeScreen(modifier: Modifier = Modifier) {
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun HomeContentPreview() {
     WheelVaultTheme {

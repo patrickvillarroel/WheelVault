@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">Wheel Vault</string>
+    <string name="add">Añadir</string>
+    <string name="back">Volver</string>
+    <string name="brands">Marcas</string>
+    <string name="car">Auto</string>
+    <string name="car_informal">Carro</string>
+    <string name="close">Cerrar</string>
+    <string name="collectors_project">Collector\'s Project</string>
+    <string name="collectors_project_lines">Collector\'s\nProject</string>
+    <string name="statistics">Estadísticas</string>
+    <string name="favorites">Favoritos</string>
+    <string name="garage">Garaje</string>
+    <string name="menu">Menú</string>
+    <string name="recently_added">Agregados recientes</string>
+    <string name="search">Buscar</string>
+    <string name="profile">Perfil</string>
 </resources>

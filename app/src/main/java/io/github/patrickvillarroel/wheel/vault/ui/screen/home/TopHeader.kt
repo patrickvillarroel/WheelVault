@@ -1,15 +1,8 @@
-package io.github.patrickvillarroel.wheel.vault.ui.screen.component
+package io.github.patrickvillarroel.wheel.vault.ui.screen.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -19,35 +12,27 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.patrickvillarroel.wheel.vault.R
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuButtonHeader
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
-fun TopHeader(modifier: Modifier = Modifier) {
-    // Encabezado con imagen
+fun TopHeader(onProfileClick: () -> Unit, modifier: Modifier = Modifier) {
+    // Encabezado con iconos y menu
     Box(
         modifier = modifier
             .fillMaxWidth()
             .height(340.dp)
-            .clip(
-                RoundedCornerShape(
-                    topStart = 0.dp,
-                    topEnd = 0.dp,
-                    bottomStart = 36.dp,
-                    bottomEnd = 36.dp,
-                ),
-            )
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
@@ -57,6 +42,12 @@ fun TopHeader(modifier: Modifier = Modifier) {
                     startY = 0f,
                     endY = 1400f,
                 ),
+                shape = RoundedCornerShape(
+                    topStart = 0.dp,
+                    topEnd = 0.dp,
+                    bottomStart = 36.dp,
+                    bottomEnd = 36.dp,
+                ),
             ),
     ) {
         Column(
@@ -64,26 +55,12 @@ fun TopHeader(modifier: Modifier = Modifier) {
                 .align(Alignment.TopStart)
                 .padding(16.dp),
         ) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "Menú",
-                    tint = Color.White,
-                )
-                Icon(
-                    imageVector = Icons.Default.AccountCircle,
-                    contentDescription = "Profile",
-                    tint = Color.White,
-                )
-            }
+            MenuButtonHeader(onProfileClick)
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Collectors\nProject",
+                text = stringResource(R.string.collectors_project_lines),
                 color = Color.White,
                 fontSize = 70.sp,
                 fontWeight = FontWeight.Black,
@@ -95,22 +72,19 @@ fun TopHeader(modifier: Modifier = Modifier) {
 
         // Imagen del auto principal
         Image(
-            painter = painterResource(id = R.drawable.header_car),
-            contentDescription = "Carro",
-            contentScale = ContentScale.Fit,
+            painter = painterResource(id = R.drawable.header_car_fixed),
+            contentDescription = stringResource(R.string.car),
+            contentScale = ContentScale.Crop,
             modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .graphicsLayer {
-                    scaleX = -1f // Invertir horizontal
-                }
-                .padding(start = 16.dp, bottom = 8.dp)
-                .height(190.dp),
+                .padding(top = 170.dp)
+                .height(259.dp)
+                .align(Alignment.BottomEnd),
         )
     }
 }
 
 @Composable
-fun TopHeaderWithBrush(modifier: Modifier = Modifier) {
+private fun TopHeaderWithBrush(modifier: Modifier = Modifier) {
     // Encabezado con imagen
     Box(
         modifier = modifier
@@ -169,11 +143,11 @@ fun TopHeaderWithBrush(modifier: Modifier = Modifier) {
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun HeaderPreview() {
     WheelVaultTheme {
-        TopHeader()
+        TopHeader(onProfileClick = {})
     }
 }
 
