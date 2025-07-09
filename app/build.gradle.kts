@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.ktlint)
 }
@@ -82,6 +83,7 @@ dependencies {
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.android.accompanist.permission)
 
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.androidx.startup)
@@ -95,6 +97,12 @@ dependencies {
     implementation(libs.datastore.preferences)
     implementation(libs.room.runtime)
     ksp(libs.room.compiler)
+
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.androidx.camera.mlkit.vision)
+    implementation(libs.text.recognition)
 
     testImplementation(libs.junit)
     testImplementation(libs.konsist)

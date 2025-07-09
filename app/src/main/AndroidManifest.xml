@@ -6,6 +6,11 @@
     <uses-permission
         android:name="android.permission.POST_NOTIFICATIONS"
         android:minSdkVersion="33" />
+    <!-- Camera -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <application
         android:name=".MainApplication"
