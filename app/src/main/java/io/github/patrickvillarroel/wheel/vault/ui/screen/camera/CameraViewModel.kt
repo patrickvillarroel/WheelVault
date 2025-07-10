@@ -1,5 +1,6 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.camera
 
+import android.util.Log
 import androidx.annotation.OptIn
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
@@ -31,6 +32,7 @@ class CameraViewModel : ViewModel() {
     private val _showControls = MutableStateFlow(false)
     val showControls = _showControls.asStateFlow()
 
+    @Volatile
     private var hasRecognizedValidText = false
 
     private val imageProxyFlow = MutableSharedFlow<ImageProxy>(
@@ -64,7 +66,6 @@ class CameraViewModel : ViewModel() {
         }
 
         _isProcessing.update { true }
-
         val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
 
         textRecognizer.process(image)
@@ -80,26 +81,27 @@ class CameraViewModel : ViewModel() {
                     _showControls.update { true }
                     hasRecognizedValidText = true
                 }
+                _isProcessing.update { false }
             }
-            .addOnFailureListener {
+            .addOnFailureListener { e ->
+                Log.e("Camera View Model", "Error al reconocer texto", e)
                 _recognizedText.update { "Error al reconocer texto." }
                 _showControls.update { false }
             }
             .addOnCompleteListener {
                 imageProxy.close()
-                _isProcessing.update { false }
             }
     }
 
     fun reset() {
-        _recognizedText.value = "Apunte al nombre del modelo..."
-        _showControls.value = false
-        _isProcessing.value = false
+        _recognizedText.update { "Apunte al nombre del modelo..." }
+        _showControls.update { false }
+        _isProcessing.update { true }
         hasRecognizedValidText = false
     }
 
     fun processImage(imageProxy: ImageProxy) {
-        if (!hasRecognizedValidText && !imageProxyFlow.tryEmit(imageProxy)) {
+        if (!imageProxyFlow.tryEmit(imageProxy)) {
             imageProxy.close()
         }
     }

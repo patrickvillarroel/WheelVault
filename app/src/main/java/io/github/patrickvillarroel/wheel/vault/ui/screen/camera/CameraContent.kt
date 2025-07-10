@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.patrickvillarroel.wheel.vault.R
@@ -68,7 +70,7 @@ fun CameraLensContent(
             if (isCameraPermission) {
                 CameraPreview(
                     onImageCapture = processImage,
-                    modifier = Modifier.size(412.dp, 548.dp),
+                    modifier = Modifier.size(412.dp, 648.dp),
                 )
             }
 
@@ -85,27 +87,34 @@ fun CameraLensContent(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
                     .size(265.dp, 385.dp)
-                    .offset(y = (85).dp)
+                    .offset(y = (55).dp)
                     .border(2.dp, Color.LightGray, shape = RectangleShape),
             )
 
             // Text reconocido
             if (!isProcessing) {
                 Text(
-                    recognizedText,
+                    "¿Es Correcto?",
                     color = Color.White,
-                    maxLines = 1,
-                    modifier = Modifier
-                        .padding(90.dp)
-                        .align(Alignment.BottomCenter),
+                    modifier = Modifier.offset(y = (-180).dp).align(Alignment.BottomCenter),
                 )
             }
+
+            Text(
+                recognizedText,
+                color = Color.White,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .offset(y = (-120).dp)
+                    .align(Alignment.BottomCenter),
+            )
 
             CameraControllers(
                 showControls = showControls,
                 reset = reset,
                 onConfirm = onConfirm,
-                modifier = Modifier.align(Alignment.BottomCenter),
+                modifier = Modifier.offset(y = (-30).dp),
             )
         }
     }
@@ -129,7 +138,7 @@ fun BoxScope.CameraControllers(
                 Text("Continuar")
             }
             Spacer(Modifier.width(8.dp))
-            Button(onClick = reset) {
+            FilledTonalButton(onClick = reset) {
                 Text("Reintentar")
             }
         }
