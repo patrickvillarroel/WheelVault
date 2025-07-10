@@ -45,11 +45,16 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.component.CarCard
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
-fun CollectorsHomeScreen(modifier: Modifier = Modifier) {
+fun CollectorsHomeScreen(onAddClick: () -> Unit, onSearchClick: () -> Unit, modifier: Modifier = Modifier) {
     val closeMenu = stringResource(R.string.close) + stringResource(R.string.menu)
     var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }
     BackHandler(fabMenuExpanded) { fabMenuExpanded = false }
-    val items = remember { listOf(Icons.Filled.Add to R.string.add, Icons.Filled.Search to R.string.search) }
+    val items = remember {
+        listOf(
+            Triple(Icons.Filled.Add, R.string.add, onAddClick),
+            Triple(Icons.Filled.Search, R.string.search, onSearchClick),
+        )
+    }
 
     Scaffold(
         modifier = modifier,
@@ -73,9 +78,12 @@ fun CollectorsHomeScreen(modifier: Modifier = Modifier) {
                     )
                 }
             }) {
-                items.forEachIndexed { i, (image, description) ->
+                items.forEachIndexed { i, (image, description, onClick) ->
                     FloatingActionButtonMenuItem(
-                        onClick = { fabMenuExpanded = false },
+                        onClick = {
+                            fabMenuExpanded = false
+                            onClick()
+                        },
                         icon = { Icon(image, stringResource(description)) },
                         text = { Text(stringResource(description)) },
                         modifier = Modifier.semantics {
@@ -179,6 +187,6 @@ fun CollectorsHomeScreen(modifier: Modifier = Modifier) {
 @Composable
 private fun HomeContentPreview() {
     WheelVaultTheme {
-        CollectorsHomeScreen()
+        CollectorsHomeScreen({}, {})
     }
 }
