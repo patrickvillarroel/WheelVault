@@ -24,7 +24,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun CameraLensScreen(
     onBack: () -> Unit,
-    onConfirm: (String) -> Unit,
+    onAddDetail: (String?) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CameraViewModel = koinViewModel(),
     permissionViewModel: CameraPermissionViewModel = koinViewModel(),
@@ -37,7 +37,7 @@ fun CameraLensScreen(
     val permissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
     val settingsLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
-    ) {}
+    ) { /* Maybe check the result, but we trust in permission state */ }
 
     LaunchedEffect(permissionState.status) {
         if (permissionState.status.isGranted) {
@@ -45,6 +45,10 @@ fun CameraLensScreen(
         } else {
             permissionViewModel.requestPermission()
         }
+    }
+    LaunchedEffect(Unit) {
+        // Reset when this composable start in composition to avoid previous results on VM show on UI
+        viewModel.reset()
     }
 
     if (permissionViewModel.showPermissionDialog) {
@@ -68,13 +72,14 @@ fun CameraLensScreen(
 
     CameraLensContent(
         onBack = onBack,
+        onSkipClick = { onAddDetail(null) },
         processImage = { viewModel.processImage(it) },
         recognizedText = recognizedText,
         isProcessing = isProcessing,
         showControls = showControls,
         isCameraPermission = isCameraPermission,
         reset = { viewModel.reset() },
-        onConfirm = { onConfirm(recognizedText) },
+        onConfirm = { onAddDetail(recognizedText) },
         modifier = modifier,
     )
 }
