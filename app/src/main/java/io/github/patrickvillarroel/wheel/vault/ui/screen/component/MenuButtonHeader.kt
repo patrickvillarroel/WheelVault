@@ -1,10 +1,7 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.component
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Menu
@@ -17,6 +14,8 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,59 +31,76 @@ import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 @Composable
 fun MenuButtonHeader(
     onProfileClick: () -> Unit,
+    onGarageClick: () -> Unit,
+    onFavoritesClick: () -> Unit,
+    onStatisticsClick: () -> Unit,
     modifier: Modifier = Modifier,
-    content: @Composable RowScope.() -> Unit = {},
+    title: @Composable () -> Unit = {},
 ) {
     var expandedMenu by remember { mutableStateOf(false) }
 
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        IconButton({ expandedMenu = !expandedMenu }) {
-            AnimatedContent(expandedMenu, label = "Menu Swip") {
+    TopAppBar(
+        modifier = modifier,
+        title = title,
+        navigationIcon = {
+            IconButton({ expandedMenu = !expandedMenu }) {
+                AnimatedContent(expandedMenu, label = "Menu Swip") {
+                    Icon(
+                        imageVector = if (!it) Icons.Default.Menu else Icons.Default.ViewWeek,
+                        contentDescription = stringResource(R.string.menu),
+                        tint = Color.White,
+                    )
+                }
+            }
+            DropdownMenu(
+                expanded = expandedMenu,
+                onDismissRequest = { expandedMenu = false },
+            ) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.garage)) },
+                    leadingIcon = { Icon(Icons.Outlined.DirectionsCar, contentDescription = null) },
+                    onClick = {
+                        expandedMenu = false
+                        onGarageClick()
+                    },
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.favorites)) },
+                    leadingIcon = { Icon(Icons.Outlined.Favorite, contentDescription = null) },
+                    onClick = {
+                        expandedMenu = false
+                        onFavoritesClick()
+                    },
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.statistics)) },
+                    leadingIcon = { Icon(Icons.Outlined.Calculate, contentDescription = null) },
+                    onClick = {
+                        expandedMenu = false
+                        onStatisticsClick()
+                    },
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = onProfileClick) {
                 Icon(
-                    imageVector = if (!it) Icons.Default.Menu else Icons.Default.ViewWeek,
-                    contentDescription = stringResource(R.string.menu),
+                    Icons.Default.AccountCircle,
+                    contentDescription = stringResource(R.string.profile),
                     tint = Color.White,
                 )
             }
-        }
-        DropdownMenu(
-            expanded = expandedMenu,
-            onDismissRequest = { expandedMenu = false },
-        ) {
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.garage)) },
-                leadingIcon = { Icon(Icons.Outlined.DirectionsCar, contentDescription = null) },
-                onClick = { /* Do something... */ },
-            )
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.favorites)) },
-                leadingIcon = { Icon(Icons.Outlined.Favorite, contentDescription = null) },
-                onClick = { /* Do something... */ },
-            )
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.statistics)) },
-                leadingIcon = { Icon(Icons.Outlined.Calculate, contentDescription = null) },
-                onClick = { /* Do something... */ },
-            )
-        }
-        content()
-        IconButton(onProfileClick) {
-            Icon(
-                imageVector = Icons.Default.AccountCircle,
-                contentDescription = stringResource(R.string.profile),
-                tint = Color.White,
-            )
-        }
-    }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+    )
 }
 
 @Preview
 @Composable
 private fun HeaderBrushPreview() {
     WheelVaultTheme {
-        MenuButtonHeader(onProfileClick = {})
+        Column {
+            MenuButtonHeader(onProfileClick = {}, onGarageClick = {}, onFavoritesClick = {}, onStatisticsClick = {})
+        }
     }
 }
