@@ -1,6 +1,7 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.garage
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
@@ -29,9 +30,10 @@ fun DefaultFilterBar(onSearchClick: () -> Unit, onHomeClick: () -> Unit, modifie
     var selectedModel by rememberSaveable { mutableStateOf(false) }
 
     LazyRow(
+        contentPadding = PaddingValues(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = modifier.padding(bottom = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = modifier.padding(bottom = 10.dp, top = 8.dp),
     ) {
         item {
             AssistChip(

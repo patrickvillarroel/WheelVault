@@ -1,5 +1,6 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.garage
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -37,7 +38,7 @@ fun GarageTopBar(
         modifier = modifier,
     ) {
         AnimatedContent(
-            modifier = Modifier.padding(top = 60.dp, start = 2.dp, end = 2.dp),
+            modifier = Modifier.padding(top = 50.dp),
             targetState = uiState,
             transitionSpec = {
                 fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(150))
@@ -50,14 +51,17 @@ fun GarageTopBar(
                     onHomeClick = onHomeClick,
                 )
 
-                GarageUiState.SEARCH -> SearchBarInput(
-                    query = searchQuery,
-                    onQueryChange = onSearchQueryChange,
-                    onClose = {
-                        onSearchQueryChange("")
-                        onStateChange(GarageUiState.DEFAULT)
-                    },
-                )
+                GarageUiState.SEARCH -> {
+                    BackHandler { onStateChange(GarageUiState.DEFAULT) }
+                    SearchBarInput(
+                        query = searchQuery,
+                        onQueryChange = onSearchQueryChange,
+                        onClose = {
+                            onSearchQueryChange("")
+                            onStateChange(GarageUiState.DEFAULT)
+                        },
+                    )
+                }
             }
         }
     }

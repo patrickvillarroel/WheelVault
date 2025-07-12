@@ -66,13 +66,13 @@ fun GarageContent(
             }
         },
     ) { paddingValues ->
-        LazyColumn(Modifier.padding(paddingValues).fillMaxSize().padding(15.dp)) {
+        LazyColumn(Modifier.padding(paddingValues).fillMaxSize().padding(start = 15.dp, end = 15.dp)) {
             item {
                 Text(
                     stringResource(R.string.garage),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(bottom = 5.dp),
+                    modifier = Modifier.padding(top = 15.dp, start = 15.dp, bottom = 5.dp),
                 )
             }
             items(carResults, key = { it.id }) { item ->

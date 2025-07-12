@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -26,14 +27,21 @@ fun SearchBarInput(query: String, onQueryChange: (String) -> Unit, onClose: () -
         placeholder = { Text("Buscar en garaje") },
         leadingIcon = {
             IconButton(onClick = onClose) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Cerrar búsqueda")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Cerrar búsqueda")
+            }
+        },
+        trailingIcon = {
+            if (query.isNotEmpty()) {
+                IconButton(onClick = { onQueryChange("") }) {
+                    Icon(Icons.Filled.Close, "Limpiar búsqueda")
+                }
             }
         },
         singleLine = true,
         shape = RoundedCornerShape(50),
         modifier = modifier
             .fillMaxWidth()
-            .padding(bottom = 8.dp)
+            .padding(10.dp)
             .background(Color(0xFF2B2730), shape = RoundedCornerShape(50)),
         colors = TextFieldDefaults.colors(
             unfocusedContainerColor = Color.Black,
@@ -52,6 +60,6 @@ fun SearchBarInput(query: String, onQueryChange: (String) -> Unit, onClose: () -
 @Composable
 private fun SearchPreview() {
     WheelVaultTheme {
-        SearchBarInput("", {}, {})
+        SearchBarInput("Hola", {}, {})
     }
 }
