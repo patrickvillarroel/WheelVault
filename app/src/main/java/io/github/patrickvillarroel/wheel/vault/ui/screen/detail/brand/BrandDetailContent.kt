@@ -1,5 +1,6 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.detail.brand
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,9 +25,11 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BrandHeader
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.CarItemCard
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
+// TODO move parameters into data class, carCollection is not immutable
 @Composable
 fun BrandDetailContent(
-    brandIconDetail: Pair<Int, String?>,
+    brandName: String,
+    brandIconDetail: Pair<Int, String>,
     description: String,
     carCollection: List<Pair<CarItem, (Boolean) -> Unit>>,
     onBackClick: () -> Unit,
@@ -38,7 +41,7 @@ fun BrandDetailContent(
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
         topBar = {
             BrandHeader(
                 icon = brandIconDetail,
@@ -55,9 +58,24 @@ fun BrandDetailContent(
             }
         },
     ) { paddingValues ->
-        LazyColumn(Modifier.padding(paddingValues).padding(top = 15.dp, start = 15.dp, end = 15.dp)) {
-            item { Text("Info", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold) }
-            item { Text(description, style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Justify) }
+        LazyColumn(
+            Modifier.fillMaxSize().padding(top = 15.dp, start = 15.dp, end = 15.dp),
+            contentPadding = paddingValues,
+        ) {
+            item {
+                Text(
+                    "Info $brandName",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+            item {
+                Text(
+                    description,
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Justify,
+                )
+            }
             item {
                 Text(
                     "Carritos en la colección:",
@@ -67,7 +85,7 @@ fun BrandDetailContent(
                 )
             }
             items(carCollection) { (car, onFavorite) ->
-                CarItemCard(car, onFavoriteToggle = onFavorite)
+                CarItemCard(car, onFavoriteToggle = onFavorite, Modifier.padding(bottom = 5.dp))
             }
         }
     }
@@ -78,6 +96,7 @@ fun BrandDetailContent(
 private fun BrandPreview() {
     WheelVaultTheme {
         BrandDetailContent(
+            "Hot Wheels",
             R.drawable.hot_wheels_logo_black to "Hot Wheels Logo",
             description =
             "En 1968, los coches de metal de Hot Wheels se diseñaron para revolucionar el mundo de los coches de juguete con el objetivo de ofrecer un diseño más detallado y un mejor rendimiento que los de la competencia. Cinco décadas más tarde, Hot Wheels es número 1 en ventas de juguetes en el mundo.\nHot Wheels se ha convertido en un referente tanto de la cultura automovilística como de la popular gracias a los eventos en directo, como el HW Legends Tour, a los eventos deportivos HW Superchargers y a las atracciones de los parques temáticos, así como a sus colaboraciones con algunas de las marcas más conocidas.",

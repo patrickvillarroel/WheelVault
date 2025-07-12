@@ -40,7 +40,7 @@ fun BrandHeader(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(292.dp)
+            .height(225.dp)
             .background(
                 color = Color(0xFFE42E31),
                 shape = RoundedCornerShape(
@@ -49,7 +49,7 @@ fun BrandHeader(
                     bottomStart = 36.dp,
                     bottomEnd = 36.dp,
                 ),
-            ).padding(16.dp),
+            ).padding(10.dp),
     ) {
         MenuButtonHeader(
             onProfileClick = onProfileClick,

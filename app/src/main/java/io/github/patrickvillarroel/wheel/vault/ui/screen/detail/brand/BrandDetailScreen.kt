@@ -21,9 +21,9 @@ fun BrandDetailScreen(
     val brands = remember {
         listOf(
             Triple(
-                R.drawable.hot_wheels_logo_black,
+                R.drawable.hot_wheels_logo_black to "Hot Wheels",
                 "En 1968, los coches de metal de Hot Wheels se diseñaron para revolucionar el mundo de los coches de juguete con el objetivo de ofrecer un diseño más detallado y un mejor rendimiento que los de la competencia. Cinco décadas más tarde, Hot Wheels es número 1 en ventas de juguetes en el mundo.\nHot Wheels se ha convertido en un referente tanto de la cultura automovilística como de la popular gracias a los eventos en directo, como el HW Legends Tour, a los eventos deportivos HW Superchargers y a las atracciones de los parques temáticos, así como a sus colaboraciones con algunas de las marcas más conocidas.",
-                listOf(
+                List(10) {
                     CarItem(
                         name = "Ford Mustang GTD",
                         year = 2025,
@@ -31,16 +31,17 @@ fun BrandDetailScreen(
                         quantity = 2,
                         imageUrl = "https://m.media-amazon.com/images/I/61iE8unK0XL._AC_SL1069_.jpg",
                         isFavorite = true,
-                    ) to { _: Boolean -> },
-                ),
+                    ) to { _: Boolean -> }
+                },
             ),
         )
     }
-    val car = remember(brandId) { brands.getOrNull(brandId) ?: brands.first() }
+    val (iconDetail, description, cars) = remember(brandId) { brands.getOrNull(brandId) ?: brands.first() }
     BrandDetailContent(
-        car.first to car.second,
-        description = car.second,
-        carCollection = car.third,
+        iconDetail.second,
+        iconDetail,
+        description = description,
+        carCollection = cars,
         onBackClick = onBackClick,
         onProfileClick = onProfileClick,
         onGarageClick = onGarageClick,
