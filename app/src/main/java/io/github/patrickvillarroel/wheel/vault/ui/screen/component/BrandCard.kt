@@ -3,6 +3,7 @@ package io.github.patrickvillarroel.wheel.vault.ui.screen.component
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,12 +19,13 @@ import androidx.compose.ui.unit.dp
 import io.github.patrickvillarroel.wheel.vault.R
 
 @Composable
-fun BrandCard(@DrawableRes logo: Int, modifier: Modifier = Modifier) {
+fun BrandCard(@DrawableRes logo: Int, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .size(80.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(Color(0xFFE53935)),
+            .background(Color(0xFFE53935))
+            .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Image(

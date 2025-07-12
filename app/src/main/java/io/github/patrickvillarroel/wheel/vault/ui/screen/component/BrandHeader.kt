@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,6 +32,9 @@ fun BrandHeader(
     icon: Pair<Int, String?>,
     onBackClick: () -> Unit,
     onProfileClick: () -> Unit,
+    onGarageClick: () -> Unit,
+    onFavoritesClick: () -> Unit,
+    onStatisticsClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -45,9 +49,14 @@ fun BrandHeader(
                     bottomStart = 36.dp,
                     bottomEnd = 36.dp,
                 ),
-            ),
+            ).padding(16.dp),
     ) {
-        MenuButtonHeader(onProfileClick = onProfileClick)
+        MenuButtonHeader(
+            onProfileClick = onProfileClick,
+            onGarageClick = onGarageClick,
+            onFavoritesClick = onFavoritesClick,
+            onStatisticsClick = onStatisticsClick,
+        )
         Image(
             painterResource(icon.first),
             icon.second,
@@ -58,7 +67,7 @@ fun BrandHeader(
             onBackClick,
             modifier = Modifier
                 .align(Alignment.BottomStart)
-                .padding(top = 40.dp, start = 15.dp),
+                .offset(y = (15).dp),
         ) {
             Icon(Icons.AutoMirrored.Default.KeyboardArrowLeft, stringResource(R.string.back), tint = Color.Black)
             Text(stringResource(R.string.back), color = Color.Black, style = MaterialTheme.typography.labelLarge)
@@ -74,6 +83,9 @@ private fun BrandHeaderPreview() {
             R.drawable.hot_wheels_logo_black to "Hot Wheels Logo",
             onBackClick = {},
             onProfileClick = {},
+            onGarageClick = {},
+            onFavoritesClick = {},
+            onStatisticsClick = {},
         )
     }
 }
