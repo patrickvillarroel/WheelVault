@@ -51,7 +51,14 @@ fun WheelVaultApp(modifier: Modifier = Modifier) {
                 // TODO pass the state from others screens
                 GarageScreen(
                     onProfileClick = { /* TODO add profile */ },
-                    onHomeClick = { backStack.removeLastOrNull() },
+                    onHomeClick = {
+                        val indexHome = backStack.lastIndexOf(NavigationKeys.Home)
+                        if (indexHome != -1) {
+                            backStack.removeAll { it != NavigationKeys.Home }
+                        } else {
+                            backStack.add(NavigationKeys.Home)
+                        }
+                    },
                     onAddClick = { backStack.add(NavigationKeys.AddCamera) },
                 )
             }
