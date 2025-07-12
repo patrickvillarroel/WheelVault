@@ -10,7 +10,7 @@ import androidx.navigation3.ui.NavDisplay
 import io.github.patrickvillarroel.wheel.vault.ui.screen.camera.CameraLensScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.brand.BrandDetailScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageScreen
-import io.github.patrickvillarroel.wheel.vault.ui.screen.home.CollectorsHomeScreen
+import io.github.patrickvillarroel.wheel.vault.ui.screen.home.HomeScreen
 
 @Composable
 fun WheelVaultApp(modifier: Modifier = Modifier) {
@@ -21,18 +21,22 @@ fun WheelVaultApp(modifier: Modifier = Modifier) {
         backStack = backStack,
         entryProvider = entryProvider {
             entry<NavigationKeys.Home> {
-                CollectorsHomeScreen(
+                HomeScreen(
                     onAddClick = { backStack.add(NavigationKeys.AddCamera) },
                     onSearchClick = { backStack.add(NavigationKeys.Garage("")) },
                     onBrandClick = { backStack.add(NavigationKeys.BrandDetail(it)) },
                     onGarageClick = { backStack.add(NavigationKeys.Garage()) },
                     onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
                     onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
+                    onProfileClick = { /* TODO add profile screen */ },
                 )
             }
 
             entry<NavigationKeys.AddCamera> {
-                CameraLensScreen({ backStack.removeLastOrNull() }, { /* TODO add detail create car screen */ })
+                CameraLensScreen(
+                    onBack = { backStack.removeLastOrNull() },
+                    onAddDetail = { /* TODO add detail create car screen */ },
+                )
             }
 
             entry<NavigationKeys.BrandDetail> { (id) ->

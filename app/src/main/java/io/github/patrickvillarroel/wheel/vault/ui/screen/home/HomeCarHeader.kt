@@ -27,7 +27,7 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuButtonHea
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
-fun TopHeader(
+fun HomeCarHeader(
     onProfileClick: () -> Unit,
     onGarageClick: () -> Unit,
     onFavoritesClick: () -> Unit,
@@ -38,7 +38,7 @@ fun TopHeader(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(340.dp)
+            .height(250.dp)
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
@@ -59,7 +59,7 @@ fun TopHeader(
         Column(
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .padding(16.dp),
+                .padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
         ) {
             MenuButtonHeader(
                 onProfileClick = onProfileClick,
@@ -68,8 +68,7 @@ fun TopHeader(
                 onStatisticsClick = onStatisticsClick,
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
+            // TODO replace text and image with fixed image
             Text(
                 text = stringResource(R.string.collectors_project_lines),
                 color = Color.White,
@@ -88,7 +87,7 @@ fun TopHeader(
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .padding(top = 170.dp)
-                .height(259.dp)
+                .height(239.dp)
                 .align(Alignment.BottomEnd),
         )
     }
@@ -154,18 +153,10 @@ private fun TopHeaderWithBrush(modifier: Modifier = Modifier) {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun HeaderPreview() {
     WheelVaultTheme {
-        TopHeader(onProfileClick = {}, onGarageClick = {}, onFavoritesClick = {}, onStatisticsClick = {})
-    }
-}
-
-@Preview
-@Composable
-private fun HeaderBrushPreview() {
-    WheelVaultTheme {
-        TopHeaderWithBrush()
+        HomeCarHeader(onProfileClick = {}, onGarageClick = {}, onFavoritesClick = {}, onStatisticsClick = {})
     }
 }

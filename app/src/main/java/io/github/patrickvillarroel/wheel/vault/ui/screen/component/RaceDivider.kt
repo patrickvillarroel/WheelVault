@@ -22,7 +22,7 @@ import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
 fun RaceDivider(modifier: Modifier = Modifier) {
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(modifier = modifier.fillMaxWidth().padding(top = 2.dp, bottom = 2.dp)) {
         // Línea sólida superior
         HorizontalDivider(
             thickness = 2.dp,
