@@ -9,4 +9,11 @@ sealed interface NavigationKeys {
 
     @Serializable
     data object AddCamera : NavKey
+
+    @Serializable
+    data class BrandDetail(val id: Int) : NavKey
+
+    @Serializable
+    data class Garage(val query: String? = null, val favorites: Boolean = false, val statistics: Boolean = false) :
+        NavKey
 }

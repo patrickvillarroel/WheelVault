@@ -14,5 +14,6 @@
     <string name="menu">Menú</string>
     <string name="recently_added">Agregados recientes</string>
     <string name="search">Buscar</string>
+    <string name="skip">Omitir</string>
     <string name="profile">Perfil</string>
 </resources>
