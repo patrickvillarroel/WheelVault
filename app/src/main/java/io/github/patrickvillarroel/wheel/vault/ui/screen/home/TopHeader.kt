@@ -27,7 +27,13 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuButtonHea
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
-fun TopHeader(onProfileClick: () -> Unit, modifier: Modifier = Modifier) {
+fun TopHeader(
+    onProfileClick: () -> Unit,
+    onGarageClick: () -> Unit,
+    onFavoritesClick: () -> Unit,
+    onStatisticsClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     // Encabezado con iconos y menu
     Box(
         modifier = modifier
@@ -55,7 +61,12 @@ fun TopHeader(onProfileClick: () -> Unit, modifier: Modifier = Modifier) {
                 .align(Alignment.TopStart)
                 .padding(16.dp),
         ) {
-            MenuButtonHeader(onProfileClick)
+            MenuButtonHeader(
+                onProfileClick = onProfileClick,
+                onGarageClick = onGarageClick,
+                onFavoritesClick = onFavoritesClick,
+                onStatisticsClick = onStatisticsClick,
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -147,7 +158,7 @@ private fun TopHeaderWithBrush(modifier: Modifier = Modifier) {
 @Composable
 private fun HeaderPreview() {
     WheelVaultTheme {
-        TopHeader(onProfileClick = {})
+        TopHeader(onProfileClick = {}, onGarageClick = {}, onFavoritesClick = {}, onStatisticsClick = {})
     }
 }
 

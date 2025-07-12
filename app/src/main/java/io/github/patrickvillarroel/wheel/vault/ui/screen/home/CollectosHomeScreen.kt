@@ -2,13 +2,16 @@ package io.github.patrickvillarroel.wheel.vault.ui.screen.home
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -38,17 +41,27 @@ import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BrandCard
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.CarCard
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
-fun CollectorsHomeScreen(onAddClick: () -> Unit, onSearchClick: () -> Unit, modifier: Modifier = Modifier) {
+fun CollectorsHomeScreen(
+    onAddClick: () -> Unit,
+    onSearchClick: () -> Unit,
+    onBrandClick: (Int) -> Unit,
+    onGarageClick: () -> Unit,
+    onFavoritesClick: () -> Unit,
+    onStatisticsClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val closeMenu = stringResource(R.string.close) + stringResource(R.string.menu)
     var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }
-    BackHandler(fabMenuExpanded) { fabMenuExpanded = false }
+    val listState = rememberLazyListState()
     val items = remember {
         listOf(
             Triple(Icons.Filled.Add, R.string.add, onAddClick),
@@ -56,6 +69,7 @@ fun CollectorsHomeScreen(onAddClick: () -> Unit, onSearchClick: () -> Unit, modi
         )
     }
 
+    BackHandler(fabMenuExpanded) { fabMenuExpanded = false }
     Scaffold(
         modifier = modifier,
         floatingActionButton = {
@@ -104,80 +118,89 @@ fun CollectorsHomeScreen(onAddClick: () -> Unit, onSearchClick: () -> Unit, modi
                 }
             }
         },
-    ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
-        ) {
-            item { TopHeader(onProfileClick = {}) }
+    ) { paddingValues ->
+        Box(Modifier.fillMaxSize()) {
+            TopHeader(
+                onProfileClick = {},
+                onGarageClick = onGarageClick,
+                onFavoritesClick = onFavoritesClick,
+                onStatisticsClick = onStatisticsClick,
+                modifier = Modifier
+                    .zIndex(1f)
+                    .offset {
+                        // TODO the header height is 340.dp
+                        IntOffset(x = 0, y = -listState.firstVisibleItemScrollOffset.coerceAtMost(340))
+                    },
+            )
 
-            item { Spacer(modifier = Modifier.height(16.dp)) }
+            LazyColumn(state = listState, modifier = Modifier.fillMaxSize().padding(paddingValues).padding(top = 340.dp)) {
+                item { Spacer(modifier = Modifier.height(16.dp)) }
 
-            // Sección de marcas
-            item {
-                Text(
-                    text = stringResource(R.string.brands),
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 16.dp),
-                )
-            }
+                // Sección de marcas
+                item {
+                    Text(
+                        text = stringResource(R.string.brands),
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(start = 16.dp),
+                    )
+                }
 
-            item {
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    items(5) {
-                        BrandCard(logo = R.drawable.hot_wheels_logo_black)
+                item {
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        items(5) {
+                            BrandCard(logo = R.drawable.hot_wheels_logo_black, onClick = { onBrandClick(it) })
+                        }
                     }
                 }
-            }
 
-            item {
-                HorizontalDivider(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .height(2.dp),
-                    thickness = DividerDefaults.Thickness,
-                    color = Color.Gray.copy(alpha = 0.3f),
-                )
-            }
+                item {
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .height(2.dp),
+                        thickness = DividerDefaults.Thickness,
+                        color = Color.Gray.copy(alpha = 0.3f),
+                    )
+                }
 
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-            }
+                item {
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
 
-            // Sección de recientes
-            item {
-                Text(
-                    text = stringResource(R.string.recently_added),
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 16.dp),
-                )
-            }
+                // Sección de recientes
+                item {
+                    Text(
+                        text = stringResource(R.string.recently_added),
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(start = 16.dp),
+                    )
+                }
 
-            item {
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    items(5) {
-                        CarCard(imageRes = R.drawable.batman_car)
+                item {
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        items(5) {
+                            CarCard(imageRes = R.drawable.batman_car)
+                        }
                     }
                 }
-            }
 
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-            }
+                item {
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
 
-            item {
-                Text(
-                    text = stringResource(R.string.recently_added),
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 16.dp),
-                )
+                item {
+                    Text(
+                        text = stringResource(R.string.recently_added),
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(start = 16.dp),
+                    )
+                }
             }
         }
     }
@@ -187,6 +210,6 @@ fun CollectorsHomeScreen(onAddClick: () -> Unit, onSearchClick: () -> Unit, modi
 @Composable
 private fun HomeContentPreview() {
     WheelVaultTheme {
-        CollectorsHomeScreen({}, {})
+        CollectorsHomeScreen(onAddClick = {}, onSearchClick = {}, onBrandClick = {}, onGarageClick = {}, onFavoritesClick = {}, onStatisticsClick = {})
     }
 }
