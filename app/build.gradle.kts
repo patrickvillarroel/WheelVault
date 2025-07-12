@@ -84,6 +84,7 @@ dependencies {
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.activity.compose)
     implementation(libs.android.accompanist.permission)
+    implementation(libs.androidx.ui.text.google.fonts)
 
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.androidx.startup)

@@ -31,6 +31,8 @@ androidx-lifecycle = "2.9.1"
 androidx-lifecycle-viewmodel-nav3 = "1.0.0-alpha03"
 # https://developers.google.com/ml-kit/vision/text-recognition/v2/android
 google-mlkit = "16.0.1"
+# https://mvnrepository.com/artifact/androidx.compose.ui/ui-text-google-fonts
+google-fonts = "1.8.3"
 # https://developer.android.com/jetpack/androidx/releases/navigation3
 navigation3 = "1.0.0-alpha05"
 # https://github.com/InsertKoinIO/koin/releases
@@ -114,6 +116,7 @@ androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 android-accompanist-permission = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
+androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "google-fonts" }
 
 # navigation 3
 androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "androidx-lifecycle-viewmodel-nav3" }
