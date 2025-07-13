@@ -13,6 +13,7 @@ fun CarDetailScreen(
     onGarageClick: () -> Unit,
     onFavoritesClick: () -> Unit,
     onStatisticsClick: () -> Unit,
+    onEditClick: (CarItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     // TODO replace with VM
@@ -43,8 +44,8 @@ fun CarDetailScreen(
         onGarageClick = onGarageClick,
         onFavoritesClick = onFavoritesClick,
         onStatisticsClick = onStatisticsClick,
-        onEditClick = {},
-        onDeleteClick = {},
+        onEditClick = { onEditClick(carDetail) },
+        onDeleteClick = { /* TODO add delete modal */ },
         onFavoriteToggle = {},
         modifier = modifier,
     )

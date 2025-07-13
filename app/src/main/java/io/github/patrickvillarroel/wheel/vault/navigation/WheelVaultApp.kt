@@ -10,6 +10,7 @@ import androidx.navigation3.ui.NavDisplay
 import io.github.patrickvillarroel.wheel.vault.ui.screen.camera.CameraLensScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.brand.BrandDetailScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarDetailScreen
+import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.edit.CarEditScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.home.HomeScreen
 
@@ -37,7 +38,8 @@ fun WheelVaultApp(modifier: Modifier = Modifier) {
             entry<NavigationKeys.AddCamera> {
                 CameraLensScreen(
                     onBack = { backStack.removeLastOrNull() },
-                    onAddDetail = { /* TODO add detail create car screen */ },
+                    // TODO send more data like picture or save a partial in DB
+                    onAddDetail = { backStack.add(NavigationKeys.CarEdit(it)) },
                 )
             }
 
@@ -74,6 +76,18 @@ fun WheelVaultApp(modifier: Modifier = Modifier) {
             entry<NavigationKeys.CarDetail> { (id) ->
                 CarDetailScreen(
                     carId = id,
+                    onBackClick = { backStack.removeLastOrNull() },
+                    onProfileClick = { /* TODO add profile screen */ },
+                    onGarageClick = { backStack.add(NavigationKeys.Garage()) },
+                    onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
+                    onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
+                    onEditClick = { backStack.add(it.toCarEdit()) },
+                )
+            }
+
+            entry<NavigationKeys.CarEdit> { edit ->
+                CarEditScreen(
+                    partialCarItem = edit.toCarPartial(),
                     onBackClick = { backStack.removeLastOrNull() },
                     onProfileClick = { /* TODO add profile screen */ },
                     onGarageClick = { backStack.add(NavigationKeys.Garage()) },

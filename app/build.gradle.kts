@@ -14,6 +14,7 @@ version = "0.0.1"
 
 kotlin {
     compilerOptions {
+        freeCompilerArgs = listOf("-Xcontext-parameters")
         extraWarnings.set(true)
         allWarningsAsErrors.set(true)
         optIn.addAll(

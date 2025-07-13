@@ -19,4 +19,17 @@ sealed interface NavigationKeys {
     @Serializable
     data class Garage(val query: String? = null, val favorites: Boolean = false, val statistics: Boolean = false) :
         NavKey
+
+    @Serializable
+    data class CarEdit(
+        val model: String? = null,
+        val year: Int? = null,
+        val manufacturer: String? = null,
+        val quantity: Int = 0,
+        val brand: String? = null,
+        val description: String? = null,
+        val category: String? = null,
+        val images: List<String> = emptyList(),
+        val isFavorite: Boolean = false,
+    ) : NavKey
 }
