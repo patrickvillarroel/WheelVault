@@ -9,6 +9,7 @@ fun HomeScreen(
     onAddClick: () -> Unit,
     onSearchClick: () -> Unit,
     onBrandClick: (Int) -> Unit,
+    onCarClick: (Int) -> Unit,
     onGarageClick: () -> Unit,
     onFavoritesClick: () -> Unit,
     onStatisticsClick: () -> Unit,
@@ -32,7 +33,7 @@ fun HomeScreen(
         onStatisticsClick = onStatisticsClick,
         onProfileClick = onProfileClick,
         onNewsClick = {},
-        onCardClick = {},
+        onCardClick = onCarClick,
         modifier = modifier,
     )
 }

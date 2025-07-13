@@ -9,6 +9,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import io.github.patrickvillarroel.wheel.vault.ui.screen.camera.CameraLensScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.brand.BrandDetailScreen
+import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarDetailScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.home.HomeScreen
 
@@ -26,6 +27,7 @@ fun WheelVaultApp(modifier: Modifier = Modifier) {
                     onSearchClick = { backStack.add(NavigationKeys.Garage("")) },
                     onBrandClick = { backStack.add(NavigationKeys.BrandDetail(it)) },
                     onGarageClick = { backStack.add(NavigationKeys.Garage()) },
+                    onCarClick = { backStack.add(NavigationKeys.CarDetail(it)) },
                     onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
                     onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
                     onProfileClick = { /* TODO add profile screen */ },
@@ -41,13 +43,14 @@ fun WheelVaultApp(modifier: Modifier = Modifier) {
 
             entry<NavigationKeys.BrandDetail> { (id) ->
                 BrandDetailScreen(
-                    id,
+                    brandId = id,
                     onBackClick = { backStack.removeLastOrNull() },
                     onProfileClick = { /* TODO add profile screen */ },
                     onGarageClick = { backStack.add(NavigationKeys.Garage()) },
                     onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
                     onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
                     onAddClick = { backStack.add(NavigationKeys.AddCamera) },
+                    onCarClick = { backStack.add(NavigationKeys.CarDetail(it)) },
                 )
             }
 
@@ -63,7 +66,19 @@ fun WheelVaultApp(modifier: Modifier = Modifier) {
                             backStack.add(NavigationKeys.Home)
                         }
                     },
+                    onCarClick = { backStack.add(NavigationKeys.CarDetail(it)) },
                     onAddClick = { backStack.add(NavigationKeys.AddCamera) },
+                )
+            }
+
+            entry<NavigationKeys.CarDetail> { (id) ->
+                CarDetailScreen(
+                    carId = id,
+                    onBackClick = { backStack.removeLastOrNull() },
+                    onProfileClick = { /* TODO add profile screen */ },
+                    onGarageClick = { backStack.add(NavigationKeys.Garage()) },
+                    onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
+                    onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
                 )
             }
         },

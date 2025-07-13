@@ -10,6 +10,7 @@ fun GarageScreen(
     onProfileClick: () -> Unit,
     onHomeClick: () -> Unit,
     onAddClick: () -> Unit,
+    onCarClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     // TODO add VM replace this fake
@@ -17,7 +18,7 @@ fun GarageScreen(
     val result = remember {
         List(10) {
             CarItem(
-                name = "Ford Mustang GTD",
+                model = "Ford Mustang GTD",
                 year = 2025,
                 manufacturer = "HotWheels",
                 quantity = 2,
@@ -35,6 +36,7 @@ fun GarageScreen(
         onHomeClick = onHomeClick,
         onSearch = {},
         onAddClick = onAddClick,
+        onCarClick = { onCarClick(it.id) },
         onToggleFavorite = { _, _ -> },
         onFavoritesClick = {},
         onStatisticsClick = {},

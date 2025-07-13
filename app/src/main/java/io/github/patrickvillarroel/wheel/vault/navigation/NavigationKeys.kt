@@ -14,6 +14,9 @@ sealed interface NavigationKeys {
     data class BrandDetail(val id: Int) : NavKey
 
     @Serializable
+    data class CarDetail(val id: Int) : NavKey
+
+    @Serializable
     data class Garage(val query: String? = null, val favorites: Boolean = false, val statistics: Boolean = false) :
         NavKey
 }

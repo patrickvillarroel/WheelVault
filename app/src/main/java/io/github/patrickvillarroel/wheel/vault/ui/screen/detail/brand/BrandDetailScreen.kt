@@ -15,6 +15,7 @@ fun BrandDetailScreen(
     onFavoritesClick: () -> Unit,
     onStatisticsClick: () -> Unit,
     onAddClick: () -> Unit,
+    onCarClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     // TODO simulate brand search with VM
@@ -25,7 +26,7 @@ fun BrandDetailScreen(
                 "En 1968, los coches de metal de Hot Wheels se diseñaron para revolucionar el mundo de los coches de juguete con el objetivo de ofrecer un diseño más detallado y un mejor rendimiento que los de la competencia. Cinco décadas más tarde, Hot Wheels es número 1 en ventas de juguetes en el mundo.\nHot Wheels se ha convertido en un referente tanto de la cultura automovilística como de la popular gracias a los eventos en directo, como el HW Legends Tour, a los eventos deportivos HW Superchargers y a las atracciones de los parques temáticos, así como a sus colaboraciones con algunas de las marcas más conocidas.",
                 List(10) {
                     CarItem(
-                        name = "Ford Mustang GTD",
+                        model = "Ford Mustang GTD",
                         year = 2025,
                         manufacturer = "HotWheels",
                         quantity = 2,
@@ -37,6 +38,7 @@ fun BrandDetailScreen(
         )
     }
     val (iconDetail, description, cars) = remember(brandId) { brands.getOrNull(brandId) ?: brands.first() }
+
     BrandDetailContent(
         iconDetail.second,
         iconDetail,
@@ -48,6 +50,7 @@ fun BrandDetailScreen(
         onFavoritesClick = onFavoritesClick,
         onStatisticsClick = onStatisticsClick,
         onAddClick = onAddClick,
+        onCarClick = { onCarClick(it.id) },
         modifier = modifier,
     )
 }

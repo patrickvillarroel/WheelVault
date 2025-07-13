@@ -38,6 +38,7 @@ fun BrandDetailContent(
     onFavoritesClick: () -> Unit,
     onStatisticsClick: () -> Unit,
     onAddClick: () -> Unit,
+    onCarClick: (CarItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -85,7 +86,12 @@ fun BrandDetailContent(
                 )
             }
             items(carCollection) { (car, onFavorite) ->
-                CarItemCard(car, onFavoriteToggle = onFavorite, Modifier.padding(bottom = 5.dp))
+                CarItemCard(
+                    carItem = car,
+                    onClick = { onCarClick(car) },
+                    onFavoriteToggle = onFavorite,
+                    Modifier.padding(bottom = 5.dp),
+                )
             }
         }
     }
@@ -102,7 +108,7 @@ private fun BrandPreview() {
             "En 1968, los coches de metal de Hot Wheels se diseñaron para revolucionar el mundo de los coches de juguete con el objetivo de ofrecer un diseño más detallado y un mejor rendimiento que los de la competencia. Cinco décadas más tarde, Hot Wheels es número 1 en ventas de juguetes en el mundo.\nHot Wheels se ha convertido en un referente tanto de la cultura automovilística como de la popular gracias a los eventos en directo, como el HW Legends Tour, a los eventos deportivos HW Superchargers y a las atracciones de los parques temáticos, así como a sus colaboraciones con algunas de las marcas más conocidas.",
             carCollection = listOf(
                 CarItem(
-                    name = "Ford Mustang GTD",
+                    model = "Ford Mustang GTD",
                     year = 2025,
                     manufacturer = "HotWheels",
                     quantity = 2,
@@ -116,6 +122,7 @@ private fun BrandPreview() {
             onGarageClick = {},
             onFavoritesClick = {},
             onAddClick = {},
+            onCarClick = {},
             onStatisticsClick = {},
         )
     }

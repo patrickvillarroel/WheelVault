@@ -34,6 +34,7 @@ fun GarageContent(
     onHomeClick: () -> Unit,
     onSearch: (String) -> Unit,
     onAddClick: () -> Unit,
+    onCarClick: (CarItem) -> Unit,
     onToggleFavorite: (Int, Boolean) -> Unit,
     onFavoritesClick: () -> Unit,
     onStatisticsClick: () -> Unit,
@@ -76,7 +77,12 @@ fun GarageContent(
                 )
             }
             items(carResults, key = { it.id }) { item ->
-                CarItemCard(item, onFavoriteToggle = { onToggleFavorite(item.id, it) }, Modifier.padding(3.dp))
+                CarItemCard(
+                    carItem = item,
+                    onClick = { onCarClick(item) },
+                    onFavoriteToggle = { onToggleFavorite(item.id, it) },
+                    Modifier.padding(3.dp),
+                )
             }
         }
     }
@@ -89,7 +95,7 @@ private fun GaragePreview() {
         GarageContent(
             List(10) {
                 CarItem(
-                    name = "Ford Mustang GTD",
+                    model = "Ford Mustang GTD",
                     year = 2025,
                     manufacturer = "HotWheels",
                     quantity = 2,
@@ -102,6 +108,7 @@ private fun GaragePreview() {
             onHomeClick = {},
             onSearch = {},
             onAddClick = {},
+            onCarClick = {},
             onToggleFavorite = { _, _ -> },
             onFavoritesClick = {},
             onStatisticsClick = {},
