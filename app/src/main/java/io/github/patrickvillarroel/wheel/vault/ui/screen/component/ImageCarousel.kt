@@ -1,7 +1,5 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.component
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,13 +14,12 @@ import androidx.compose.material3.carousel.HorizontalCenteredHeroCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 
 @Composable
-fun ImageCarousel(images: List<String>, modifier: Modifier = Modifier) {
+fun ImageCarousel(images: List<Any>, modifier: Modifier = Modifier) {
     val state = rememberCarouselState { images.size }
 
     HorizontalCenteredHeroCarousel(
@@ -33,7 +30,7 @@ fun ImageCarousel(images: List<String>, modifier: Modifier = Modifier) {
             .height(300.dp)
             .padding(5.dp),
     ) { page ->
-        Box(Modifier.background(color = Color(0xFF2C2930), shape = RoundedCornerShape(size = 15.dp))) {
+        Card(shape = RoundedCornerShape(size = 15.dp), modifier = Modifier.fillMaxSize()) {
             AsyncImage(
                 model = images[page],
                 contentDescription = "Image $page",
@@ -46,7 +43,7 @@ fun ImageCarousel(images: List<String>, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun HeroImageCarousel(images: List<String>, modifier: Modifier = Modifier) {
+fun HeroImageCarousel(images: List<Any>, modifier: Modifier = Modifier) {
     val pagerState = rememberPagerState { images.size }
 
     HorizontalPager(
