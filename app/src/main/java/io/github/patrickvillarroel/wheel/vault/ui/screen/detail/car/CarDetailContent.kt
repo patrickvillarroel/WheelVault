@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.ButtonGroupDefaults
@@ -19,18 +18,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BackTextButton
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.FavoriteIcon
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeroImageCarousel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuHeader
@@ -58,14 +55,7 @@ fun CarDetailContent(
                 onFavoritesClick = onFavoritesClick,
                 onStatisticsClick = onStatisticsClick,
             ) {
-                TextButton(onClick = onBack, modifier = Modifier.padding(top = 40.dp, start = 15.dp)) {
-                    Icon(
-                        Icons.AutoMirrored.Default.KeyboardArrowLeft,
-                        stringResource(R.string.back),
-                        tint = Color.Black,
-                    )
-                    Text(stringResource(R.string.back), color = Color.Black, fontWeight = FontWeight.Bold)
-                }
+                BackTextButton(onBack = onBack)
             }
         },
     ) { paddingValues ->
@@ -133,7 +123,7 @@ fun CarDetailContent(
                     Text(
                         text = "Cantidad: ${carDetail.quantity}",
                         style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Medium, // si quieres resaltar el número ligeramente
+                        fontWeight = FontWeight.Medium,
                     )
                     RaceDivider()
                 }
