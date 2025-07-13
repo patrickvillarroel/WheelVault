@@ -1,33 +1,25 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.component
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,56 +28,26 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
-import kotlinx.coroutines.launch
 
 @Composable
-fun CarItemCard(carItem: CarItem, onFavoriteToggle: (Boolean) -> Unit, modifier: Modifier = Modifier) {
-    var isFavorite by remember { mutableStateOf(carItem.isFavorite) }
-
-    // Animaciones
-    val starColor by animateColorAsState(
-        targetValue = if (isFavorite) Color.Yellow else Color.Gray,
-        animationSpec = tween(durationMillis = 1000),
-    )
-
-    val scale by animateFloatAsState(
-        targetValue = if (isFavorite) 1.3f else 1f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow,
-        ),
-    )
-
-    val rotation = remember { Animatable(0f) }
-    val alpha = remember { Animatable(1f) }
-
-    LaunchedEffect(isFavorite) {
-        if (isFavorite) {
-            launch {
-                rotation.animateTo(
-                    targetValue = 360f,
-                    animationSpec = tween(durationMillis = 600, easing = FastOutSlowInEasing),
-                )
-                rotation.snapTo(0f)
-            }
-            launch {
-                alpha.animateTo(0.5f, animationSpec = tween(150))
-                alpha.animateTo(1f, animationSpec = tween(150))
-            }
-        }
-    }
-
-    Box(
-        modifier
-            .background(Color(0xFF3A3540), shape = RoundedCornerShape(16.dp))
-            .padding(8.dp),
+fun CarItemCard(
+    carItem: CarItem,
+    onClick: () -> Unit,
+    onFavoriteToggle: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier,
+        onClick = onClick,
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF3A3540)),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
         ) {
             AsyncImage(
                 model = carItem.imageUrl,
-                contentDescription = carItem.name,
+                contentDescription = carItem.model,
                 modifier = Modifier
                     .size(100.dp)
                     .align(Alignment.CenterVertically)
@@ -101,31 +63,15 @@ fun CarItemCard(carItem: CarItem, onFavoriteToggle: (Boolean) -> Unit, modifier:
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(
-                        text = carItem.name,
+                        text = carItem.model,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
                         fontSize = 16.sp,
                     )
-
-                    IconButton(
-                        onClick = {
-                            isFavorite = !isFavorite
-                            onFavoriteToggle(isFavorite)
-                        },
-                        modifier = Modifier
-                            .scale(scale)
-                            .graphicsLayer(
-                                rotationZ = rotation.value,
-                                alpha = alpha.value,
-                            ),
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = "Favorito",
-                            tint = starColor,
-                            modifier = Modifier.size(24.dp),
-                        )
-                    }
+                    FavoriteIcon(
+                        isFavorite = carItem.isFavorite,
+                        onFavoriteToggle = onFavoriteToggle,
+                    )
                 }
 
                 HorizontalDivider(modifier = Modifier.height(4.dp), color = Color(0xFFE42E31))
@@ -158,16 +104,19 @@ fun CarItemCard(carItem: CarItem, onFavoriteToggle: (Boolean) -> Unit, modifier:
 private fun CardItemPreview() {
     val car = remember {
         CarItem(
-            name = "Ford Mustang GTD",
+            model = "Ford Mustang GTD",
             year = 2025,
+            brand = "Hot Wheels",
             manufacturer = "HotWheels",
             quantity = 2,
-            imageUrl = "https://tse1.mm.bing.net/th/id/OIP.zfsbW7lEIwYgeUt7Fd1knwHaHg?rs=1&pid=ImgDetMain&o=7&rm=3",
+            images = listOf(
+                "https://tse1.mm.bing.net/th/id/OIP.zfsbW7lEIwYgeUt7Fd1knwHaHg?rs=1&pid=ImgDetMain&o=7&rm=3",
+            ),
             isFavorite = true,
         )
     }
 
     WheelVaultTheme {
-        CarItemCard(carItem = car, onFavoriteToggle = {}, modifier = Modifier.padding(16.dp))
+        CarItemCard(carItem = car, onClick = {}, onFavoriteToggle = {}, modifier = Modifier.padding(16.dp))
     }
 }
