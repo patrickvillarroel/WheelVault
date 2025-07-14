@@ -49,6 +49,7 @@ fun CarItemCard(
                 model = carItem.imageUrl,
                 contentDescription = carItem.model,
                 modifier = Modifier
+                    .padding(start = 10.dp)
                     .size(100.dp)
                     .align(Alignment.CenterVertically)
                     .clip(RoundedCornerShape(8.dp)),

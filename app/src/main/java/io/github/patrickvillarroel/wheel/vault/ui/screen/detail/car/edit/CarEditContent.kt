@@ -1,13 +1,13 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.edit
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
@@ -19,6 +19,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,7 +37,6 @@ import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BackTextButton
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.FavoriteIcon
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeroImageCarousel
-import io.github.patrickvillarroel.wheel.vault.ui.screen.component.ImageCarousel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuHeader
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.RedOutlinedTextField
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
@@ -65,125 +65,113 @@ fun CarEditContent(
     var categoria by rememberSaveable { mutableStateOf(carDetailPartial.category ?: "") }
     val imagenes by rememberSaveable { mutableStateOf(carDetailPartial.images) }
 
-    Scaffold(modifier = modifier.fillMaxSize(), topBar = {
-        MenuHeader(onProfileClick, onGarageClick, onFavoritesClick, onStatisticsClick) {
-            BackTextButton(onBackClick)
-        }
-    }) { paddingValues ->
-        Column(
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            MenuHeader(onProfileClick, onGarageClick, onFavoritesClick, onStatisticsClick) {
+                BackTextButton(onBackClick)
+            }
+        },
+    ) { paddingValues ->
+        LazyColumn(
             Modifier
                 .padding(paddingValues)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .padding(start = 16.dp, end = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(3.dp),
         ) {
-            HeroImageCarousel(imagenes)
-            LazyColumn(
-                Modifier
-                    .fillMaxSize()
-                    .padding(start = 16.dp, end = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(3.dp),
-            ) {
-                item {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text(
-                            text = if (isEditAction) "Editar Carrito" else "Agregar Carrito",
-                            style = MaterialTheme.typography.headlineSmall,
-                            modifier = Modifier.padding(top = 16.dp),
-                        )
-                        FavoriteIcon(carDetailPartial.isFavorite, onFavoriteToggle = {
-                            car = car.copy(isFavorite = it)
-                        })
-                    }
+            item { HeroImageCarousel(imagenes) }
+            item {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(
+                        text = if (isEditAction) "Editar Carrito" else "Agregar Carrito",
+                        style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier.padding(top = 16.dp),
+                    )
+                    FavoriteIcon(carDetailPartial.isFavorite, onFavoriteToggle = {
+                        car = car.copy(isFavorite = it)
+                    })
                 }
+            }
 
-                item {
-                    RedOutlinedTextField(marca, {
-                        marca = it
-                        car = car.copy(brand = it)
-                    }, "Marca")
-                }
-                item {
-                    RedOutlinedTextField(modelo, {
-                        modelo = it
-                        car = car.copy(model = it)
-                    }, "Modelo")
-                }
-                item {
-                    RedOutlinedTextField(descripcion, {
-                        descripcion = it
-                        car = car.copy(description = it)
-                    }, "Descripción")
-                }
+            item {
+                RedOutlinedTextField(marca, {
+                    marca = it
+                    car = car.copy(brand = it)
+                }, "Marca")
+            }
+            item {
+                RedOutlinedTextField(modelo, {
+                    modelo = it
+                    car = car.copy(model = it)
+                }, "Modelo")
+            }
+            item {
+                RedOutlinedTextField(descripcion, {
+                    descripcion = it
+                    car = car.copy(description = it)
+                }, "Descripción")
+            }
 
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        RedOutlinedTextField(manufacturer, {
-                            manufacturer = it
-                            car = car.copy(manufacturer = it)
-                        }, "Manufactura", Modifier.weight(1f))
-                        RedOutlinedTextField(
-                            cantidad,
-                            {
-                                cantidad = it
-                                car = car.copy(quantity = it.toIntOrNull() ?: 0)
-                            },
-                            "Cantidad",
-                            Modifier.weight(1f),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        )
-                    }
-                }
-
-                item {
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    RedOutlinedTextField(manufacturer, {
+                        manufacturer = it
+                        car = car.copy(manufacturer = it)
+                    }, "Manufactura", Modifier.weight(1f))
                     RedOutlinedTextField(
-                        categoria,
+                        cantidad,
                         {
-                            categoria = it
-                            car = car.copy(category = it)
+                            cantidad = it
+                            car = car.copy(quantity = it.toIntOrNull() ?: 0)
                         },
-                        "Categoría",
+                        "Cantidad",
+                        Modifier.weight(1f),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     )
                 }
+            }
 
-                item {
-                    Spacer(Modifier.height(8.dp))
-                    Text("Imágenes Extra", color = Color.White)
-                    ImageCarousel(images = imagenes)
+            item {
+                RedOutlinedTextField(
+                    categoria,
+                    {
+                        categoria = it
+                        car = car.copy(category = it)
+                    },
+                    "Categoría",
+                )
+            }
+
+            item {
+                Spacer(Modifier.height(8.dp))
+                Text("Imágenes Extra")
+                Button(
+                    // car = car.copy(images = car.images + onAddPictureClick(imagenes))
+                    onClick = { /* TODO Lanzar modal o dropdown menu elegir camara o galeria, lanzar el intent */ },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                    modifier = Modifier.padding(vertical = 8.dp),
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = null, tint = Color.White)
+                    Spacer(Modifier.width(4.dp))
+                    Text("Agregar", color = Color.White)
                 }
+            }
 
-                item {
-                    Button(
-                        // car = car.copy(images = car.images + onAddPictureClick(imagenes))
-                        onClick = { /* TODO Lanzar modal o dropdown menu elegir camara o galeria, lanzar el intent */ },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                        modifier = Modifier.padding(vertical = 8.dp),
-                    ) {
-                        Icon(Icons.Default.Add, contentDescription = null, tint = Color.White)
-                        Spacer(Modifier.width(4.dp))
-                        Text("Agregar", color = Color.White)
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                ) {
+                    OutlinedButton(onClick = { /* TODO Add cancel confirm modal */ }) {
+                        Icon(Icons.Default.Close, null, Modifier.size(32.dp))
                     }
-                }
 
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                    ) {
-                        Button(
-                            onClick = { /* TODO Add cancel confirm modal */ },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),
-                        ) {
-                            Icon(Icons.Default.Close, contentDescription = null, tint = Color.White)
-                        }
-
-                        Button(
-                            onClick = { onConfirmClick(carDetailPartial) },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                        ) {
-                            Icon(Icons.Default.Check, contentDescription = null, tint = Color.White)
-                        }
+                    OutlinedButton(onClick = { onConfirmClick(carDetailPartial) }) {
+                        Icon(Icons.Default.Check, null, Modifier.size(32.dp), Color.Red)
                     }
                 }
             }
