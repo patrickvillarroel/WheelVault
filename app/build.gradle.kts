@@ -81,7 +81,6 @@ dependencies {
     implementation(libs.compose.material3)
     implementation(libs.compose.material.icons.extended)
     implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.activity.compose)
@@ -90,16 +89,13 @@ dependencies {
 
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.androidx.startup)
-    implementation(libs.koin.compose)
     implementation(libs.koin.compose.viewmodel)
 
     implementation(libs.coil.compose)
-    implementation(libs.coil.okhttp)
-    implementation(libs.retrofit)
+    implementation(libs.coil.ktor3)
 
-    implementation(libs.datastore.preferences)
-    implementation(libs.room.runtime)
-    ksp(libs.room.compiler)
+    implementation(platform(libs.supabase.bom))
+    implementation(libs.supabase.compose.auth.ui)
 
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
@@ -107,11 +103,9 @@ dependencies {
     implementation(libs.androidx.camera.mlkit.vision)
     implementation(libs.text.recognition)
 
-    testImplementation(libs.junit)
-    testImplementation(libs.konsist)
-
-    androidTestImplementation(platform(libs.compose.bom))
-    androidTestImplementation(libs.androidx.test.junit)
+    implementation(libs.datastore.preferences)
+    implementation(libs.room.runtime)
+    ksp(libs.room.compiler)
 
     debugImplementation(platform(libs.compose.bom))
     debugImplementation(libs.compose.ui.tooling)
@@ -121,5 +115,5 @@ dependencies {
 }
 
 ktlint {
-    version.set(libs.versions.ktlint.pinterest.get())
+    version.set(libs.versions.ktlint.core.get())
 }
