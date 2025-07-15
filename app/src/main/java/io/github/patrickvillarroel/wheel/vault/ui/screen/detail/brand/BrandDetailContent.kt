@@ -1,5 +1,9 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.detail.brand
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,6 +32,9 @@ import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 // TODO move parameters into data class, carCollection is not immutable
 @Composable
 fun BrandDetailContent(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    sharedKey: Any,
     brandName: String,
     brandIconDetail: Pair<Int, String>,
     description: String,
@@ -41,54 +48,59 @@ fun BrandDetailContent(
     onCarClick: (CarItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            BrandHeader(
-                icon = brandIconDetail,
-                onBackClick = onBackClick,
-                onProfileClick = onProfileClick,
-                onGarageClick = onGarageClick,
-                onFavoritesClick = onFavoritesClick,
-                onStatisticsClick = onStatisticsClick,
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = onAddClick, containerColor = Color(0xFFE42E31)) {
-                Icon(Icons.Filled.Add, stringResource(R.string.add), tint = Color.Black)
-            }
-        },
-    ) { paddingValues ->
-        LazyColumn(Modifier.padding(paddingValues).fillMaxSize().padding(top = 15.dp, start = 15.dp, end = 15.dp)) {
-            item {
-                Text(
-                    "Info $brandName",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
+    with(sharedTransitionScope) {
+        Scaffold(
+            modifier = modifier.fillMaxSize(),
+            topBar = {
+                BrandHeader(
+                    icon = brandIconDetail,
+                    onBackClick = onBackClick,
+                    onProfileClick = onProfileClick,
+                    onGarageClick = onGarageClick,
+                    onFavoritesClick = onFavoritesClick,
+                    onStatisticsClick = onStatisticsClick,
+                    Modifier.sharedBounds(rememberSharedContentState(sharedKey), animatedVisibilityScope),
                 )
-            }
-            item {
-                Text(
-                    description,
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Justify,
-                )
-            }
-            item {
-                Text(
-                    "Carritos en la colección:",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(top = 10.dp),
-                )
-            }
-            items(carCollection) { (car, onFavorite) ->
-                CarItemCard(
-                    carItem = car,
-                    onClick = { onCarClick(car) },
-                    onFavoriteToggle = onFavorite,
-                    Modifier.padding(bottom = 7.dp),
-                )
+            },
+            floatingActionButton = {
+                FloatingActionButton(onClick = onAddClick, containerColor = Color(0xFFE42E31)) {
+                    Icon(Icons.Filled.Add, stringResource(R.string.add), tint = Color.Black)
+                }
+            },
+        ) { paddingValues ->
+            LazyColumn(Modifier.padding(paddingValues).fillMaxSize().padding(top = 15.dp, start = 15.dp, end = 15.dp)) {
+                item {
+                    Text(
+                        "Info $brandName",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+                item {
+                    Text(
+                        description,
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Justify,
+                    )
+                }
+                item {
+                    Text(
+                        "Carritos en la colección:",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(top = 10.dp),
+                    )
+                }
+                items(carCollection) { (car, onFavorite) ->
+                    CarItemCard(
+                        carItem = car,
+                        onClick = { onCarClick(car) },
+                        onFavoriteToggle = onFavorite,
+                        modifier = Modifier
+                            .padding(bottom = 7.dp)
+                            .sharedBounds(rememberSharedContentState("car-${car.id}"), animatedVisibilityScope),
+                    )
+                }
             }
         }
     }
@@ -98,29 +110,36 @@ fun BrandDetailContent(
 @Composable
 private fun BrandPreview() {
     WheelVaultTheme {
-        BrandDetailContent(
-            "Hot Wheels",
-            R.drawable.hot_wheels_logo_black to "Hot Wheels Logo",
-            description =
-            "En 1968, los coches de metal de Hot Wheels se diseñaron para revolucionar el mundo de los coches de juguete con el objetivo de ofrecer un diseño más detallado y un mejor rendimiento que los de la competencia. Cinco décadas más tarde, Hot Wheels es número 1 en ventas de juguetes en el mundo.\nHot Wheels se ha convertido en un referente tanto de la cultura automovilística como de la popular gracias a los eventos en directo, como el HW Legends Tour, a los eventos deportivos HW Superchargers y a las atracciones de los parques temáticos, así como a sus colaboraciones con algunas de las marcas más conocidas.",
-            carCollection = listOf(
-                CarItem(
-                    model = "Ford Mustang GTD",
-                    year = 2025,
-                    manufacturer = "HotWheels",
-                    quantity = 2,
-                    imageUrl =
-                    "https://tse1.mm.bing.net/th/id/OIP.zfsbW7lEIwYgeUt7Fd1knwHaHg?rs=1&pid=ImgDetMain&o=7&rm=3",
-                    isFavorite = true,
-                ) to {},
-            ),
-            onBackClick = {},
-            onProfileClick = {},
-            onGarageClick = {},
-            onFavoritesClick = {},
-            onAddClick = {},
-            onCarClick = {},
-            onStatisticsClick = {},
-        )
+        SharedTransitionLayout {
+            AnimatedVisibility(true) {
+                BrandDetailContent(
+                    this@SharedTransitionLayout,
+                    this,
+                    "brand-0",
+                    "Hot Wheels",
+                    R.drawable.hot_wheels_logo_black to "Hot Wheels Logo",
+                    description =
+                    "En 1968, los coches de metal de Hot Wheels se diseñaron para revolucionar el mundo de los coches de juguete con el objetivo de ofrecer un diseño más detallado y un mejor rendimiento que los de la competencia. Cinco décadas más tarde, Hot Wheels es número 1 en ventas de juguetes en el mundo.\nHot Wheels se ha convertido en un referente tanto de la cultura automovilística como de la popular gracias a los eventos en directo, como el HW Legends Tour, a los eventos deportivos HW Superchargers y a las atracciones de los parques temáticos, así como a sus colaboraciones con algunas de las marcas más conocidas.",
+                    carCollection = listOf(
+                        CarItem(
+                            model = "Ford Mustang GTD",
+                            year = 2025,
+                            manufacturer = "HotWheels",
+                            quantity = 2,
+                            imageUrl =
+                            "https://tse1.mm.bing.net/th/id/OIP.zfsbW7lEIwYgeUt7Fd1knwHaHg?rs=1&pid=ImgDetMain&o=7&rm=3",
+                            isFavorite = true,
+                        ) to {},
+                    ),
+                    onBackClick = {},
+                    onProfileClick = {},
+                    onGarageClick = {},
+                    onFavoritesClick = {},
+                    onAddClick = {},
+                    onCarClick = {},
+                    onStatisticsClick = {},
+                )
+            }
+        }
     }
 }

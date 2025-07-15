@@ -20,6 +20,7 @@ kotlin {
         optIn.addAll(
             "androidx.compose.material3.ExperimentalMaterial3Api",
             "androidx.compose.material3.ExperimentalMaterial3ExpressiveApi",
+            "androidx.compose.animation.ExperimentalSharedTransitionApi",
         )
         jvmTarget.set(JvmTarget.JVM_11)
     }

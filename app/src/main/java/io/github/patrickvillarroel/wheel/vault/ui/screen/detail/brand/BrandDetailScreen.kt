@@ -1,5 +1,7 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.detail.brand
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -8,6 +10,8 @@ import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 
 @Composable
 fun BrandDetailScreen(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     brandId: Int,
     onBackClick: () -> Unit,
     onProfileClick: () -> Unit,
@@ -40,8 +44,11 @@ fun BrandDetailScreen(
     val (iconDetail, description, cars) = remember(brandId) { brands.getOrNull(brandId) ?: brands.first() }
 
     BrandDetailContent(
-        iconDetail.second,
-        iconDetail,
+        sharedTransitionScope = sharedTransitionScope,
+        animatedVisibilityScope = animatedVisibilityScope,
+        sharedKey = "brand-$brandId",
+        brandName = iconDetail.second,
+        brandIconDetail = iconDetail,
         description = description,
         carCollection = cars,
         onBackClick = onBackClick,

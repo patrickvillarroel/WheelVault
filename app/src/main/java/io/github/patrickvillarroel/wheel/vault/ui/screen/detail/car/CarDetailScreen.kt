@@ -1,5 +1,7 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -7,6 +9,8 @@ import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 
 @Composable
 fun CarDetailScreen(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     carId: Int,
     onBackClick: () -> Unit,
     onProfileClick: () -> Unit,
@@ -38,6 +42,9 @@ fun CarDetailScreen(
     val carDetail = remember(carId) { cars.getOrNull(carId) ?: cars.first() }
 
     CarDetailContent(
+        sharedTransitionScope = sharedTransitionScope,
+        animatedVisibilityScope = animatedVisibilityScope,
+        carId = carId,
         carDetail = carDetail,
         onBack = onBackClick,
         onProfileClick = onProfileClick,

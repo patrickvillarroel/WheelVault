@@ -1,5 +1,9 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.garage
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,6 +33,8 @@ import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
 fun GarageContent(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     carResults: List<CarItem>,
     onProfileClick: () -> Unit,
     onHomeClick: () -> Unit,
@@ -67,22 +73,26 @@ fun GarageContent(
             }
         },
     ) { paddingValues ->
-        LazyColumn(Modifier.padding(paddingValues).fillMaxSize().padding(start = 15.dp, end = 15.dp)) {
-            item {
-                Text(
-                    stringResource(R.string.garage),
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(top = 15.dp, start = 15.dp, bottom = 5.dp),
-                )
-            }
-            items(carResults, key = { it.id }) { item ->
-                CarItemCard(
-                    carItem = item,
-                    onClick = { onCarClick(item) },
-                    onFavoriteToggle = { onToggleFavorite(item.id, it) },
-                    Modifier.padding(3.dp),
-                )
+        with(sharedTransitionScope) {
+            LazyColumn(Modifier.padding(paddingValues).fillMaxSize().padding(start = 15.dp, end = 15.dp)) {
+                item {
+                    Text(
+                        stringResource(R.string.garage),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(top = 15.dp, start = 15.dp, bottom = 5.dp),
+                    )
+                }
+                items(carResults, key = { it.id }) { item ->
+                    CarItemCard(
+                        carItem = item,
+                        onClick = { onCarClick(item) },
+                        onFavoriteToggle = { onToggleFavorite(item.id, it) },
+                        modifier = Modifier
+                            .padding(3.dp)
+                            .sharedBounds(rememberSharedContentState("car-${item.id}"), animatedVisibilityScope),
+                    )
+                }
             }
         }
     }
@@ -92,26 +102,32 @@ fun GarageContent(
 @Composable
 private fun GaragePreview() {
     WheelVaultTheme {
-        GarageContent(
-            List(10) {
-                CarItem(
-                    model = "Ford Mustang GTD",
-                    year = 2025,
-                    manufacturer = "HotWheels",
-                    quantity = 2,
-                    imageUrl =
-                    "https://tse1.mm.bing.net/th/id/OIP.zfsbW7lEIwYgeUt7Fd1knwHaHg?rs=1&pid=ImgDetMain&o=7&rm=3",
-                    isFavorite = true,
+        SharedTransitionLayout {
+            AnimatedVisibility(true) {
+                GarageContent(
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    animatedVisibilityScope = this,
+                    carResults = List(10) {
+                        CarItem(
+                            model = "Ford Mustang GTD",
+                            year = 2025,
+                            manufacturer = "HotWheels",
+                            quantity = 2,
+                            imageUrl =
+                            "https://tse1.mm.bing.net/th/id/OIP.zfsbW7lEIwYgeUt7Fd1knwHaHg?rs=1&pid=ImgDetMain&o=7&rm=3",
+                            isFavorite = true,
+                        )
+                    },
+                    onProfileClick = {},
+                    onHomeClick = {},
+                    onSearch = {},
+                    onAddClick = {},
+                    onCarClick = {},
+                    onToggleFavorite = { _, _ -> },
+                    onFavoritesClick = {},
+                    onStatisticsClick = {},
                 )
-            },
-            onProfileClick = {},
-            onHomeClick = {},
-            onSearch = {},
-            onAddClick = {},
-            onCarClick = {},
-            onToggleFavorite = { _, _ -> },
-            onFavoritesClick = {},
-            onStatisticsClick = {},
-        )
+            }
+        }
     }
 }

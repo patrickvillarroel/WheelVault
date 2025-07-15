@@ -1,5 +1,7 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.garage
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -7,6 +9,8 @@ import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 
 @Composable
 fun GarageScreen(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     onProfileClick: () -> Unit,
     onHomeClick: () -> Unit,
     onAddClick: () -> Unit,
@@ -31,7 +35,9 @@ fun GarageScreen(
 
     // TODO replace all clicks with VM
     GarageContent(
-        result,
+        sharedTransitionScope = sharedTransitionScope,
+        animatedVisibilityScope = animatedVisibilityScope,
+        carResults = result,
         onProfileClick = onProfileClick,
         onHomeClick = onHomeClick,
         onSearch = {},

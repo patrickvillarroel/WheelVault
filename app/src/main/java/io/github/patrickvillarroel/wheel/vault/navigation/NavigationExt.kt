@@ -1,8 +1,15 @@
 /** This file contain a extension only callable in [EntryProviderBuilder] to convert a domain model to navigation model */
 package io.github.patrickvillarroel.wheel.vault.navigation
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.ContentTransform
+import androidx.compose.runtime.Composable
 import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entry
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
+import androidx.navigation3.ui.NavDisplay
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 
 /** Extension function to convert a [CarItem] to a [NavigationKeys.CarEdit], only callable in a [EntryProviderBuilder] */
@@ -40,5 +47,41 @@ fun NavigationKeys.CarEdit.toCarPartial(): CarItem.Partial {
         images = partial.images,
         description = partial.description,
         category = partial.category,
+    )
+}
+
+/**
+ * Add entry provider to [EntryProviderBuilder].
+ *
+ * @param T the type of the key for this NavEntry
+ * @param transitionSpec the transition spec for this entry. See [NavDisplay.transitionSpec].
+ * @param popTransitionSpec the transition spec when popping this entry from backstack.
+ * See [NavDisplay.popTransitionSpec].
+ * @param predictivePopTransitionSpec the transition spec when popping this entry from backstack using the predictive back gesture.
+ * See [NavDisplay.predictivePopTransitionSpec].
+ * @param metadata provides information to the display
+ * @param content content for this entry to be displayed when this entry is active with [AnimatedContentScope] of [LocalNavAnimatedContentScope].
+ */
+inline fun <reified T : NavKey> EntryProviderBuilder<*>.entry(
+    noinline transitionSpec: (AnimatedContentTransitionScope<*>.() -> ContentTransform?)? = null,
+    noinline popTransitionSpec: (AnimatedContentTransitionScope<*>.() -> ContentTransform?)? = null,
+    noinline predictivePopTransitionSpec: (AnimatedContentTransitionScope<*>.() -> ContentTransform?)? = null,
+    metadata: Map<String, Any> = emptyMap(),
+    noinline content: @Composable AnimatedContentScope.(T) -> Unit,
+) {
+    val metadata = buildMap {
+        putAll(metadata)
+        transitionSpec?.let { putAll(NavDisplay.transitionSpec(transitionSpec)) }
+        popTransitionSpec?.let { putAll(NavDisplay.popTransitionSpec(popTransitionSpec)) }
+        predictivePopTransitionSpec?.let { putAll(NavDisplay.predictivePopTransitionSpec(predictivePopTransitionSpec)) }
+    }
+
+    this.entry<T>(
+        metadata = metadata,
+        content = { entry ->
+            with(LocalNavAnimatedContentScope.current) {
+                content(entry)
+            }
+        },
     )
 }
