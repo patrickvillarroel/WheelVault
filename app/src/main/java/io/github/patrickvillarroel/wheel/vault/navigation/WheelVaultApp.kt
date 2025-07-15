@@ -1,5 +1,8 @@
 package io.github.patrickvillarroel.wheel.vault.navigation
 
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -19,10 +22,17 @@ fun WheelVaultApp(modifier: Modifier = Modifier) {
     val backStack = rememberNavBackStack(NavigationKeys.Home)
 
     NavDisplay(
-        modifier = modifier.fillMaxSize(),
         backStack = backStack,
+        modifier = modifier.fillMaxSize(),
+        onBack = { backStack.removeLastOrNull() },
+        transitionSpec = {
+            ContentTransform(slideInHorizontally { it }, slideOutHorizontally())
+        },
+        popTransitionSpec = {
+            ContentTransform(slideInHorizontally(), slideOutHorizontally { it })
+        },
         entryProvider = entryProvider {
-            entry<NavigationKeys.Home> {
+            entry<NavigationKeys.Home> { _ ->
                 HomeScreen(
                     onAddClick = { backStack.add(NavigationKeys.AddCamera) },
                     onSearchClick = { backStack.add(NavigationKeys.Garage("")) },
@@ -35,7 +45,7 @@ fun WheelVaultApp(modifier: Modifier = Modifier) {
                 )
             }
 
-            entry<NavigationKeys.AddCamera> {
+            entry<NavigationKeys.AddCamera> { _ ->
                 CameraLensScreen(
                     onBack = { backStack.removeLastOrNull() },
                     // TODO send more data like picture or save a partial in DB

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
@@ -19,7 +18,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -166,12 +164,18 @@ fun CarEditContent(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
-                    OutlinedButton(onClick = { /* TODO Add cancel confirm modal */ }) {
-                        Icon(Icons.Default.Close, null, Modifier.size(32.dp))
+                    Button(
+                        onClick = { /* TODO Add cancel confirm modal */ },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),
+                    ) {
+                        Icon(Icons.Default.Close, null, tint = Color.White)
                     }
 
-                    OutlinedButton(onClick = { onConfirmClick(carDetailPartial) }) {
-                        Icon(Icons.Default.Check, null, Modifier.size(32.dp), Color.Red)
+                    Button(
+                        onClick = { onConfirmClick(carDetailPartial) },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                    ) {
+                        Icon(Icons.Default.Check, null, tint = Color.White)
                     }
                 }
             }
@@ -193,7 +197,7 @@ private fun EditPreview() {
             onFavoritesClick = {},
             onStatisticsClick = {},
             onConfirmClick = {},
-            onAddPictureClick = { "image1.jpg" },
+            onAddPictureClick = {},
             isEditAction = true,
         )
     }
