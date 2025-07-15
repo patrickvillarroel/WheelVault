@@ -1,153 +1,76 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.login
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.github.jan.supabase.compose.auth.ui.AuthForm
-import io.github.jan.supabase.compose.auth.ui.LocalAuthState
+import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.compose.auth.ui.annotations.AuthUiExperimental
-import io.github.jan.supabase.compose.auth.ui.email.OutlinedEmailField
-import io.github.jan.supabase.compose.auth.ui.password.OutlinedPasswordField
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @OptIn(AuthUiExperimental::class)
 @Composable
-fun LoginContent(onLoginClick: () -> Unit, modifier: Modifier = Modifier) {
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        containerColor = Color(0xFF1D1B20),
-    ) { paddingValues ->
-        Box(
-            Modifier
-                .padding(paddingValues)
-                .fillMaxSize(),
+fun LoginContent(
+    onLoginWithEmailClick: () -> Unit,
+    onLoginWithGoogleClick: () -> Unit,
+    onRegisterClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Scaffold(modifier.fillMaxSize()) { paddingValues ->
+        Column(
+            Modifier.padding(paddingValues).fillMaxSize().padding(25.dp),
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            Image(painterResource(R.drawable.helmet_icon), "Logo", Modifier.size(50.dp))
+            Spacer(Modifier.height(20.dp))
             Text(
                 stringResource(R.string.collectors_project_lines),
+                Modifier.padding(bottom = 60.dp),
                 style = MaterialTheme.typography.displayLargeEmphasized,
                 textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.TopCenter)
-                    .padding(top = 20.dp),
-                color = Color.White,
             )
 
-            Text(
-                "Iniciar Sesión",
-                style = MaterialTheme.typography.headlineLarge,
-                color = Color.White,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.TopCenter)
-                    .offset(y = 170.dp),
-            )
-
-            Box(
-                Modifier
-                    .width(268.dp)
-                    .height(265.dp)
-                    .align(Alignment.Center),
+            Button(
+                onRegisterClick,
+                Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935)),
             ) {
-                Box(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(top = 40.dp)
-                        .background(Color(0xFFE53935), RoundedCornerShape(size = 20.dp)),
-                ) {
-                    AuthForm {
-                        val state = LocalAuthState.current
-                        Column(Modifier.padding(10.dp)) {
-                            OutlinedEmailField(
-                                email,
-                                onValueChange = { email = it },
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = Color.Black,
-                                    unfocusedBorderColor = Color.Black,
-                                ),
-                                label = { Text("Correo electrónico", color = Color.White) },
-                            )
+                Text("Register", color = Color.White, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
+            }
 
-                            OutlinedPasswordField(
-                                password,
-                                onValueChange = { password = it },
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = Color.Black,
-                                    unfocusedBorderColor = Color.Black,
-                                ),
-                                label = { Text("Contraseña", color = Color.White) },
-                            )
+            OutlinedButton(onClick = onLoginWithGoogleClick, Modifier.fillMaxWidth()) {
+                ProviderButton(Google)
+            }
 
-                            Button(
-                                onClick = onLoginClick,
-                                enabled = state.validForm,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color.Black,
-                                    disabledContainerColor = Color.Gray,
-                                ),
-                                modifier = Modifier.align(Alignment.CenterHorizontally),
-                            ) {
-                                Text("Ingresar", style = MaterialTheme.typography.labelLarge, color = Color.White)
-                            }
-                        }
-                    }
-                }
-
-                Card(
-                    shape = CircleShape,
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    modifier = Modifier
-                        .size(80.dp)
-                        .align(Alignment.TopCenter)
-                        .offset(y = (-30).dp),
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.helmet_icon),
-                        contentDescription = "Helmet Icon",
-                        modifier = Modifier
-                            .size(60.dp)
-                            .weight(1f)
-                            .align(Alignment.CenterHorizontally),
-                        contentScale = ContentScale.Fit,
-                    )
-                }
+            OutlinedButton(onLoginWithEmailClick, Modifier.padding(bottom = 50.dp).fillMaxWidth()) {
+                Icon(Icons.Filled.Email, "Email")
+                Text("Continue with email", Modifier.weight(1f), textAlign = TextAlign.Center)
             }
         }
     }
@@ -157,6 +80,6 @@ fun LoginContent(onLoginClick: () -> Unit, modifier: Modifier = Modifier) {
 @Composable
 private fun LoginPreview() {
     WheelVaultTheme {
-        LoginContent(onLoginClick = {})
+        LoginContent(onLoginWithEmailClick = {}, onLoginWithGoogleClick = {}, onRegisterClick = {})
     }
 }

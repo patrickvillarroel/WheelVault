@@ -135,6 +135,7 @@ room-compiler = { group = "androidx.room", name = "room-compiler", version.ref =
 
 # supabase
 supabase-bom = { group = "io.github.jan-tennert.supabase", name = "bom", version.ref = "supabase-kt" }
+supabase-auth = { group = "io.github.jan-tennert.supabase", name = "auth-kt" }
 supabase-compose-auth-ui = { group = "io.github.jan-tennert.supabase", name = "compose-auth-ui" }
 
 # android specific

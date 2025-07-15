@@ -35,4 +35,7 @@ sealed interface NavigationKeys {
 
     @Serializable
     data object Login : NavKey
+
+    @Serializable
+    data class LoginWithEmail(val isRegister: Boolean) : NavKey
 }

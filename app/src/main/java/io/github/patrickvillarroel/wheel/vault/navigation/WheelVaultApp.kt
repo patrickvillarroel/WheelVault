@@ -17,6 +17,7 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.edit.CarEdit
 import io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.home.HomeScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.login.LoginScreen
+import io.github.patrickvillarroel.wheel.vault.ui.screen.login.LoginWithEmailScreen
 
 @Composable
 fun WheelVaultApp(modifier: Modifier = Modifier) {
@@ -36,6 +37,18 @@ fun WheelVaultApp(modifier: Modifier = Modifier) {
             entryProvider = entryProvider {
                 entry<NavigationKeys.Login> { _ ->
                     LoginScreen(
+                        onLoginSuccess = {
+                            backStack.remove(NavigationKeys.Login)
+                            backStack.add(NavigationKeys.Home)
+                        },
+                        onLoginWithEmailClick = { backStack.add(NavigationKeys.LoginWithEmail(isRegister = false)) },
+                        onRegisterClick = { backStack.add(NavigationKeys.LoginWithEmail(isRegister = true)) },
+                    )
+                }
+
+                entry<NavigationKeys.LoginWithEmail> { (isRegister) ->
+                    LoginWithEmailScreen(
+                        isRegister = isRegister,
                         onLoginSuccess = {
                             backStack.remove(NavigationKeys.Login)
                             backStack.add(NavigationKeys.Home)
