@@ -32,4 +32,7 @@ sealed interface NavigationKeys {
         val images: List<String> = emptyList(),
         val isFavorite: Boolean = false,
     ) : NavKey
+
+    @Serializable
+    data object Login : NavKey
 }

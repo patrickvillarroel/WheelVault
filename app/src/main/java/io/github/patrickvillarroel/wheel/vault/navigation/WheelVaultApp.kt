@@ -16,10 +16,11 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarDetailScr
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.edit.CarEditScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.home.HomeScreen
+import io.github.patrickvillarroel.wheel.vault.ui.screen.login.LoginScreen
 
 @Composable
 fun WheelVaultApp(modifier: Modifier = Modifier) {
-    val backStack = rememberNavBackStack(NavigationKeys.Home)
+    val backStack = rememberNavBackStack(NavigationKeys.Login)
 
     SharedTransitionLayout {
         NavDisplay(
@@ -33,6 +34,15 @@ fun WheelVaultApp(modifier: Modifier = Modifier) {
                 ContentTransform(slideInHorizontally(), slideOutHorizontally { it })
             },
             entryProvider = entryProvider {
+                entry<NavigationKeys.Login> { _ ->
+                    LoginScreen(
+                        onLoginSuccess = {
+                            backStack.remove(NavigationKeys.Login)
+                            backStack.add(NavigationKeys.Home)
+                        },
+                    )
+                }
+
                 entry<NavigationKeys.Home> { _ ->
                     HomeScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
