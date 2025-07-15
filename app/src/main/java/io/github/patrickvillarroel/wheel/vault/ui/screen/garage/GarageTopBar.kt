@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuHeader
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
@@ -24,17 +25,12 @@ fun GarageTopBar(
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
     onStateChange: (GarageUiState) -> Unit,
-    onProfileClick: () -> Unit,
     onHomeClick: () -> Unit,
-    onFavoriteClick: () -> Unit,
-    onStaticsClick: () -> Unit,
+    headersCallbacks: HeaderCallbacks,
     modifier: Modifier = Modifier,
 ) {
     MenuHeader(
-        onProfileClick = onProfileClick,
-        onGarageClick = { /* TODO the users is already here lol */ },
-        onFavoritesClick = onFavoriteClick,
-        onStatisticsClick = onStaticsClick,
+        headerCallbacks = headersCallbacks,
         modifier = modifier,
     ) {
         AnimatedContent(
@@ -79,10 +75,13 @@ private fun TopBarPreview() {
             searchQuery = searchQuery,
             onSearchQueryChange = { searchQuery = it },
             onStateChange = { uiState = it },
-            onProfileClick = {},
             onHomeClick = {},
-            onFavoriteClick = {},
-            onStaticsClick = {},
+            headersCallbacks = HeaderCallbacks(
+                onProfileClick = {},
+                onGarageClick = {},
+                onFavoritesClick = {},
+                onStatisticsClick = {},
+            ),
         )
     }
 }

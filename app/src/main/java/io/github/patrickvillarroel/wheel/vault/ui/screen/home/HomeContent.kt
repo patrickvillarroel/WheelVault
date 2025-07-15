@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -29,41 +30,19 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.component.RaceDivider
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.VideoCardPreview
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
-/**
- * TODO change all callbacks to a data class
- * @param brands is [(id, drawable)] id must be unique
- * @param news is [link/painter] must be unique
- * @param recentCars is [id, link/drawable] id must be unique
- */
 @Composable
 fun HomeContent(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    brands: List<Pair<Int, Int>>,
-    news: List<Any>,
-    recentCars: List<Pair<Int, Int>>,
-    onAddClick: () -> Unit,
-    onSearchClick: () -> Unit,
-    onBrandClick: (Int) -> Unit,
-    onGarageClick: () -> Unit,
-    onFavoritesClick: () -> Unit,
-    onStatisticsClick: () -> Unit,
-    onProfileClick: () -> Unit,
-    onNewsClick: (Any) -> Unit,
-    onCarClick: (Int) -> Unit,
+    info: HomeCallbacks,
     modifier: Modifier = Modifier,
 ) {
+    val (brands, news, recentCars) = remember(info.homeInfo) { info.homeInfo }
+
     Scaffold(
         modifier = modifier,
-        topBar = {
-            HomeCarHeader(
-                onProfileClick = onProfileClick,
-                onGarageClick = onGarageClick,
-                onFavoritesClick = onFavoritesClick,
-                onStatisticsClick = onStatisticsClick,
-            )
-        },
-        floatingActionButton = { HomeFloatingButton(onAddClick = onAddClick, onSearchClick = onSearchClick) },
+        topBar = { HomeCarHeader(info) },
+        floatingActionButton = { HomeFloatingButton(onAddClick = info.onAddClick, onSearchClick = info.onSearchClick) },
     ) { paddingValues ->
         with(sharedTransitionScope) {
             LazyColumn(Modifier.fillMaxSize().padding(paddingValues)) {
@@ -87,7 +66,7 @@ fun HomeContent(
                         items(brands, key = { (id, _) -> id }) { (id, image) ->
                             BrandCard(
                                 logo = image,
-                                onClick = { onBrandClick(id) },
+                                onClick = { info.onBrandClick(id) },
                                 modifier = Modifier.sharedBounds(
                                     rememberSharedContentState("brand-$id"),
                                     animatedVisibilityScope,
@@ -117,7 +96,7 @@ fun HomeContent(
                         items(recentCars, key = { (id, _) -> id }) { (id, image) ->
                             CarCard(
                                 image = image,
-                                onClick = { onCarClick(id) },
+                                onClick = { info.onCarClick(id) },
                                 modifier = Modifier.sharedBounds(
                                     rememberSharedContentState("car-$id"),
                                     animatedVisibilityScope,
@@ -144,7 +123,7 @@ fun HomeContent(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         items(news, key = { it }) {
-                            VideoCardPreview(it, onPlayClick = { onNewsClick(it) })
+                            VideoCardPreview(it, onPlayClick = { info.onNewsClick(it) })
                         }
                     }
                 }
@@ -162,18 +141,20 @@ private fun HomeContentPreview() {
                 HomeContent(
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
-                    brands = List(10) { it to R.drawable.hot_wheels_logo_black },
-                    news = listOf(R.drawable.thumbnail_example),
-                    recentCars = listOf(1 to R.drawable.batman_car),
-                    onAddClick = {},
-                    onSearchClick = {},
-                    onBrandClick = {},
-                    onGarageClick = {},
-                    onFavoritesClick = {},
-                    onStatisticsClick = {},
-                    onProfileClick = {},
-                    onNewsClick = {},
-                    onCarClick = {},
+                    info = HomeCallbacks(
+                        brands = List(10) { it to R.drawable.hot_wheels_logo_black },
+                        news = listOf(R.drawable.thumbnail_example),
+                        recentCars = listOf(1 to R.drawable.batman_car),
+                        onAddClick = {},
+                        onSearchClick = {},
+                        onBrandClick = {},
+                        onNewsClick = {},
+                        onCarClick = {},
+                        onProfileClick = {},
+                        onGarageClick = {},
+                        onFavoritesClick = {},
+                        onStatisticsClick = {},
+                    ),
                 )
             }
         }

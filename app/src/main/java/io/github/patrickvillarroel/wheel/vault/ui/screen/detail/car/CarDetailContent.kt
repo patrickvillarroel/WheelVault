@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BackTextButton
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.FavoriteIcon
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeroImageCarousel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuHeader
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.RaceDivider
@@ -42,29 +43,15 @@ import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 fun CarDetailContent(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    /** Temporal pass the id to animate the transition */
-    carId: Int,
-    carDetail: CarItem,
-    onBack: () -> Unit,
-    onProfileClick: () -> Unit,
-    onGarageClick: () -> Unit,
-    onFavoritesClick: () -> Unit,
-    onStatisticsClick: () -> Unit,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit,
-    onFavoriteToggle: (Boolean) -> Unit,
+    callbacks: CarDetailCallbacks,
     modifier: Modifier = Modifier,
 ) {
+    val carDetail = callbacks.carDetail
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            MenuHeader(
-                onProfileClick = onProfileClick,
-                onGarageClick = onGarageClick,
-                onFavoritesClick = onFavoritesClick,
-                onStatisticsClick = onStatisticsClick,
-            ) {
-                BackTextButton(onBack = onBack)
+            MenuHeader(callbacks.headersBackCallbacks) {
+                BackTextButton(onBack = callbacks.headersBackCallbacks.onBackClick)
             }
         },
     ) { paddingValues ->
@@ -76,7 +63,7 @@ fun CarDetailContent(
             ) {
                 HeroImageCarousel(
                     carDetail.images,
-                    Modifier.sharedBounds(rememberSharedContentState("car-$carId"), animatedVisibilityScope),
+                    Modifier.sharedBounds(rememberSharedContentState("car-${carDetail.id}"), animatedVisibilityScope),
                 )
 
                 LazyColumn(
@@ -92,7 +79,7 @@ fun CarDetailContent(
                                 style = MaterialTheme.typography.headlineSmall,
                                 modifier = Modifier.padding(top = 16.dp),
                             )
-                            FavoriteIcon(carDetail.isFavorite, onFavoriteToggle)
+                            FavoriteIcon(carDetail.isFavorite, callbacks.onFavoriteToggle)
                         }
                     }
 
@@ -150,7 +137,7 @@ fun CarDetailContent(
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 OutlinedIconButton(
-                                    onClick = onEditClick,
+                                    onClick = callbacks.onEditClick,
                                     modifier = Modifier.size(65.dp),
                                 ) {
                                     Icon(Icons.Filled.Edit, "Editar", Modifier.size(32.dp))
@@ -159,7 +146,7 @@ fun CarDetailContent(
                             }
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 OutlinedIconButton(
-                                    onClick = onDeleteClick,
+                                    onClick = callbacks.onDeleteClick,
                                     modifier = Modifier.size(65.dp),
                                 ) {
                                     Icon(Icons.Outlined.Delete, "Eliminar", Modifier.size(32.dp), Color(0xFFE42E31))
@@ -196,16 +183,19 @@ private fun CarDetailContentPreview() {
                 CarDetailContent(
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
-                    carId = carDetail.id,
-                    carDetail = carDetail,
-                    onBack = {},
-                    onProfileClick = {},
-                    onGarageClick = {},
-                    onFavoritesClick = {},
-                    onStatisticsClick = {},
-                    onEditClick = {},
-                    onDeleteClick = {},
-                    onFavoriteToggle = {},
+                    callbacks = CarDetailCallbacks(
+                        carDetail = carDetail,
+                        headersBackCallbacks = HeaderBackCallbacks(
+                            onBackClick = {},
+                            onProfileClick = {},
+                            onGarageClick = {},
+                            onFavoritesClick = {},
+                            onStatisticsClick = {},
+                        ),
+                        onEditClick = {},
+                        onDeleteClick = {},
+                        onFavoriteToggle = {},
+                    ),
                 )
             }
         }

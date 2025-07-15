@@ -1,4 +1,4 @@
-package io.github.patrickvillarroel.wheel.vault.ui.screen.component
+package io.github.patrickvillarroel.wheel.vault.ui.screen.detail.brand
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -25,8 +25,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.github.patrickvillarroel.wheel.vault.R
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderMenuDropdownCallbacks
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuDropDown
 
 @Composable
 private fun BrandHeader(
@@ -44,13 +47,11 @@ private fun BrandHeader(
         modifier = modifier,
         scrollBehavior = scrollBehavior,
         title = {
-            /*
             Text(
                 text = brandName,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
-             */
         },
         subtitle = {
             Image(
@@ -78,9 +79,11 @@ private fun BrandHeader(
         },
         actions = {
             MenuDropDown(
-                onGarageClick = onGarageClick,
-                onFavoritesClick = onFavoritesClick,
-                onStatisticsClick = onStatisticsClick,
+                HeaderMenuDropdownCallbacks(
+                    onGarageClick = onGarageClick,
+                    onFavoritesClick = onFavoritesClick,
+                    onStatisticsClick = onStatisticsClick,
+                ),
             )
             IconButton(onClick = onProfileClick) {
                 Icon(
@@ -101,7 +104,7 @@ private fun BrandHeader(
 }
 
 @Composable
-private fun BrandHeade(
+private fun BrandHeader(
     icon: Pair<Int, String?>,
     onBackClick: () -> Unit,
     onProfileClick: () -> Unit,
@@ -123,9 +126,11 @@ private fun BrandHeade(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     MenuDropDown(
-                        onGarageClick = onGarageClick,
-                        onFavoritesClick = onFavoritesClick,
-                        onStatisticsClick = onStatisticsClick,
+                        HeaderMenuDropdownCallbacks(
+                            onGarageClick = onGarageClick,
+                            onFavoritesClick = onFavoritesClick,
+                            onStatisticsClick = onStatisticsClick,
+                        ),
                     )
                     IconButton(onClick = onProfileClick) {
                         Icon(

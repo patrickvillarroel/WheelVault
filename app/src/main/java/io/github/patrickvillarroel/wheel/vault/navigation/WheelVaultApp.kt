@@ -11,10 +11,12 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import io.github.patrickvillarroel.wheel.vault.ui.screen.camera.CameraLensScreen
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.brand.BrandDetailScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarDetailScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.edit.CarEditScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageScreen
+import io.github.patrickvillarroel.wheel.vault.ui.screen.home.HomeNavCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.home.HomeScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.login.LoginScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.login.LoginWithEmailScreen
@@ -65,14 +67,16 @@ fun WheelVaultApp(modifier: Modifier = Modifier) {
                     HomeScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
-                        onAddClick = { backStack.add(NavigationKeys.AddCamera) },
-                        onSearchClick = { backStack.add(NavigationKeys.Garage("")) },
-                        onBrandClick = { backStack.add(NavigationKeys.BrandDetail(it)) },
-                        onGarageClick = { backStack.add(NavigationKeys.Garage()) },
-                        onCarClick = { backStack.add(NavigationKeys.CarDetail(it)) },
-                        onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
-                        onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
-                        onProfileClick = { backStack.add(NavigationKeys.Profile) },
+                        callbacks = HomeNavCallbacks(
+                            onAddClick = { backStack.add(NavigationKeys.AddCamera) },
+                            onSearchClick = { backStack.add(NavigationKeys.Garage("")) },
+                            onBrandClick = { backStack.add(NavigationKeys.BrandDetail(it)) },
+                            onGarageClick = { backStack.add(NavigationKeys.Garage()) },
+                            onCarClick = { backStack.add(NavigationKeys.CarDetail(it)) },
+                            onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
+                            onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
+                            onProfileClick = { backStack.add(NavigationKeys.Profile) },
+                        ),
                     )
                 }
 
@@ -89,11 +93,13 @@ fun WheelVaultApp(modifier: Modifier = Modifier) {
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
                         brandId = id,
-                        onBackClick = { backStack.removeLastOrNull() },
-                        onProfileClick = { backStack.add(NavigationKeys.Profile) },
-                        onGarageClick = { backStack.add(NavigationKeys.Garage()) },
-                        onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
-                        onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
+                        headerBackCallbacks = HeaderBackCallbacks(
+                            onBackClick = { backStack.removeLastOrNull() },
+                            onProfileClick = { backStack.add(NavigationKeys.Profile) },
+                            onGarageClick = { backStack.add(NavigationKeys.Garage()) },
+                            onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
+                            onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
+                        ),
                         onAddClick = { backStack.add(NavigationKeys.AddCamera) },
                         onCarClick = { backStack.add(NavigationKeys.CarDetail(it)) },
                     )
@@ -104,7 +110,6 @@ fun WheelVaultApp(modifier: Modifier = Modifier) {
                     GarageScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
-                        onProfileClick = { backStack.add(NavigationKeys.Profile) },
                         onHomeClick = {
                             val indexHome = backStack.lastIndexOf(NavigationKeys.Home)
                             if (indexHome != -1) {
@@ -115,6 +120,7 @@ fun WheelVaultApp(modifier: Modifier = Modifier) {
                         },
                         onCarClick = { backStack.add(NavigationKeys.CarDetail(it)) },
                         onAddClick = { backStack.add(NavigationKeys.AddCamera) },
+                        onProfileClick = { backStack.add(NavigationKeys.Profile) },
                     )
                 }
 
@@ -123,32 +129,39 @@ fun WheelVaultApp(modifier: Modifier = Modifier) {
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
                         carId = id,
-                        onBackClick = { backStack.removeLastOrNull() },
-                        onProfileClick = { backStack.add(NavigationKeys.Profile) },
-                        onGarageClick = { backStack.add(NavigationKeys.Garage()) },
-                        onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
-                        onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
                         onEditClick = { backStack.add(it.toCarEdit()) },
+                        headerBackCallbacks = HeaderBackCallbacks(
+                            onBackClick = { backStack.removeLastOrNull() },
+                            onProfileClick = { backStack.add(NavigationKeys.Profile) },
+                            onGarageClick = { backStack.add(NavigationKeys.Garage()) },
+                            onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
+                            onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
+                        ),
                     )
                 }
 
                 entry<NavigationKeys.CarEdit> { edit ->
                     CarEditScreen(
                         partialCarItem = edit.toCarPartial(),
-                        onBackClick = { backStack.removeLastOrNull() },
-                        onProfileClick = { backStack.add(NavigationKeys.Profile) },
-                        onGarageClick = { backStack.add(NavigationKeys.Garage()) },
-                        onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
-                        onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
+                        headersBackCallbacks = HeaderBackCallbacks(
+                            onBackClick = { backStack.removeLastOrNull() },
+                            onProfileClick = { backStack.add(NavigationKeys.Profile) },
+                            onGarageClick = { backStack.add(NavigationKeys.Garage()) },
+                            onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
+                            onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
+                        ),
                     )
                 }
 
                 entry<NavigationKeys.Profile> { _ ->
                     ProfileScreen(
-                        onBackClick = { backStack.removeLastOrNull() },
-                        onGarageClick = { backStack.add(NavigationKeys.Garage()) },
-                        onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
-                        onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
+                        backCallbacks = HeaderBackCallbacks(
+                            onProfileClick = {},
+                            onBackClick = { backStack.removeLastOrNull() },
+                            onGarageClick = { backStack.add(NavigationKeys.Garage()) },
+                            onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
+                            onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
+                        ),
                     )
                 }
             },

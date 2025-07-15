@@ -67,7 +67,7 @@ fun FavoriteIcon(isFavorite: Boolean, onFavoriteToggle: (Boolean) -> Unit, modif
             isFavorite = !isFavorite
             onFavoriteToggle(isFavorite)
         },
-        modifier = Modifier
+        modifier = modifier
             .scale(scale)
             .graphicsLayer(
                 rotationZ = rotation.value,

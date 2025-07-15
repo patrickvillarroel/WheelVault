@@ -17,25 +17,16 @@ import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
 fun MenuButtonHeader(
-    onProfileClick: () -> Unit,
-    onGarageClick: () -> Unit,
-    onFavoritesClick: () -> Unit,
-    onStatisticsClick: () -> Unit,
+    headerCallbacks: HeaderCallbacks,
     modifier: Modifier = Modifier,
     title: @Composable () -> Unit = {},
 ) {
     TopAppBar(
         modifier = modifier,
         title = title,
-        navigationIcon = {
-            MenuDropDown(
-                onGarageClick = onGarageClick,
-                onFavoritesClick = onFavoritesClick,
-                onStatisticsClick = onStatisticsClick,
-            )
-        },
+        navigationIcon = { MenuDropDown(headerCallbacks) },
         actions = {
-            IconButton(onClick = onProfileClick) {
+            IconButton(onClick = headerCallbacks.onProfileClick) {
                 Icon(
                     Icons.Default.AccountCircle,
                     contentDescription = stringResource(R.string.profile),
@@ -52,7 +43,9 @@ fun MenuButtonHeader(
 private fun HeaderBrushPreview() {
     WheelVaultTheme {
         Column {
-            MenuButtonHeader(onProfileClick = {}, onGarageClick = {}, onFavoritesClick = {}, onStatisticsClick = {})
+            MenuButtonHeader(
+                HeaderCallbacks(onProfileClick = {}, onGarageClick = {}, onFavoritesClick = {}, onStatisticsClick = {}),
+            )
         }
     }
 }

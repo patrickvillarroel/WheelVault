@@ -32,34 +32,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BackTextButton
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuHeader
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
-fun ProfileContent(
-    email: String,
-    isEditable: Boolean,
-    onEditClick: () -> Unit,
-    onEmailChange: (String) -> Unit,
-    linkedAccounts: Map<AuthProvider, Boolean>,
-    onProviderClick: (AuthProvider) -> Unit,
-    onBackClick: () -> Unit,
-    onGarageClick: () -> Unit,
-    onFavoritesClick: () -> Unit,
-    onStatisticsClick: () -> Unit,
-    onLogout: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+fun ProfileContent(email: String, isEditable: Boolean, callbacks: ProfileCallbacks, modifier: Modifier = Modifier) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            MenuHeader(
-                onProfileClick = { /* You are here babe */ },
-                onGarageClick = onGarageClick,
-                onFavoritesClick = onFavoritesClick,
-                onStatisticsClick = onStatisticsClick,
-            ) {
-                BackTextButton(onBackClick)
+            MenuHeader(callbacks.backCallbacks) {
+                BackTextButton(callbacks.backCallbacks.onBackClick)
             }
         },
     ) { paddingValues ->
@@ -67,10 +50,10 @@ fun ProfileContent(
             ProfileCard(
                 email = email,
                 isEditable = isEditable,
-                onEditClick = onEditClick,
-                onEmailChange = onEmailChange,
-                linkedAccounts = linkedAccounts,
-                onProviderClick = onProviderClick,
+                onEditClick = callbacks.onEditClick,
+                onEmailChange = callbacks.onEmailChange,
+                linkedAccounts = callbacks.linkedAccounts,
+                onProviderClick = callbacks.onProviderClick,
                 modifier = Modifier.align(Alignment.TopCenter).offset(y = 70.dp),
             )
 
@@ -100,7 +83,7 @@ fun ProfileContent(
             }
 
             Button(
-                onClick = onLogout,
+                onClick = callbacks.onLogout,
                 modifier = Modifier
                     .align(Alignment.Center)
                     .offset(y = 70.dp)
@@ -121,15 +104,20 @@ private fun ProfileContentPreview() {
         ProfileContent(
             email = "james.c.mcreynolds@example-pet-store.com",
             isEditable = false,
-            onEditClick = {},
-            onEmailChange = {},
-            linkedAccounts = mapOf(AuthProvider.Email to true, AuthProvider.Password to false),
-            onProviderClick = {},
-            onBackClick = {},
-            onGarageClick = {},
-            onFavoritesClick = {},
-            onStatisticsClick = {},
-            onLogout = {},
+            callbacks = ProfileCallbacks(
+                onEditClick = {},
+                onEmailChange = {},
+                linkedAccounts = mapOf(AuthProvider.Email to true, AuthProvider.Password to false),
+                onProviderClick = {},
+                backCallbacks = HeaderBackCallbacks(
+                    onBackClick = {},
+                    onProfileClick = {},
+                    onGarageClick = {},
+                    onFavoritesClick = {},
+                    onStatisticsClick = {},
+                ),
+                onLogout = {},
+            ),
         )
     }
 }

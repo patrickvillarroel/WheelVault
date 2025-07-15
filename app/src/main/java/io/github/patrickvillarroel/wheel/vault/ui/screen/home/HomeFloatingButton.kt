@@ -66,7 +66,7 @@ fun HomeFloatingButton(onAddClick: () -> Unit, onSearchClick: () -> Unit, modifi
             FloatingActionButtonMenuItem(
                 onClick = {
                     fabMenuExpanded = false
-                    onClick()
+                    onClick.invoke()
                 },
                 icon = { Icon(image, stringResource(description)) },
                 text = { Text(stringResource(description)) },

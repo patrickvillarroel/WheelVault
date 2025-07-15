@@ -27,12 +27,7 @@ import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Suppress("ktlint:compose:multiple-emitters-check")
 @Composable
-fun MenuDropDown(
-    onGarageClick: () -> Unit,
-    onFavoritesClick: () -> Unit,
-    onStatisticsClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+fun MenuDropDown(menuDropdownCallbacks: HeaderMenuDropdownCallbacks, modifier: Modifier = Modifier) {
     var expandedMenu by remember { mutableStateOf(false) }
     IconButton({ expandedMenu = !expandedMenu }, modifier = modifier) {
         AnimatedContent(expandedMenu, label = "Menu Swip") {
@@ -52,7 +47,7 @@ fun MenuDropDown(
             leadingIcon = { Icon(Icons.Outlined.DirectionsCar, contentDescription = null) },
             onClick = {
                 expandedMenu = false
-                onGarageClick()
+                menuDropdownCallbacks.onGarageClick()
             },
         )
         DropdownMenuItem(
@@ -60,7 +55,7 @@ fun MenuDropDown(
             leadingIcon = { Icon(Icons.Outlined.Favorite, contentDescription = null) },
             onClick = {
                 expandedMenu = false
-                onFavoritesClick()
+                menuDropdownCallbacks.onFavoritesClick()
             },
         )
         DropdownMenuItem(
@@ -68,7 +63,7 @@ fun MenuDropDown(
             leadingIcon = { Icon(Icons.Outlined.Calculate, contentDescription = null) },
             onClick = {
                 expandedMenu = false
-                onStatisticsClick()
+                menuDropdownCallbacks.onStatisticsClick()
             },
         )
     }
@@ -79,7 +74,7 @@ fun MenuDropDown(
 private fun HeaderBrushPreview() {
     WheelVaultTheme {
         Column {
-            MenuDropDown(onGarageClick = {}, onFavoritesClick = {}, onStatisticsClick = {})
+            MenuDropDown(HeaderMenuDropdownCallbacks(onGarageClick = {}, onFavoritesClick = {}, onStatisticsClick = {}))
         }
     }
 }

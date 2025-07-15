@@ -6,18 +6,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
 
 @Composable
 fun CarDetailScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
     carId: Int,
-    onBackClick: () -> Unit,
-    onProfileClick: () -> Unit,
-    onGarageClick: () -> Unit,
-    onFavoritesClick: () -> Unit,
-    onStatisticsClick: () -> Unit,
     onEditClick: (CarItem) -> Unit,
+    headerBackCallbacks: HeaderBackCallbacks,
     modifier: Modifier = Modifier,
 ) {
     // TODO replace with VM
@@ -39,21 +36,18 @@ fun CarDetailScreen(
         }
     }
 
-    val carDetail = remember(carId) { cars.getOrNull(carId) ?: cars.first() }
+    val carDetail = remember(carId) { cars.getOrNull(carId) ?: cars.first().copy(id = carId) }
 
     CarDetailContent(
         sharedTransitionScope = sharedTransitionScope,
         animatedVisibilityScope = animatedVisibilityScope,
-        carId = carId,
-        carDetail = carDetail,
-        onBack = onBackClick,
-        onProfileClick = onProfileClick,
-        onGarageClick = onGarageClick,
-        onFavoritesClick = onFavoritesClick,
-        onStatisticsClick = onStatisticsClick,
-        onEditClick = { onEditClick(carDetail) },
-        onDeleteClick = { /* TODO add delete modal */ },
-        onFavoriteToggle = {},
+        callbacks = CarDetailCallbacks(
+            carDetail = carDetail,
+            headersBackCallbacks = headerBackCallbacks,
+            onEditClick = { onEditClick(carDetail) },
+            onDeleteClick = { /* TODO add delete modal */ },
+            onFavoriteToggle = {},
+        ),
         modifier = modifier,
     )
 }

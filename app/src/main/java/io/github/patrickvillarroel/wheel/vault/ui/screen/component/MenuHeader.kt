@@ -24,10 +24,7 @@ import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
 fun MenuHeader(
-    onProfileClick: () -> Unit,
-    onGarageClick: () -> Unit,
-    onFavoritesClick: () -> Unit,
-    onStatisticsClick: () -> Unit,
+    headerCallbacks: HeaderCallbacks,
     modifier: Modifier = Modifier,
     secondRow: @Composable BoxScope.() -> Unit = {},
 ) {
@@ -45,12 +42,7 @@ fun MenuHeader(
                 ),
             ).windowInsetsPadding(WindowInsets.statusBars),
     ) {
-        MenuButtonHeader(
-            onProfileClick = onProfileClick,
-            onGarageClick = onGarageClick,
-            onFavoritesClick = onFavoritesClick,
-            onStatisticsClick = onStatisticsClick,
-        ) {
+        MenuButtonHeader(headerCallbacks) {
             Text(
                 stringResource(R.string.collectors_project),
                 textAlign = TextAlign.Center,
@@ -67,6 +59,13 @@ fun MenuHeader(
 @Composable
 private fun HeaderBrushPreview() {
     WheelVaultTheme {
-        MenuHeader(onProfileClick = {}, onGarageClick = {}, onFavoritesClick = {}, onStatisticsClick = {})
+        MenuHeader(
+            HeaderCallbacks(
+                onProfileClick = {},
+                onGarageClick = {},
+                onFavoritesClick = {},
+                onStatisticsClick = {},
+            ),
+        )
     }
 }

@@ -23,18 +23,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.patrickvillarroel.wheel.vault.R
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuButtonHeader
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
-fun HomeCarHeader(
-    onProfileClick: () -> Unit,
-    onGarageClick: () -> Unit,
-    onFavoritesClick: () -> Unit,
-    onStatisticsClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    // Encabezado con iconos y menu
+fun HomeCarHeader(headerCallbacks: HeaderCallbacks, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -61,12 +55,7 @@ fun HomeCarHeader(
                 .align(Alignment.TopStart)
                 .padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
         ) {
-            MenuButtonHeader(
-                onProfileClick = onProfileClick,
-                onGarageClick = onGarageClick,
-                onFavoritesClick = onFavoritesClick,
-                onStatisticsClick = onStatisticsClick,
-            )
+            MenuButtonHeader(headerCallbacks)
 
             // TODO replace text and image with fixed image
             Text(
@@ -157,6 +146,13 @@ private fun TopHeaderWithBrush(modifier: Modifier = Modifier) {
 @Composable
 private fun HeaderPreview() {
     WheelVaultTheme {
-        HomeCarHeader(onProfileClick = {}, onGarageClick = {}, onFavoritesClick = {}, onStatisticsClick = {})
+        HomeCarHeader(
+            HeaderCallbacks(
+                onProfileClick = {},
+                onGarageClick = {},
+                onFavoritesClick = {},
+                onStatisticsClick = {},
+            ),
+        )
     }
 }

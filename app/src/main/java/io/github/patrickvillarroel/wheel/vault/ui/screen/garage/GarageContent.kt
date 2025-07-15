@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.CarItemCard
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
@@ -36,14 +37,7 @@ fun GarageContent(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
     carResults: List<CarItem>,
-    onProfileClick: () -> Unit,
-    onHomeClick: () -> Unit,
-    onSearch: (String) -> Unit,
-    onAddClick: () -> Unit,
-    onCarClick: (CarItem) -> Unit,
-    onToggleFavorite: (Int, Boolean) -> Unit,
-    onFavoritesClick: () -> Unit,
-    onStatisticsClick: () -> Unit,
+    callbacks: GarageCallbacks,
     modifier: Modifier = Modifier,
 ) {
     // TODO move the state to parent composable or receive the query to make the query from other screens
@@ -58,17 +52,15 @@ fun GarageContent(
                 searchQuery = searchQuery,
                 onSearchQueryChange = {
                     searchQuery = it
-                    onSearch(it)
+                    callbacks.onSearch(it)
                 },
                 onStateChange = { uiState = it },
-                onProfileClick = onProfileClick,
-                onHomeClick = onHomeClick,
-                onFavoriteClick = onFavoritesClick,
-                onStaticsClick = onStatisticsClick,
+                onHomeClick = callbacks.onHomeClick,
+                headersCallbacks = callbacks.headersCallbacks,
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddClick, containerColor = Color(0xFFE42E31)) {
+            FloatingActionButton(onClick = callbacks.onAddClick, containerColor = Color(0xFFE42E31)) {
                 Icon(Icons.Filled.Add, stringResource(R.string.add), tint = Color.Black)
             }
         },
@@ -86,8 +78,8 @@ fun GarageContent(
                 items(carResults, key = { it.id }) { item ->
                     CarItemCard(
                         carItem = item,
-                        onClick = { onCarClick(item) },
-                        onFavoriteToggle = { onToggleFavorite(item.id, it) },
+                        onClick = { callbacks.onCarClick(item) },
+                        onFavoriteToggle = { callbacks.onToggleFavorite(item, it) },
                         modifier = Modifier
                             .padding(3.dp)
                             .sharedBounds(rememberSharedContentState("car-${item.id}"), animatedVisibilityScope),
@@ -118,14 +110,19 @@ private fun GaragePreview() {
                             isFavorite = true,
                         )
                     },
-                    onProfileClick = {},
-                    onHomeClick = {},
-                    onSearch = {},
-                    onAddClick = {},
-                    onCarClick = {},
-                    onToggleFavorite = { _, _ -> },
-                    onFavoritesClick = {},
-                    onStatisticsClick = {},
+                    callbacks = GarageCallbacks(
+                        onHomeClick = {},
+                        onSearch = {},
+                        onAddClick = {},
+                        onCarClick = {},
+                        onToggleFavorite = { _, _ -> },
+                        headersCallbacks = HeaderCallbacks(
+                            onProfileClick = {},
+                            onGarageClick = {},
+                            onFavoritesClick = {},
+                            onStatisticsClick = {},
+                        ),
+                    ),
                 )
             }
         }

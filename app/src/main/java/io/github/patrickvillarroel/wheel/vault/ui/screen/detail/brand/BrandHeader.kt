@@ -1,4 +1,4 @@
-package io.github.patrickvillarroel.wheel.vault.ui.screen.component
+package io.github.patrickvillarroel.wheel.vault.ui.screen.detail.brand
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,22 +19,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import io.github.patrickvillarroel.wheel.vault.R
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuButtonHeader
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
 fun BrandHeader(
-    icon: Pair<Int, String?>,
-    onBackClick: () -> Unit,
-    onProfileClick: () -> Unit,
-    onGarageClick: () -> Unit,
-    onFavoritesClick: () -> Unit,
-    onStatisticsClick: () -> Unit,
+    logoAndDescription: Pair<Any, String?>,
+    headerBackCallbacks: HeaderBackCallbacks,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -51,20 +50,25 @@ fun BrandHeader(
                 ),
             ).padding(10.dp),
     ) {
-        MenuButtonHeader(
-            onProfileClick = onProfileClick,
-            onGarageClick = onGarageClick,
-            onFavoritesClick = onFavoritesClick,
-            onStatisticsClick = onStatisticsClick,
-        )
-        Image(
-            painterResource(icon.first),
-            icon.second,
-            Modifier.align(Alignment.Center).width(300.dp),
-            contentScale = ContentScale.Crop,
-        )
+        MenuButtonHeader(headerBackCallbacks)
+        val (icon, description) = logoAndDescription
+        if (icon is Painter) {
+            Image(
+                icon,
+                description,
+                Modifier.align(Alignment.Center).width(300.dp),
+                contentScale = ContentScale.Crop,
+            )
+        } else {
+            AsyncImage(
+                icon,
+                description,
+                Modifier.align(Alignment.Center).width(300.dp),
+                contentScale = ContentScale.Crop,
+            )
+        }
         TextButton(
-            onBackClick,
+            headerBackCallbacks.onBackClick,
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .offset(y = (15).dp),
@@ -81,11 +85,13 @@ private fun BrandHeaderPreview() {
     WheelVaultTheme {
         BrandHeader(
             R.drawable.hot_wheels_logo_black to "Hot Wheels Logo",
-            onBackClick = {},
-            onProfileClick = {},
-            onGarageClick = {},
-            onFavoritesClick = {},
-            onStatisticsClick = {},
+            HeaderBackCallbacks(
+                onBackClick = {},
+                onProfileClick = {},
+                onGarageClick = {},
+                onFavoritesClick = {},
+                onStatisticsClick = {},
+            ),
         )
     }
 }

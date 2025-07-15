@@ -34,27 +34,23 @@ import androidx.compose.ui.unit.dp
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BackTextButton
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.FavoriteIcon
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeroImageCarousel
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.InterceptedHeaderBackCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuHeader
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.RedOutlinedTextField
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
-// TODO todos los callbacks deben interceptarse para el cancel modal
 @Composable
 fun CarEditContent(
     carDetailPartial: CarItem.Partial,
-    onBackClick: () -> Unit,
-    onProfileClick: () -> Unit,
-    onGarageClick: () -> Unit,
-    onFavoritesClick: () -> Unit,
-    onStatisticsClick: () -> Unit,
-    onAddPictureClick: (Any) -> Any,
-    onConfirmClick: (CarItem.Partial) -> Unit,
     isEditAction: Boolean,
+    onConfirmClick: (CarItem.Partial) -> Unit,
+    headersBackCallbacks: HeaderBackCallbacks,
     modifier: Modifier = Modifier,
 ) {
     // Internal states
-    var car by remember { mutableStateOf(carDetailPartial) }
+    var car by remember(carDetailPartial) { mutableStateOf(carDetailPartial) }
     var marca by rememberSaveable { mutableStateOf(carDetailPartial.brand ?: "") }
     var modelo by rememberSaveable { mutableStateOf(carDetailPartial.model ?: "") }
     var descripcion by rememberSaveable { mutableStateOf(carDetailPartial.description ?: "") }
@@ -62,12 +58,20 @@ fun CarEditContent(
     var cantidad by rememberSaveable { mutableStateOf(carDetailPartial.quantity.toString()) }
     var categoria by rememberSaveable { mutableStateOf(carDetailPartial.category ?: "") }
     val imagenes by rememberSaveable { mutableStateOf(carDetailPartial.images) }
+    val headerCallbacks = remember {
+        InterceptedHeaderBackCallbacks(
+            headersBackCallbacks,
+            { _, _ ->
+                /* TODO Lanzar modal de cancelacion */
+            },
+        )
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            MenuHeader(onProfileClick, onGarageClick, onFavoritesClick, onStatisticsClick) {
-                BackTextButton(onBackClick)
+            MenuHeader(headerCallbacks) {
+                BackTextButton(headerCallbacks.onBackClick)
             }
         },
     ) { paddingValues ->
@@ -191,14 +195,15 @@ private fun EditPreview() {
     WheelVaultTheme {
         CarEditContent(
             carDetailPartial = carDetailPartial,
-            onBackClick = {},
-            onProfileClick = {},
-            onGarageClick = {},
-            onFavoritesClick = {},
-            onStatisticsClick = {},
             onConfirmClick = {},
-            onAddPictureClick = {},
             isEditAction = true,
+            headersBackCallbacks = HeaderBackCallbacks(
+                onBackClick = {},
+                onProfileClick = {},
+                onGarageClick = {},
+                onFavoritesClick = {},
+                onStatisticsClick = {},
+            ),
         )
     }
 }
