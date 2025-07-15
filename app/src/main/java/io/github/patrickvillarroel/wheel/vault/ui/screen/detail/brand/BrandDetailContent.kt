@@ -59,10 +59,7 @@ fun BrandDetailContent(
             }
         },
     ) { paddingValues ->
-        LazyColumn(
-            Modifier.fillMaxSize().padding(top = 15.dp, start = 15.dp, end = 15.dp),
-            contentPadding = paddingValues,
-        ) {
+        LazyColumn(Modifier.padding(paddingValues).fillMaxSize().padding(top = 15.dp, start = 15.dp, end = 15.dp)) {
             item {
                 Text(
                     "Info $brandName",
@@ -82,7 +79,7 @@ fun BrandDetailContent(
                     "Carritos en la colección:",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(top = 5.dp),
+                    modifier = Modifier.padding(top = 10.dp),
                 )
             }
             items(carCollection) { (car, onFavorite) ->
@@ -90,7 +87,7 @@ fun BrandDetailContent(
                     carItem = car,
                     onClick = { onCarClick(car) },
                     onFavoriteToggle = onFavorite,
-                    Modifier.padding(bottom = 5.dp),
+                    Modifier.padding(bottom = 7.dp),
                 )
             }
         }
