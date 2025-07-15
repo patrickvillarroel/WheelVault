@@ -1,9 +1,10 @@
 package io.github.patrickvillarroel.wheel.vault.navigation
 
+import androidx.compose.runtime.Stable
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
-sealed interface NavigationKeys {
+object NavigationKeys {
     @Serializable
     data object Home : NavKey
 
@@ -20,6 +21,7 @@ sealed interface NavigationKeys {
     data class Garage(val query: String? = null, val favorites: Boolean = false, val statistics: Boolean = false) :
         NavKey
 
+    @Stable
     @Serializable
     data class CarEdit(
         val model: String? = null,
@@ -37,5 +39,8 @@ sealed interface NavigationKeys {
     data object Login : NavKey
 
     @Serializable
-    data class LoginWithEmail(val isRegister: Boolean) : NavKey
+    data class LoginWithEmailAndPassword(val isRegister: Boolean) : NavKey
+
+    @Serializable
+    data object Profile : NavKey
 }

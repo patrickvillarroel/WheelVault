@@ -6,12 +6,14 @@ import androidx.compose.ui.Modifier
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
-    onLoginWithEmailClick: () -> Unit,
+    onLoginWithEmailAndPasswordClick: () -> Unit,
     onRegisterClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // TODO add logic with supabase, login with email means magic links
     LoginContent(
-        onLoginWithEmailClick = onLoginWithEmailClick,
+        onLoginWithEmailAndPasswordClick = onLoginWithEmailAndPasswordClick,
+        onLoginWithEmailClick = onLoginSuccess,
         onLoginWithGoogleClick = onLoginSuccess,
         onRegisterClick = onRegisterClick,
         modifier = modifier,

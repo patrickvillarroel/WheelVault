@@ -16,7 +16,7 @@ import io.github.jan.supabase.compose.auth.ui.annotations.AuthUiExperimental
 fun RowScope.ProviderButton(
     provider: OAuthProvider,
     modifier: Modifier = Modifier,
-    text: String = "Login with ${provider.name.replaceFirstChar { it.uppercase()} }",
+    text: String = "Continue with ${provider.name.replaceFirstChar { it.uppercase()} }",
 ) {
     ProviderIcon(provider, "Login with ${provider.name}", modifier.size(24.dp))
     Text(text, Modifier.weight(1f), textAlign = TextAlign.Center)

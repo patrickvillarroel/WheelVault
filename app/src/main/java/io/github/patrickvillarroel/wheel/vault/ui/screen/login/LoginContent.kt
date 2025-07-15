@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Password
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -37,6 +38,7 @@ import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 @Composable
 fun LoginContent(
     onLoginWithEmailClick: () -> Unit,
+    onLoginWithEmailAndPasswordClick: () -> Unit,
     onLoginWithGoogleClick: () -> Unit,
     onRegisterClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -68,9 +70,14 @@ fun LoginContent(
                 ProviderButton(Google)
             }
 
-            OutlinedButton(onLoginWithEmailClick, Modifier.padding(bottom = 50.dp).fillMaxWidth()) {
+            OutlinedButton(onLoginWithEmailClick, Modifier.fillMaxWidth()) {
                 Icon(Icons.Filled.Email, "Email")
                 Text("Continue with email", Modifier.weight(1f), textAlign = TextAlign.Center)
+            }
+
+            OutlinedButton(onLoginWithEmailAndPasswordClick, Modifier.padding(bottom = 50.dp).fillMaxWidth()) {
+                Icon(Icons.Filled.Password, "Email and password")
+                Text("Continue with email and password", Modifier.weight(1f), textAlign = TextAlign.Center)
             }
         }
     }
@@ -80,6 +87,11 @@ fun LoginContent(
 @Composable
 private fun LoginPreview() {
     WheelVaultTheme {
-        LoginContent(onLoginWithEmailClick = {}, onLoginWithGoogleClick = {}, onRegisterClick = {})
+        LoginContent(
+            onLoginWithEmailClick = {},
+            onLoginWithEmailAndPasswordClick = {},
+            onLoginWithGoogleClick = {},
+            onRegisterClick = {},
+        )
     }
 }
