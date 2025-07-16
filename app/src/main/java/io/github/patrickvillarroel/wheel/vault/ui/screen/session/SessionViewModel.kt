@@ -8,6 +8,7 @@ import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 data class SessionViewModel(private val supabase: SupabaseClient) : ViewModel() {
     val session = supabase.auth.sessionStatus.map {
@@ -19,5 +20,24 @@ data class SessionViewModel(private val supabase: SupabaseClient) : ViewModel() 
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, SessionUiStatus.Initializing)
 
-    fun currentSessionOrNull() = supabase.auth.currentSessionOrNull()
+    val currentUser = supabase.auth.sessionStatus.map {
+        when (it) {
+            is SessionStatus.Authenticated -> it.session.user
+            else -> null
+        }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    fun updateEmail(email: String) {
+        viewModelScope.launch {
+            supabase.auth.updateUser {
+                this.email = email
+            }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            supabase.auth.signOut()
+        }
+    }
 }

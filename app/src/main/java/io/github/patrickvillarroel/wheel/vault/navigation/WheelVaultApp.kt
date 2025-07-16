@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,23 +39,25 @@ import org.koin.compose.viewmodel.koinViewModel
 fun WheelVaultApp(modifier: Modifier = Modifier, sessionViewModel: SessionViewModel = koinViewModel()) {
     val session by sessionViewModel.session.collectAsStateWithLifecycle(minActiveState = Lifecycle.State.CREATED)
     val backStack = rememberNavBackStack(NavigationKeys.Splash)
+    var isSplashDone by remember { mutableStateOf(false) }
 
-    LaunchedEffect(session, backStack) {
+    LaunchedEffect(session, isSplashDone) {
+        if (!isSplashDone) return@LaunchedEffect
+
         when (session) {
-            SessionUiStatus.NotAuthenticated, SessionUiStatus.RefreshFailure -> {
-                if (backStack.lastOrNull() != NavigationKeys.Splash) {
-                    // Don't skip the splash screen
-                    backStack.clear()
-                }
+            is SessionUiStatus.Authenticated -> {
+                backStack.clear()
+                backStack.add(NavigationKeys.Home)
+            }
+
+            SessionUiStatus.NotAuthenticated,
+            SessionUiStatus.RefreshFailure,
+            -> {
+                backStack.clear()
                 backStack.add(NavigationKeys.Login)
             }
-            is SessionUiStatus.Authenticated -> {
-                if (backStack.lastOrNull() == NavigationKeys.LoginWithEmailAndPassword) {
-                    backStack.clear()
-                    backStack.add(NavigationKeys.Home)
-                }
-            }
-            else -> Unit
+
+            SessionUiStatus.Initializing -> Unit
         }
     }
 
@@ -68,12 +73,7 @@ fun WheelVaultApp(modifier: Modifier = Modifier, sessionViewModel: SessionViewMo
                     transitionSpec = { ContentTransform(slideInVertically { -it }, slideOutVertically { it }) },
                     popTransitionSpec = { ContentTransform(slideInVertically { it }, slideOutVertically { -it }) },
                 ) { _ ->
-                    SplashScreen(
-                        onVideoFinish = {
-                            backStack.remove(NavigationKeys.Splash)
-                            backStack.add(NavigationKeys.Home)
-                        },
-                    )
+                    SplashScreen(onVideoFinish = { isSplashDone = true })
                 }
 
                 entry<NavigationKeys.Login> { _ ->
