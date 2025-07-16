@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.ksp)
     alias(libs.plugins.ktlint)
 }
 
@@ -38,6 +37,9 @@ android {
         versionName = version.toString()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "SUPABASE_URL", "\"${env.SUPABASE_URL.value}\"")
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"${env.SUPABASE_ANON_KEY.value}\"")
     }
 
     buildTypes {
@@ -63,6 +65,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -73,6 +76,7 @@ composeCompiler {
 
 dependencies {
     implementation(libs.kotlinx.serialization)
+    implementation(libs.ktor.client.engine.cio)
 
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.runtime)
@@ -103,10 +107,6 @@ dependencies {
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.camera.mlkit.vision)
     implementation(libs.text.recognition)
-
-    implementation(libs.datastore.preferences)
-    implementation(libs.room.runtime)
-    ksp(libs.room.compiler)
 
     debugImplementation(platform(libs.compose.bom))
     debugImplementation(libs.compose.ui.tooling)

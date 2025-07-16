@@ -29,6 +29,9 @@ androidx-test-junit = "1.2.1"
 # https://github.com/coil-kt/coil/releases
 coil = "3.2.0"
 
+# https://github.com/uzzu/dotenv-gradle/tags
+dotenv-gradle = "4.0.0"
+
 # https://google.github.io/accompanist/permissions/
 google-accompanist-permissions = "0.37.3"
 
@@ -167,3 +170,4 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin-ksp" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-plugin" }
+dotenv-gradle = { id = "co.uzzu.dotenv.gradle", version.ref = "dotenv-gradle" }
