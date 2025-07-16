@@ -37,8 +37,8 @@ fun MenuHeader(
                 shape = RoundedCornerShape(
                     topStart = 0.dp,
                     topEnd = 0.dp,
-                    bottomStart = 36.dp,
-                    bottomEnd = 36.dp,
+                    bottomStart = 30.dp,
+                    bottomEnd = 30.dp,
                 ),
             ).windowInsetsPadding(WindowInsets.statusBars),
     ) {

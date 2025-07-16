@@ -34,7 +34,7 @@ fun GarageTopBar(
         modifier = modifier,
     ) {
         AnimatedContent(
-            modifier = Modifier.padding(top = 50.dp),
+            modifier = Modifier.padding(top = 40.dp),
             targetState = uiState,
             transitionSpec = {
                 fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(150))
@@ -63,7 +63,7 @@ fun GarageTopBar(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun TopBarPreview() {
     var uiState by remember { mutableStateOf(GarageUiState.DEFAULT) }

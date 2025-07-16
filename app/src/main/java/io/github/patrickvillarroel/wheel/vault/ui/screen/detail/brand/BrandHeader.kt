@@ -3,6 +3,7 @@ package io.github.patrickvillarroel.wheel.vault.ui.screen.detail.brand
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -48,33 +49,35 @@ fun BrandHeader(
                     bottomStart = 36.dp,
                     bottomEnd = 36.dp,
                 ),
-            ).padding(10.dp),
+            ),
     ) {
         MenuButtonHeader(headerBackCallbacks)
         val (icon, description) = logoAndDescription
-        if (icon is Painter) {
-            Image(
-                icon,
-                description,
-                Modifier.align(Alignment.Center).width(300.dp),
-                contentScale = ContentScale.Crop,
-            )
-        } else {
-            AsyncImage(
-                icon,
-                description,
-                Modifier.align(Alignment.Center).width(300.dp),
-                contentScale = ContentScale.Crop,
-            )
-        }
-        TextButton(
-            headerBackCallbacks.onBackClick,
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .offset(y = (15).dp),
-        ) {
-            Icon(Icons.AutoMirrored.Default.KeyboardArrowLeft, stringResource(R.string.back), tint = Color.Black)
-            Text(stringResource(R.string.back), color = Color.Black, style = MaterialTheme.typography.labelLarge)
+        Box(Modifier.fillMaxSize().padding(10.dp)) {
+            if (icon is Painter) {
+                Image(
+                    icon,
+                    description,
+                    Modifier.align(Alignment.Center).width(300.dp),
+                    contentScale = ContentScale.Crop,
+                )
+            } else {
+                AsyncImage(
+                    icon,
+                    description,
+                    Modifier.align(Alignment.Center).width(300.dp),
+                    contentScale = ContentScale.Crop,
+                )
+            }
+            TextButton(
+                headerBackCallbacks.onBackClick,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .offset(y = (15).dp),
+            ) {
+                Icon(Icons.AutoMirrored.Default.KeyboardArrowLeft, stringResource(R.string.back), tint = Color.Black)
+                Text(stringResource(R.string.back), color = Color.Black, style = MaterialTheme.typography.labelLarge)
+            }
         }
     }
 }

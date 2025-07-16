@@ -6,9 +6,7 @@ import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -45,9 +43,11 @@ fun HomeContent(
         floatingActionButton = { HomeFloatingButton(onAddClick = info.onAddClick, onSearchClick = info.onSearchClick) },
     ) { paddingValues ->
         with(sharedTransitionScope) {
-            LazyColumn(Modifier.fillMaxSize().padding(paddingValues)) {
-                item { Spacer(modifier = Modifier.height(16.dp)) }
-
+            LazyColumn(
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+            ) {
                 // Sección de marcas
                 item {
                     Text(

@@ -33,7 +33,7 @@ fun DefaultFilterBar(onSearchClick: () -> Unit, onHomeClick: () -> Unit, modifie
         contentPadding = PaddingValues(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp),
-        modifier = modifier.padding(bottom = 10.dp, top = 8.dp),
+        modifier = modifier.padding(bottom = 15.dp, top = 8.dp),
     ) {
         item {
             AssistChip(
