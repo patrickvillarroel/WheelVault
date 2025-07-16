@@ -113,6 +113,9 @@ dependencies {
     implementation(libs.android.identity.googleid)
     implementation(libs.androidx.credentials.play.services.auth)
 
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui.compose)
+
     debugImplementation(platform(libs.compose.bom))
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)

@@ -6,6 +6,9 @@ import kotlinx.serialization.Serializable
 
 object NavigationKeys {
     @Serializable
+    data object Splash : NavKey
+
+    @Serializable
     data object Home : NavKey
 
     @Serializable

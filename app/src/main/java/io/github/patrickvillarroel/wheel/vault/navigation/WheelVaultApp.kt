@@ -3,10 +3,16 @@ package io.github.patrickvillarroel.wheel.vault.navigation
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
@@ -21,23 +27,54 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.home.HomeScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.login.LoginScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.login.LoginWithEmailScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.profile.ProfileScreen
+import io.github.patrickvillarroel.wheel.vault.ui.screen.session.SessionUiStatus
+import io.github.patrickvillarroel.wheel.vault.ui.screen.session.SessionViewModel
+import io.github.patrickvillarroel.wheel.vault.ui.screen.splash.SplashScreen
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun WheelVaultApp(modifier: Modifier = Modifier) {
-    val backStack = rememberNavBackStack(NavigationKeys.Login)
+fun WheelVaultApp(modifier: Modifier = Modifier, sessionViewModel: SessionViewModel = koinViewModel()) {
+    val session by sessionViewModel.session.collectAsStateWithLifecycle(minActiveState = Lifecycle.State.CREATED)
+    val backStack = rememberNavBackStack(NavigationKeys.Splash)
+
+    LaunchedEffect(session, backStack) {
+        when (session) {
+            SessionUiStatus.NotAuthenticated, SessionUiStatus.RefreshFailure -> {
+                if (backStack.lastOrNull() != NavigationKeys.Splash) {
+                    // Don't skip the splash screen
+                    backStack.clear()
+                }
+                backStack.add(NavigationKeys.Login)
+            }
+            is SessionUiStatus.Authenticated -> {
+                if (backStack.lastOrNull() == NavigationKeys.LoginWithEmailAndPassword) {
+                    backStack.clear()
+                    backStack.add(NavigationKeys.Home)
+                }
+            }
+            else -> Unit
+        }
+    }
 
     SharedTransitionLayout {
         NavDisplay(
             backStack = backStack,
             modifier = modifier.fillMaxSize(),
             onBack = { backStack.removeLastOrNull() },
-            transitionSpec = {
-                ContentTransform(slideInHorizontally { it }, slideOutHorizontally())
-            },
-            popTransitionSpec = {
-                ContentTransform(slideInHorizontally(), slideOutHorizontally { it })
-            },
+            transitionSpec = { ContentTransform(slideInHorizontally { it }, slideOutHorizontally()) },
+            popTransitionSpec = { ContentTransform(slideInHorizontally(), slideOutHorizontally { it }) },
             entryProvider = entryProvider {
+                entry<NavigationKeys.Splash>(
+                    popTransitionSpec = { ContentTransform(slideInVertically(), slideOutVertically()) },
+                ) { _ ->
+                    SplashScreen(
+                        onVideoFinish = {
+                            backStack.remove(NavigationKeys.Splash)
+                            backStack.add(NavigationKeys.Home)
+                        },
+                    )
+                }
+
                 entry<NavigationKeys.Login> { _ ->
                     LoginScreen(
                         onLoginSuccess = {
