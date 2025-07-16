@@ -56,103 +56,103 @@ fun CarDetailContent(
         },
     ) { paddingValues ->
         with(sharedTransitionScope) {
-            Column(
+            LazyColumn(
                 Modifier
                     .padding(paddingValues)
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .padding(start = 16.dp, end = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(3.dp),
             ) {
-                HeroImageCarousel(
-                    carDetail.images,
-                    Modifier.sharedBounds(rememberSharedContentState("car-${carDetail.id}"), animatedVisibilityScope),
-                )
+                item {
+                    HeroImageCarousel(
+                        carDetail.images,
+                        Modifier.sharedBounds(
+                            rememberSharedContentState("car-${carDetail.id}"),
+                            animatedVisibilityScope,
+                        ),
+                    )
+                }
 
-                LazyColumn(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(start = 16.dp, end = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(3.dp),
-                ) {
-                    item {
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text(
-                                text = "Información de Carrito",
-                                style = MaterialTheme.typography.headlineSmall,
-                                modifier = Modifier.padding(top = 16.dp),
-                            )
-                            FavoriteIcon(carDetail.isFavorite, callbacks.onFavoriteToggle)
-                        }
-                    }
-
-                    item {
-                        Text("Marca", style = MaterialTheme.typography.labelLarge)
-                        Text(carDetail.brand, style = MaterialTheme.typography.bodyLarge)
-                        RaceDivider()
-                    }
-
-                    item {
-                        Text("Modelo", style = MaterialTheme.typography.labelLarge)
-                        Text(carDetail.model, style = MaterialTheme.typography.bodyLarge)
-                        RaceDivider()
-                    }
-
-                    item {
-                        Text("Año", style = MaterialTheme.typography.labelLarge)
-                        Text(carDetail.year.toString(), style = MaterialTheme.typography.bodyLarge)
-                        RaceDivider()
-                    }
-
-                    item {
-                        Text("Fabricante", style = MaterialTheme.typography.labelLarge)
-                        Text(carDetail.manufacturer, style = MaterialTheme.typography.bodyLarge)
-                        RaceDivider()
-                    }
-
-                    item {
-                        Text("Categoría", style = MaterialTheme.typography.labelLarge)
-                        Text(carDetail.category ?: "--", style = MaterialTheme.typography.bodyLarge)
-                        RaceDivider()
-                    }
-
-                    item {
-                        Text("Descripción", style = MaterialTheme.typography.labelLarge)
-                        Text(carDetail.description ?: "--", style = MaterialTheme.typography.bodyLarge)
-                        RaceDivider()
-                    }
-
-                    item {
+                item {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Text(
-                            text = "Cantidad: ${carDetail.quantity}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Medium,
+                            text = "Información de Carrito",
+                            style = MaterialTheme.typography.headlineSmall,
+                            modifier = Modifier.padding(top = 16.dp),
                         )
-                        RaceDivider()
+                        FavoriteIcon(carDetail.isFavorite, callbacks.onFavoriteToggle)
                     }
+                }
 
-                    item {
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .wrapContentWidth(Alignment.CenterHorizontally),
-                            ButtonGroupDefaults.HorizontalArrangement,
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                OutlinedIconButton(
-                                    onClick = callbacks.onEditClick,
-                                    modifier = Modifier.size(65.dp),
-                                ) {
-                                    Icon(Icons.Filled.Edit, "Editar", Modifier.size(32.dp))
-                                }
-                                Text("Editar", fontWeight = FontWeight.SemiBold)
+                item {
+                    Text("Marca", style = MaterialTheme.typography.labelLarge)
+                    Text(carDetail.brand, style = MaterialTheme.typography.bodyLarge)
+                    RaceDivider()
+                }
+
+                item {
+                    Text("Modelo", style = MaterialTheme.typography.labelLarge)
+                    Text(carDetail.model, style = MaterialTheme.typography.bodyLarge)
+                    RaceDivider()
+                }
+
+                item {
+                    Text("Año", style = MaterialTheme.typography.labelLarge)
+                    Text(carDetail.year.toString(), style = MaterialTheme.typography.bodyLarge)
+                    RaceDivider()
+                }
+
+                item {
+                    Text("Fabricante", style = MaterialTheme.typography.labelLarge)
+                    Text(carDetail.manufacturer, style = MaterialTheme.typography.bodyLarge)
+                    RaceDivider()
+                }
+
+                item {
+                    Text("Categoría", style = MaterialTheme.typography.labelLarge)
+                    Text(carDetail.category ?: "--", style = MaterialTheme.typography.bodyLarge)
+                    RaceDivider()
+                }
+
+                item {
+                    Text("Descripción", style = MaterialTheme.typography.labelLarge)
+                    Text(carDetail.description ?: "--", style = MaterialTheme.typography.bodyLarge)
+                    RaceDivider()
+                }
+
+                item {
+                    Text(
+                        text = "Cantidad: ${carDetail.quantity}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium,
+                    )
+                    RaceDivider()
+                }
+
+                item {
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .wrapContentWidth(Alignment.CenterHorizontally),
+                        ButtonGroupDefaults.HorizontalArrangement,
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            OutlinedIconButton(
+                                onClick = callbacks.onEditClick,
+                                modifier = Modifier.size(65.dp),
+                            ) {
+                                Icon(Icons.Filled.Edit, "Editar", Modifier.size(32.dp))
                             }
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                OutlinedIconButton(
-                                    onClick = callbacks.onDeleteClick,
-                                    modifier = Modifier.size(65.dp),
-                                ) {
-                                    Icon(Icons.Outlined.Delete, "Eliminar", Modifier.size(32.dp), Color(0xFFE42E31))
-                                }
-                                Text("Eliminar", fontWeight = FontWeight.SemiBold)
+                            Text("Editar", fontWeight = FontWeight.SemiBold)
+                        }
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            OutlinedIconButton(
+                                onClick = callbacks.onDeleteClick,
+                                modifier = Modifier.size(65.dp),
+                            ) {
+                                Icon(Icons.Outlined.Delete, "Eliminar", Modifier.size(32.dp), Color(0xFFE42E31))
                             }
+                            Text("Eliminar", fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }

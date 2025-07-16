@@ -6,7 +6,10 @@ import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -17,9 +20,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BrandCard
@@ -36,18 +41,22 @@ fun HomeContent(
     modifier: Modifier = Modifier,
 ) {
     val (brands, news, recentCars) = remember(info.homeInfo) { info.homeInfo }
+    val layoutDirection = LocalLayoutDirection.current
 
     Scaffold(
         modifier = modifier,
-        topBar = { HomeCarHeader(info) },
         floatingActionButton = { HomeFloatingButton(onAddClick = info.onAddClick, onSearchClick = info.onSearchClick) },
     ) { paddingValues ->
         with(sharedTransitionScope) {
             LazyColumn(
-                Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
+                Modifier.padding(
+                    start = paddingValues.calculateStartPadding(layoutDirection),
+                    end = paddingValues.calculateEndPadding(layoutDirection),
+                    bottom = paddingValues.calculateBottomPadding(),
+                ).fillMaxSize(),
             ) {
+                // mini TODO header have inside padding of top bar
+                item { HomeCarHeader(info, Modifier.fillMaxWidth()) }
                 // Sección de marcas
                 item {
                     Text(
@@ -132,6 +141,7 @@ fun HomeContent(
     }
 }
 
+@PreviewScreenSizes
 @PreviewLightDark
 @Composable
 private fun HomeContentPreview() {

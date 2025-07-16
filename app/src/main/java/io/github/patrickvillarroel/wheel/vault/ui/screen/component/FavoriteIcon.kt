@@ -31,7 +31,7 @@ fun FavoriteIcon(isFavorite: Boolean, onFavoriteToggle: (Boolean) -> Unit, modif
 
     // Animaciones
     val starColor by animateColorAsState(
-        targetValue = if (isFavorite) Color.Yellow else Color.Gray,
+        targetValue = if (isFavorite) Color(0xFFFFEB3B) else Color.Gray,
         animationSpec = tween(durationMillis = 1000),
     )
 

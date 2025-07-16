@@ -40,7 +40,7 @@ fun BrandHeader(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(225.dp)
+            .height(170.dp)
             .background(
                 color = Color(0xFFE42E31),
                 shape = RoundedCornerShape(

@@ -54,7 +54,7 @@ fun HomeCarHeader(headerCallbacks: HeaderCallbacks, modifier: Modifier = Modifie
             stringResource(R.string.collectors_project),
             Modifier
                 .align(Alignment.TopCenter)
-                .padding(TopAppBarDefaults.windowInsets.asPaddingValues())
+                .padding(TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Top).asPaddingValues())
                 .padding(top = TopAppBarDefaults.TopAppBarExpandedHeight)
                 .fillMaxWidth(),
             contentScale = ContentScale.Crop,

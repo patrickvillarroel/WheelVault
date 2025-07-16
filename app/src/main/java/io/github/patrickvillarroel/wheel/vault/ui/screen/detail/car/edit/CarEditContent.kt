@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BackTextButton
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.FavoriteIcon
@@ -57,7 +58,7 @@ fun CarEditContent(
     var manufacturer by rememberSaveable { mutableStateOf(carDetailPartial.manufacturer ?: "") }
     var cantidad by rememberSaveable { mutableStateOf(carDetailPartial.quantity.toString()) }
     var categoria by rememberSaveable { mutableStateOf(carDetailPartial.category ?: "") }
-    val imagenes by rememberSaveable { mutableStateOf(carDetailPartial.images) }
+    val imagenes by rememberSaveable { mutableStateOf(carDetailPartial.images + R.drawable.car_add) }
     val headerCallbacks = remember {
         InterceptedHeaderBackCallbacks(
             headersBackCallbacks,

@@ -1,5 +1,6 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.component
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +15,8 @@ import androidx.compose.material3.carousel.HorizontalCenteredHeroCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -44,10 +47,8 @@ fun ImageCarousel(images: List<Any>, modifier: Modifier = Modifier) {
 
 @Composable
 fun HeroImageCarousel(images: List<Any>, modifier: Modifier = Modifier) {
-    val pagerState = rememberPagerState { images.size }
-
     HorizontalPager(
-        state = pagerState,
+        state = rememberPagerState { images.size },
         pageSpacing = 16.dp,
         contentPadding = PaddingValues(horizontal = 32.dp),
         modifier = modifier
@@ -58,14 +59,25 @@ fun HeroImageCarousel(images: List<Any>, modifier: Modifier = Modifier) {
         Card(
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF7F7F7F)),
             elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         ) {
-            AsyncImage(
-                model = images[page],
-                contentDescription = "Imagen $page",
-                contentScale = ContentScale.Fit,
-                modifier = Modifier.fillMaxSize(),
-            )
+            val image = images[page]
+            if (image is Painter) {
+                Image(
+                    image,
+                    contentDescription = "Imagen $page",
+                    Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit,
+                )
+            } else {
+                AsyncImage(
+                    model = images[page],
+                    contentDescription = "Imagen $page",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
         }
     }
 }

@@ -65,7 +65,8 @@ fun WheelVaultApp(modifier: Modifier = Modifier, sessionViewModel: SessionViewMo
             popTransitionSpec = { ContentTransform(slideInHorizontally(), slideOutHorizontally { it }) },
             entryProvider = entryProvider {
                 entry<NavigationKeys.Splash>(
-                    popTransitionSpec = { ContentTransform(slideInVertically(), slideOutVertically()) },
+                    transitionSpec = { ContentTransform(slideInVertically { -it }, slideOutVertically { it }) },
+                    popTransitionSpec = { ContentTransform(slideInVertically { it }, slideOutVertically { -it }) },
                 ) { _ ->
                     SplashScreen(
                         onVideoFinish = {
