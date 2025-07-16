@@ -40,6 +40,7 @@ android {
 
         buildConfigField("String", "SUPABASE_URL", "\"${env.SUPABASE_URL.value}\"")
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"${env.SUPABASE_ANON_KEY.value}\"")
+        buildConfigField("String", "SUPABASE_WEB_KEY", "\"${env.SUPABASE_WEB_KEY.value}\"")
     }
 
     buildTypes {
@@ -107,6 +108,10 @@ dependencies {
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.camera.mlkit.vision)
     implementation(libs.text.recognition)
+
+    implementation(libs.androidx.credentials)
+    implementation(libs.android.identity.googleid)
+    implementation(libs.androidx.credentials.play.services.auth)
 
     debugImplementation(platform(libs.compose.bom))
     debugImplementation(libs.compose.ui.tooling)

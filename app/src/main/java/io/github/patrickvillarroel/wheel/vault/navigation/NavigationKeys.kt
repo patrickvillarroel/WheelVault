@@ -39,7 +39,7 @@ object NavigationKeys {
     data object Login : NavKey
 
     @Serializable
-    data class LoginWithEmailAndPassword(val isRegister: Boolean) : NavKey
+    data class LoginWithEmailAndPassword(val isRegister: Boolean = false, val isMagicLink: Boolean = false) : NavKey
 
     @Serializable
     data object Profile : NavKey

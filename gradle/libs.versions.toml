@@ -12,6 +12,9 @@ androidx-activity-compose = "1.10.1"
 # https://developer.android.com/jetpack/androidx/releases/camera
 androidx-camera = "1.4.2"
 
+# https://developer.android.com/jetpack/androidx/releases/credentials
+androidx-credentials = "1.5.0"
+
 # https://developer.android.com/jetpack/androidx/releases/datastore
 androidx-datastore-preferences = "1.1.7"
 
@@ -37,6 +40,9 @@ google-accompanist-permissions = "0.37.3"
 
 # https://mvnrepository.com/artifact/androidx.compose.ui/ui-text-google-fonts
 google-fonts-compose = "1.8.3"
+
+# https://developers.google.com/identity/android-credential-manager/releases
+google-identity-googleid = "1.1.1"
 
 # https://developers.google.com/ml-kit/vision/text-recognition/v2/android
 google-mlkit-text-recognition = "16.0.1"
@@ -162,6 +168,11 @@ androidx-camera-view = { group = "androidx.camera", name = "camera-view", versio
 # mlkit
 androidx-camera-mlkit-vision = { group = "androidx.camera", name = "camera-mlkit-vision", version.ref = "androidx-camera" }
 text-recognition = { group = "com.google.mlkit", name = "text-recognition", version.ref = "google-mlkit-text-recognition" }
+# credentials manager
+androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "androidx-credentials" }
+android-identity-googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "google-identity-googleid" }
+# optional - needed for credentials support from play services, for devices running Android 13 and below.
+androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "androidx-credentials" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-agp" }

@@ -44,6 +44,9 @@ fun WheelVaultApp(modifier: Modifier = Modifier) {
                             backStack.remove(NavigationKeys.Login)
                             backStack.add(NavigationKeys.Home)
                         },
+                        onLoginWithEmail = {
+                            backStack.add(NavigationKeys.LoginWithEmailAndPassword(isMagicLink = true))
+                        },
                         onLoginWithEmailAndPasswordClick = {
                             backStack.add(NavigationKeys.LoginWithEmailAndPassword(isRegister = false))
                         },
@@ -53,9 +56,10 @@ fun WheelVaultApp(modifier: Modifier = Modifier) {
                     )
                 }
 
-                entry<NavigationKeys.LoginWithEmailAndPassword> { (isRegister) ->
+                entry<NavigationKeys.LoginWithEmailAndPassword> { (isRegister, isMagicLink) ->
                     LoginWithEmailScreen(
                         isRegister = isRegister,
+                        isMagicLink = isMagicLink,
                         onLoginSuccess = {
                             backStack.remove(NavigationKeys.Login)
                             backStack.add(NavigationKeys.Home)

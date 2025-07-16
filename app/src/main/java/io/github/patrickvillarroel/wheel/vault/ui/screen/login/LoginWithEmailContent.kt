@@ -2,6 +2,7 @@ package io.github.patrickvillarroel.wheel.vault.ui.screen.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -45,9 +46,21 @@ import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @OptIn(AuthUiExperimental::class)
 @Composable
-fun LoginWithEmailContent(onLoginClick: () -> Unit, isRegister: Boolean, modifier: Modifier = Modifier) {
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
+fun LoginWithEmailContent(
+    onClick: (String, String) -> Unit,
+    isRegister: Boolean,
+    isMagicLink: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val displayLabel = if (isRegister) {
+        "Registrate"
+    } else if (isMagicLink) {
+        "Ingresar con Correo"
+    } else {
+        "Iniciar Sesión"
+    }
+    var email by rememberSaveable(isRegister, isMagicLink) { mutableStateOf("") }
+    var password by rememberSaveable(isRegister, isMagicLink) { mutableStateOf("") }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -70,7 +83,7 @@ fun LoginWithEmailContent(onLoginClick: () -> Unit, isRegister: Boolean, modifie
             )
 
             Text(
-                if (isRegister) "Registrate" else "Iniciar Sesión",
+                displayLabel,
                 style = MaterialTheme.typography.headlineLarge,
                 color = Color.White,
                 textAlign = TextAlign.Center,
@@ -94,7 +107,7 @@ fun LoginWithEmailContent(onLoginClick: () -> Unit, isRegister: Boolean, modifie
                 ) {
                     AuthForm {
                         val state = LocalAuthState.current
-                        Column(Modifier.padding(10.dp)) {
+                        Column(Modifier.padding(10.dp).fillMaxSize(), verticalArrangement = Arrangement.Center) {
                             OutlinedEmailField(
                                 email,
                                 onValueChange = { email = it },
@@ -105,18 +118,20 @@ fun LoginWithEmailContent(onLoginClick: () -> Unit, isRegister: Boolean, modifie
                                 label = { Text("Correo electrónico", color = Color.White) },
                             )
 
-                            OutlinedPasswordField(
-                                password,
-                                onValueChange = { password = it },
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = Color.Black,
-                                    unfocusedBorderColor = Color.Black,
-                                ),
-                                label = { Text("Contraseña", color = Color.White) },
-                            )
+                            if (!isMagicLink) {
+                                OutlinedPasswordField(
+                                    password,
+                                    onValueChange = { password = it },
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = Color.Black,
+                                        unfocusedBorderColor = Color.Black,
+                                    ),
+                                    label = { Text("Contraseña", color = Color.White) },
+                                )
+                            }
 
                             Button(
-                                onClick = onLoginClick,
+                                onClick = { onClick(email, password) },
                                 enabled = state.validForm,
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Black,
@@ -157,6 +172,6 @@ fun LoginWithEmailContent(onLoginClick: () -> Unit, isRegister: Boolean, modifie
 @Composable
 private fun LoginPreview() {
     WheelVaultTheme {
-        LoginWithEmailContent(onLoginClick = {}, isRegister = false)
+        LoginWithEmailContent(onClick = { _, _ -> }, isRegister = false, isMagicLink = true)
     }
 }

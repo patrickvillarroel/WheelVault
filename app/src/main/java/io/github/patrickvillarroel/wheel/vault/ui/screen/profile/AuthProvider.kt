@@ -66,6 +66,6 @@ sealed class AuthProvider {
     @Stable
     companion object {
         val entries: List<AuthProvider>
-            get() = listOf(Email, Password, Google)
+            get() = listOfNotNull(Email, Password, Google)
     }
 }
