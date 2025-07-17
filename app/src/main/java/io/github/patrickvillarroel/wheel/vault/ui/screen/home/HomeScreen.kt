@@ -3,9 +3,15 @@ package io.github.patrickvillarroel.wheel.vault.ui.screen.home
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.patrickvillarroel.wheel.vault.R
+import io.github.patrickvillarroel.wheel.vault.ui.screen.BrandViewModel
+import org.koin.compose.viewmodel.koinViewModel
+import java.util.UUID
 
 @Composable
 fun HomeScreen(
@@ -13,16 +19,21 @@ fun HomeScreen(
     animatedVisibilityScope: AnimatedVisibilityScope,
     callbacks: HomeNavCallbacks,
     modifier: Modifier = Modifier,
+    brandViewModel: BrandViewModel = koinViewModel(),
 ) {
-    // TODO use VM or something
-    val brands = remember { listOf(1 to R.drawable.hot_wheels_logo_black) }
+    val brands by brandViewModel.brandsImages.collectAsStateWithLifecycle()
     val news = remember { listOf(R.drawable.thumbnail_example) }
-    val recentCars = remember { listOf(1 to R.drawable.batman_car) }
+    val recentCars = remember { listOf(UUID.randomUUID() to R.drawable.batman_car) }
+
+    LaunchedEffect(true) {
+        brandViewModel.fetchAll()
+    }
 
     HomeContent(
         sharedTransitionScope = sharedTransitionScope,
         animatedVisibilityScope = animatedVisibilityScope,
         info = HomeCallbacks(
+            // TODO, maybe need a loading status and stuffs
             brands = brands,
             news = news,
             recentCars = recentCars,
