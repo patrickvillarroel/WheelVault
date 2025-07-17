@@ -101,7 +101,10 @@ dependencies {
 
     implementation(platform(libs.supabase.bom))
     implementation(libs.supabase.compose.auth.ui)
+    implementation(libs.supabase.compose.coil3)
     implementation(libs.supabase.auth)
+    implementation(libs.supabase.postgres)
+    implementation(libs.supabase.storage)
 
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
