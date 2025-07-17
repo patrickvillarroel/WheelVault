@@ -11,7 +11,7 @@ import java.util.UUID
 interface CarsRepository {
     suspend fun search(query: String, isFavorite: Boolean = false): List<CarItem>
 
-    suspend fun fetchAll(isFavorite: Boolean = false): List<CarItem>
+    suspend fun fetchAll(isFavorite: Boolean = false, limit: Int = 10): List<CarItem>
     suspend fun fetch(id: UUID): CarItem?
     suspend fun fetchByModel(model: String, isFavorite: Boolean = false): CarItem?
     suspend fun fetchByYear(year: Int, isFavorite: Boolean = false): CarItem?
@@ -26,7 +26,10 @@ interface CarsRepository {
     suspend fun countByBrand(brand: String, isFavorite: Boolean = false): Int
     suspend fun countByCategory(category: String, isFavorite: Boolean = false): Int
 
+    /** Only receive images as ByteArray. */
     suspend fun insert(car: CarItem): CarItem
+
+    /** Only receive images as ByteArray. */
     suspend fun update(car: CarItem): CarItem
     suspend fun delete(car: CarItem): Boolean
 }
