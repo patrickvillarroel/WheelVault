@@ -71,15 +71,18 @@ fun CameraLensScreen(
     }
 
     CameraLensContent(
-        onBack = onBack,
-        onSkipClick = { onAddDetail(null) },
-        processImage = { viewModel.processImage(it) },
         recognizedText = recognizedText,
         isProcessing = isProcessing,
         showControls = showControls,
         isCameraPermission = isCameraPermission,
-        reset = { viewModel.reset() },
-        onConfirm = { onAddDetail(recognizedText) },
+        callbacks = CameraCallbacks(
+            onBack = onBack,
+            onSkipClick = { onAddDetail(null) },
+            processImage = { viewModel.processImage(it) },
+            reset = { viewModel.reset() },
+            onConfirm = { onAddDetail(recognizedText) },
+            saveImage = { viewModel.saveImage(it) },
+        ),
         modifier = modifier,
     )
 }

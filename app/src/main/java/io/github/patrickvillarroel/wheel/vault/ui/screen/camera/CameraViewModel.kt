@@ -106,6 +106,9 @@ class CameraViewModel : ViewModel() {
         }
     }
 
+    fun saveImage(imageBytes: ByteArray) {
+    }
+
     override fun onCleared() {
         super.onCleared()
         textRecognizer.close()

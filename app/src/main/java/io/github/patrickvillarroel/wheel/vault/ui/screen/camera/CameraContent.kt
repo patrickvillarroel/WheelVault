@@ -1,6 +1,5 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.camera
 
-import androidx.camera.core.ImageProxy
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -31,15 +30,11 @@ import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
 fun CameraLensContent(
-    onBack: () -> Unit,
-    onSkipClick: () -> Unit,
-    processImage: (ImageProxy) -> Unit,
     recognizedText: String,
     isProcessing: Boolean,
     showControls: Boolean,
     isCameraPermission: Boolean,
-    reset: () -> Unit,
-    onConfirm: () -> Unit,
+    callbacks: CameraCallbacks,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(modifier, topBar = {
@@ -53,7 +48,7 @@ fun CameraLensContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Row(Modifier.clickable(onClick = onBack)) {
+            Row(Modifier.clickable(onClick = callbacks.onBack)) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.back),
@@ -64,7 +59,7 @@ fun CameraLensContent(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(stringResource(R.string.back), color = Color.White)
             }
-            TextButton(onClick = onSkipClick) {
+            TextButton(onClick = callbacks.onSkipClick) {
                 Icon(
                     imageVector = Icons.Default.FastForward,
                     contentDescription = stringResource(R.string.skip),
@@ -88,7 +83,8 @@ fun CameraLensContent(
             // Vista de cámara
             if (isCameraPermission) {
                 CameraPreview(
-                    onImageCapture = processImage,
+                    onImageCaptureForAnalysis = callbacks.processImage,
+                    onImageCapture = callbacks.saveImage,
                     modifier = Modifier.size(412.dp, 648.dp),
                 )
             }
@@ -131,8 +127,8 @@ fun CameraLensContent(
 
             CameraControllers(
                 showControls = showControls,
-                reset = reset,
-                onConfirm = onConfirm,
+                reset = callbacks.reset,
+                onConfirm = callbacks.onConfirm,
                 modifier = Modifier.offset(y = (-30).dp),
             )
         }
@@ -169,15 +165,18 @@ fun BoxScope.CameraControllers(
 private fun CamaraPreview() {
     WheelVaultTheme {
         CameraLensContent(
-            onBack = {},
-            onSkipClick = {},
-            processImage = {},
             recognizedText = "Hola",
             isProcessing = false,
             showControls = true,
             isCameraPermission = false,
-            reset = {},
-            onConfirm = {},
+            callbacks = CameraCallbacks(
+                reset = {},
+                onConfirm = {},
+                onBack = {},
+                onSkipClick = {},
+                processImage = {},
+                saveImage = {},
+            ),
         )
     }
 }
