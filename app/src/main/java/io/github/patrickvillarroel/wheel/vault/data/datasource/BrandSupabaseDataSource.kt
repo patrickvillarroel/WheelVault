@@ -27,28 +27,28 @@ data class BrandSupabaseDataSource(private val supabase: SupabaseClient, private
                 BrandObj::description ilike "%$query%"
             }
         }
-    }.decodeList<BrandObj>().map { it.toDomain(fetchImage(it.id)) }
+    }.decodeList<BrandObj>().map { it.toDomain(fetchImage(it.id!!)) }
 
     override suspend fun fetchAll(): List<Brand> = supabase.from(BrandObj.TABLE).select().decodeList<BrandObj>().map {
-        it.toDomain(fetchImage(it.id))
+        it.toDomain(fetchImage(it.id!!))
     }
 
     override suspend fun fetch(id: UUID): Brand? = supabase.from(BrandObj.TABLE).select {
         filter { BrandObj::id eq id.toKotlinUuid() }
     }.decodeSingleOrNull<BrandObj>()?.toDomain {
-        fetchImage(it.id)
+        fetchImage(it.id!!)
     }
 
     override suspend fun fetchByName(name: String): Brand? = supabase.from(BrandObj.TABLE).select {
         filter { BrandObj::name ilike "%$name%" }
     }.decodeSingleOrNull<BrandObj>()?.toDomain {
-        fetchImage(it.id)
+        fetchImage(it.id!!)
     }
 
     override suspend fun fetchByDescription(description: String): Brand? = supabase.from(BrandObj.TABLE).select {
         filter { BrandObj::description ilike "%$description%" }
     }.decodeSingleOrNull<BrandObj>()?.toDomain {
-        fetchImage(it.id)
+        fetchImage(it.id!!)
     }
 
     private fun fetchImage(id: UUID, contentType: String = "png") = ImageRequest.Builder(context)

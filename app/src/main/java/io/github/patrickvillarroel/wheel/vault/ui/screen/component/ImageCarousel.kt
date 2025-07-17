@@ -46,7 +46,7 @@ fun ImageCarousel(images: List<Any>, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun HeroImageCarousel(images: List<Any>, modifier: Modifier = Modifier) {
+fun HeroImageCarousel(images: Set<Any>, modifier: Modifier = Modifier) {
     HorizontalPager(
         state = rememberPagerState { images.size },
         pageSpacing = 16.dp,
@@ -62,7 +62,7 @@ fun HeroImageCarousel(images: List<Any>, modifier: Modifier = Modifier) {
             colors = CardDefaults.cardColors(containerColor = Color(0xFF7F7F7F)),
             elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         ) {
-            val image = images[page]
+            val image = images.elementAt(page)
             if (image is Painter) {
                 Image(
                     image,
@@ -72,7 +72,7 @@ fun HeroImageCarousel(images: List<Any>, modifier: Modifier = Modifier) {
                 )
             } else {
                 AsyncImage(
-                    model = images[page],
+                    model = image,
                     contentDescription = "Imagen $page",
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.fillMaxSize(),

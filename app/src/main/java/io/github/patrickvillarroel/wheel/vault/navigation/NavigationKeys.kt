@@ -38,7 +38,7 @@ object NavigationKeys {
         val brand: String? = null,
         val description: String? = null,
         val category: String? = null,
-        val images: List<String> = emptyList(),
+        val images: Set<String> = emptySet(),
         val isFavorite: Boolean = false,
     ) : NavKey
 

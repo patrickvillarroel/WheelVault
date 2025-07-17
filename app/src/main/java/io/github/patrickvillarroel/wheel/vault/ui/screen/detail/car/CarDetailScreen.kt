@@ -26,7 +26,7 @@ fun CarDetailScreen(
                 year = 2025,
                 manufacturer = "HotWheels",
                 quantity = 2,
-                images = listOf(
+                images = setOf(
                     "https://m.media-amazon.com/images/I/61iE8unK0XL._AC_SL1069_.jpg",
                     "https://m.media-amazon.com/images/I/61ojzr1uMCL.jpg",
                     "https://th.bing.com/th/id/R.6c22f47603c5163100d66383df8468fb?rik=J6k0pKwJXl45KQ&pid=ImgRaw&r=0",

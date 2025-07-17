@@ -3,11 +3,12 @@
 package io.github.patrickvillarroel.wheel.vault.data.objects
 
 import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
+import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
+import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.toJavaUuid
@@ -19,7 +20,7 @@ fun BrandObj.toDomain(image: Any) = Brand(
     description = this.description,
     image = image,
     contentDescription = "Logo of $name", // TODO use i18n
-    id = this.id.toJavaUuid(),
+    id = this.id!!.toJavaUuid(),
 )
 
 context(_: BrandRepository)
@@ -33,5 +34,31 @@ fun Brand.toObject() = BrandObj(
     name = this.name,
     description = this.description,
     id = this.id.toKotlinUuid(),
-    createdAt = Clock.System.now().toString(),
+)
+
+context(_: CarsRepository)
+fun CarItem.toObject() = CarObj(
+    id = this.id.toKotlinUuid(),
+    model = this.model,
+    year = this.year,
+    brand = this.brand,
+    manufacturer = this.manufacturer,
+    category = this.category,
+    description = this.description,
+    quantity = this.quantity,
+    isFavorite = this.isFavorite,
+)
+
+context(_: CarsRepository)
+fun CarObj.toDomain(images: Set<Any>) = CarItem(
+    id = this.id!!.toJavaUuid(),
+    model = this.model,
+    year = this.year,
+    brand = this.brand,
+    manufacturer = this.manufacturer,
+    category = this.category,
+    description = this.description,
+    quantity = this.quantity,
+    isFavorite = this.isFavorite,
+    images = images,
 )

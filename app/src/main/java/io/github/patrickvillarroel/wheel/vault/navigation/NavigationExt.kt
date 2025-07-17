@@ -27,7 +27,7 @@ fun CarItem.Partial.toCarEdit(): NavigationKeys.CarEdit {
         quantity = partial.quantity,
         manufacturer = partial.manufacturer,
         isFavorite = partial.isFavorite,
-        images = partial.images.map { it.toString() },
+        images = partial.images.map { it.toString() }.toSet(),
         description = partial.description,
         category = partial.category,
     )

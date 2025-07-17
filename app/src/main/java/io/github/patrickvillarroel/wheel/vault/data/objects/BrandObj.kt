@@ -10,11 +10,11 @@ import kotlin.uuid.Uuid
 /** Brand object of PostgresSQL from Supabase */
 @Serializable
 data class BrandObj(
-    val id: Uuid,
+    val id: Uuid? = null,
     val name: String,
     val description: String,
     @SerialName("created_at")
-    val createdAt: String,
+    val createdAt: String? = null,
 ) {
     companion object {
         const val TABLE = "brands"

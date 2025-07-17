@@ -173,7 +173,7 @@ private fun CarDetailContentPreview() {
             description = "A reliable and fuel-efficient sedan.",
             category = "Sedan",
             quantity = 5,
-            images = listOf("image1.jpg", "image2.jpg", "image3.jpg"),
+            images = setOf("image1.jpg", "image2.jpg", "image3.jpg"),
         )
     }
 

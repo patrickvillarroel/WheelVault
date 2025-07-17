@@ -110,7 +110,7 @@ private fun CardItemPreview() {
             brand = "Hot Wheels",
             manufacturer = "HotWheels",
             quantity = 2,
-            images = listOf(
+            images = setOf(
                 "https://tse1.mm.bing.net/th/id/OIP.zfsbW7lEIwYgeUt7Fd1knwHaHg?rs=1&pid=ImgDetMain&o=7&rm=3",
             ),
             isFavorite = true,

@@ -8,7 +8,7 @@ data class CarItem(
     val year: Int,
     val manufacturer: String,
     val brand: String,
-    val images: List<Any>,
+    val images: Set<Any> = setOf(EmptyImage),
     val quantity: Int = 0,
     val isFavorite: Boolean = false,
     val description: String? = null,
@@ -28,7 +28,7 @@ data class CarItem(
         brand = manufacturer,
         manufacturer = manufacturer,
         quantity = quantity,
-        images = listOf(imageUrl),
+        images = setOf(imageUrl),
         isFavorite = isFavorite,
     )
 
@@ -63,7 +63,7 @@ data class CarItem(
         val brand: String? = null,
         val description: String? = null,
         val category: String? = null,
-        val images: List<Any> = emptyList(),
+        val images: Set<Any> = setOf(),
         val isFavorite: Boolean = false,
     ) {
         fun toCarItem(): CarItem? {
@@ -78,4 +78,6 @@ data class CarItem(
             )
         }
     }
+
+    data object EmptyImage
 }
