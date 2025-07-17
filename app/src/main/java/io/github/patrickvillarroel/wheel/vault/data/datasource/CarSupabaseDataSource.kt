@@ -112,21 +112,19 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
         TODO()
     }
 
-    private suspend fun fetchAllImages(
-        carId: Uuid,
-        userId: String = supabase.auth.currentUserOrNull()!!.id,
-        contentType: String = "png",
-    ) = supabase.storage.from(CarObj.BUCKET_IMAGES)
-        .list("$userId/$carId")
-        .map { file ->
-            ImageRequest.Builder(context)
-                .data(authenticatedStorageItem(CarObj.BUCKET_IMAGES, "$userId/$carId/${file.name}.$contentType"))
-                .build()
-        }.toSet()
+    private suspend fun fetchAllImages(carId: Uuid, userId: String = supabase.auth.currentUserOrNull()!!.id) =
+        supabase.storage.from(CarObj.BUCKET_IMAGES)
+            .list("$userId/$carId")
+            .map { file ->
+                ImageRequest.Builder(context)
+                    .data(authenticatedStorageItem(CarObj.BUCKET_IMAGES, "$userId/$carId/${file.name}"))
+                    .build()
+            }.toSet()
 
     private suspend fun uploadImages(
         carId: UUID,
         images: Set<ByteArray>,
+        contentType: String = "png",
         userId: String = supabase.auth.currentUserOrNull()!!.id,
     ): Set<String> = coroutineScope {
         val results: MutableSet<String> = ConcurrentSkipListSet()
@@ -134,7 +132,7 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
         images.map { bytes ->
             async {
                 val imageId = UUID.randomUUID()
-                val path = "$userId/$carId/$imageId.png"
+                val path = "$userId/$carId/$imageId.$contentType"
 
                 try {
                     val bucketPath = supabase.storage.from(CarObj.BUCKET_IMAGES).upload(path, bytes) {
