@@ -7,12 +7,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
+import java.util.UUID
 
 @Composable
 fun CarDetailScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    carId: Int,
+    carId: UUID,
     onEditClick: (CarItem) -> Unit,
     headerBackCallbacks: HeaderBackCallbacks,
     modifier: Modifier = Modifier,
@@ -36,7 +37,7 @@ fun CarDetailScreen(
         }
     }
 
-    val carDetail = remember(carId) { cars.getOrNull(carId) ?: cars.first().copy(id = carId) }
+    val carDetail = remember(carId) { cars.firstOrNull { it.id == carId } ?: cars.first().copy(id = carId) }
 
     CarDetailContent(
         sharedTransitionScope = sharedTransitionScope,

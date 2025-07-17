@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package io.github.patrickvillarroel.wheel.vault.navigation
 
 import androidx.compose.animation.ContentTransform
@@ -34,6 +36,9 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.session.SessionUiStatus
 import io.github.patrickvillarroel.wheel.vault.ui.screen.session.SessionViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.splash.SplashScreen
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.toJavaUuid
+import kotlin.uuid.toKotlinUuid
 
 @Composable
 fun WheelVaultApp(modifier: Modifier = Modifier, sessionViewModel: SessionViewModel = koinViewModel()) {
@@ -112,9 +117,9 @@ fun WheelVaultApp(modifier: Modifier = Modifier, sessionViewModel: SessionViewMo
                         callbacks = HomeNavCallbacks(
                             onAddClick = { backStack.add(NavigationKeys.AddCamera) },
                             onSearchClick = { backStack.add(NavigationKeys.Garage("")) },
-                            onBrandClick = { backStack.add(NavigationKeys.BrandDetail(it)) },
+                            onBrandClick = { backStack.add(NavigationKeys.BrandDetail(it.toKotlinUuid())) },
                             onGarageClick = { backStack.add(NavigationKeys.Garage()) },
-                            onCarClick = { backStack.add(NavigationKeys.CarDetail(it)) },
+                            onCarClick = { backStack.add(NavigationKeys.CarDetail(it.toKotlinUuid())) },
                             onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
                             onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
                             onProfileClick = { backStack.add(NavigationKeys.Profile) },
@@ -134,7 +139,7 @@ fun WheelVaultApp(modifier: Modifier = Modifier, sessionViewModel: SessionViewMo
                     BrandDetailScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
-                        brandId = id,
+                        brandId = id.toJavaUuid(),
                         headerBackCallbacks = HeaderBackCallbacks(
                             onBackClick = { backStack.removeLastOrNull() },
                             onProfileClick = { backStack.add(NavigationKeys.Profile) },
@@ -143,7 +148,7 @@ fun WheelVaultApp(modifier: Modifier = Modifier, sessionViewModel: SessionViewMo
                             onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
                         ),
                         onAddClick = { backStack.add(NavigationKeys.AddCamera) },
-                        onCarClick = { backStack.add(NavigationKeys.CarDetail(it)) },
+                        onCarClick = { backStack.add(NavigationKeys.CarDetail(it.toKotlinUuid())) },
                     )
                 }
 
@@ -160,7 +165,7 @@ fun WheelVaultApp(modifier: Modifier = Modifier, sessionViewModel: SessionViewMo
                                 backStack.add(NavigationKeys.Home)
                             }
                         },
-                        onCarClick = { backStack.add(NavigationKeys.CarDetail(it)) },
+                        onCarClick = { backStack.add(NavigationKeys.CarDetail(it.toKotlinUuid())) },
                         onAddClick = { backStack.add(NavigationKeys.AddCamera) },
                         onProfileClick = { backStack.add(NavigationKeys.Profile) },
                     )
@@ -170,7 +175,7 @@ fun WheelVaultApp(modifier: Modifier = Modifier, sessionViewModel: SessionViewMo
                     CarDetailScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
-                        carId = id,
+                        carId = id.toJavaUuid(),
                         onEditClick = { backStack.add(it.toCarEdit()) },
                         headerBackCallbacks = HeaderBackCallbacks(
                             onBackClick = { backStack.removeLastOrNull() },

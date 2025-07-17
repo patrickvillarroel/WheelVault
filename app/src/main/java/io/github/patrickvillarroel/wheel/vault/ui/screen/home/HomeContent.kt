@@ -32,6 +32,7 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.component.CarCard
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.RaceDivider
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.VideoCardPreview
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
+import java.util.UUID
 
 @Composable
 fun HomeContent(
@@ -152,9 +153,9 @@ private fun HomeContentPreview() {
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
                     info = HomeCallbacks(
-                        brands = List(10) { it to R.drawable.hot_wheels_logo_black },
+                        brands = List(10) { UUID.randomUUID() to R.drawable.hot_wheels_logo_black },
                         news = listOf(R.drawable.thumbnail_example),
-                        recentCars = listOf(1 to R.drawable.batman_car),
+                        recentCars = listOf(UUID.randomUUID() to R.drawable.batman_car),
                         onAddClick = {},
                         onSearchClick = {},
                         onBrandClick = {},

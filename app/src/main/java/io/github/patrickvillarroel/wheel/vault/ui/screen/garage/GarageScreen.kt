@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderCallbacks
+import java.util.UUID
 
 @Composable
 fun GarageScreen(
@@ -14,7 +15,7 @@ fun GarageScreen(
     animatedVisibilityScope: AnimatedVisibilityScope,
     onHomeClick: () -> Unit,
     onAddClick: () -> Unit,
-    onCarClick: (Int) -> Unit,
+    onCarClick: (UUID) -> Unit,
     onProfileClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {

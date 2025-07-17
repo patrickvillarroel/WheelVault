@@ -1,10 +1,9 @@
 package io.github.patrickvillarroel.wheel.vault.domain.model
 
-import kotlin.random.Random
+import java.util.UUID
 
 data class CarItem(
-    // TODO
-    val id: Int = Random.nextInt(),
+    val id: UUID = UUID.randomUUID(),
     val model: String,
     val year: Int,
     val manufacturer: String,

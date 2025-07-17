@@ -1,8 +1,12 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package io.github.patrickvillarroel.wheel.vault.navigation
 
 import androidx.compose.runtime.Stable
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 object NavigationKeys {
     @Serializable
@@ -15,10 +19,10 @@ object NavigationKeys {
     data object AddCamera : NavKey
 
     @Serializable
-    data class BrandDetail(val id: Int) : NavKey
+    data class BrandDetail(val id: Uuid) : NavKey
 
     @Serializable
-    data class CarDetail(val id: Int) : NavKey
+    data class CarDetail(val id: Uuid) : NavKey
 
     @Serializable
     data class Garage(val query: String? = null, val favorites: Boolean = false, val statistics: Boolean = false) :

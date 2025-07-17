@@ -9,14 +9,15 @@ import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
+import java.util.UUID
 
 @Composable
 fun BrandDetailScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    brandId: Int,
+    brandId: UUID,
     onAddClick: () -> Unit,
-    onCarClick: (Int) -> Unit,
+    onCarClick: (UUID) -> Unit,
     headerBackCallbacks: HeaderBackCallbacks,
     modifier: Modifier = Modifier,
 ) {
@@ -41,7 +42,7 @@ fun BrandDetailScreen(
             },
         )
     }
-    val (brand, cars) = remember(brandId) { brands.getOrNull(brandId) ?: brands.first() }
+    val (brand, cars) = remember(brandId) { brands.firstOrNull { it.first.id == brandId } ?: brands.first() }
 
     BrandDetailContent(
         sharedTransitionScope = sharedTransitionScope,
