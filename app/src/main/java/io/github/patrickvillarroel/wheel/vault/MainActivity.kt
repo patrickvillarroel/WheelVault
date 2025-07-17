@@ -10,6 +10,12 @@ import io.github.patrickvillarroel.wheel.vault.navigation.WheelVaultApp
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 import org.koin.android.ext.android.inject
 
+/**
+ * Wheel Vault app
+ * @author Rey Acosta 8-1024-1653
+ * @author Patrick Villarroel E-8-206126
+ * @author Derlin Romero 20-62-7741
+ */
 class MainActivity : ComponentActivity() {
     val supabase: SupabaseClient by inject()
 
