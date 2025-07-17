@@ -10,8 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.ui.screen.BrandViewModel
+import io.github.patrickvillarroel.wheel.vault.ui.screen.CarViewModel
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.UUID
 
 @Composable
 fun HomeScreen(
@@ -20,13 +20,15 @@ fun HomeScreen(
     callbacks: HomeNavCallbacks,
     modifier: Modifier = Modifier,
     brandViewModel: BrandViewModel = koinViewModel(),
+    carViewModel: CarViewModel = koinViewModel(),
 ) {
     val brands by brandViewModel.brandsImages.collectAsStateWithLifecycle()
+    val recentCars by carViewModel.recentCarsImages.collectAsStateWithLifecycle()
     val news = remember { listOf(R.drawable.thumbnail_example) }
-    val recentCars = remember { listOf(UUID.randomUUID() to R.drawable.batman_car) }
 
     LaunchedEffect(true) {
         brandViewModel.fetchAll()
+        carViewModel.fetchRecentCars()
     }
 
     HomeContent(
