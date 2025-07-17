@@ -6,6 +6,7 @@ import org.koin.dsl.module
 val wheelVaultModule = module {
     // data-sources
     includes(supabaseModule)
+    includes(dataModule)
 
     // presenter
     includes(presenterModule)

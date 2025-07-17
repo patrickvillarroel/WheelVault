@@ -1,5 +1,6 @@
 package io.github.patrickvillarroel.wheel.vault.di
 
+import io.github.patrickvillarroel.wheel.vault.ui.screen.BrandViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.camera.CameraPermissionViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.camera.CameraViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.login.LoginViewModel
@@ -12,4 +13,5 @@ val presenterModule = module {
     viewModel { CameraPermissionViewModel() }
     viewModel { LoginViewModel(get()) }
     viewModel { SessionViewModel(get()) }
+    viewModel { BrandViewModel(get()) }
 }
