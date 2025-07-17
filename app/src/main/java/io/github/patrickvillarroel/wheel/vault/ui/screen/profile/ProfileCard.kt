@@ -1,7 +1,6 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.profile
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -44,7 +42,6 @@ fun ProfileCard(
     onEditClick: () -> Unit,
     onEmailChange: (String) -> Unit,
     linkedAccounts: Map<AuthProvider, Boolean>,
-    onProviderClick: (AuthProvider) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -109,8 +106,7 @@ fun ProfileCard(
                         modifier = Modifier
                             .size(48.dp)
                             .clip(CircleShape)
-                            .background(if (isLinked) Color.White else Color.Gray.copy(alpha = 0.2f))
-                            .clickable { onProviderClick(provider) },
+                            .background(if (isLinked) Color.White else Color.Gray.copy(alpha = 0.2f)),
                     ) {
                         if (isLinked) {
                             provider.Icon(
@@ -123,12 +119,6 @@ fun ProfileCard(
                                     .fillMaxSize()
                                     .background(Color.Gray.copy(alpha = 0.6f), CircleShape),
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = "Agregar ${provider.name}",
-                                    modifier = Modifier.align(Alignment.Center),
-                                    tint = Color.White,
-                                )
                                 provider.Icon(
                                     tint = Color.Black,
                                     modifier = Modifier.align(Alignment.Center).size(30.dp),
@@ -156,7 +146,6 @@ private fun CardPreview() {
                 AuthProvider.Password to false,
                 AuthProvider.Google to true,
             ),
-            onProviderClick = {},
         )
     }
 }

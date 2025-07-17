@@ -53,7 +53,6 @@ fun ProfileContent(email: String, isEditable: Boolean, callbacks: ProfileCallbac
                 onEditClick = callbacks.onEditClick,
                 onEmailChange = callbacks.onEmailChange,
                 linkedAccounts = callbacks.linkedAccounts,
-                onProviderClick = callbacks.onProviderClick,
                 modifier = Modifier.align(Alignment.TopCenter).offset(y = 70.dp),
             )
 
@@ -108,7 +107,6 @@ private fun ProfileContentPreview() {
                 onEditClick = {},
                 onEmailChange = {},
                 linkedAccounts = mapOf(AuthProvider.Email to true, AuthProvider.Password to false),
-                onProviderClick = {},
                 backCallbacks = HeaderBackCallbacks(
                     onBackClick = {},
                     onProfileClick = {},

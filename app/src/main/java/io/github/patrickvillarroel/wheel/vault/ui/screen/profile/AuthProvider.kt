@@ -10,8 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import io.github.jan.supabase.compose.auth.ui.ProviderIcon
+import androidx.compose.ui.platform.LocalDensity
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.compose.auth.ui.annotations.AuthUiExperimental
+import io.github.jan.supabase.compose.auth.ui.providerPainter
 import androidx.compose.material3.Icon as MaterialIcon
 import io.github.jan.supabase.auth.providers.Google as ProviderGoogle
 
@@ -56,11 +58,18 @@ sealed class AuthProvider {
     object Google : AuthProvider() {
         override val name: String = "Google"
 
-        @OptIn(AuthUiExperimental::class)
+        @OptIn(AuthUiExperimental::class, SupabaseInternal::class)
         @Composable
         @Stable
         override fun Icon(modifier: Modifier, contentDescription: String?, tint: Color) {
-            ProviderIcon(ProviderGoogle, contentDescription, modifier)
+            providerPainter(ProviderGoogle, LocalDensity.current)?.let {
+                MaterialIcon(
+                    painter = it,
+                    contentDescription = contentDescription,
+                    tint = tint,
+                    modifier = modifier,
+                )
+            }
         }
     }
 
