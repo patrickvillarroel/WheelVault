@@ -13,6 +13,9 @@ object NavigationKeys {
     data object Splash : NavKey
 
     @Serializable
+    data object Onboarding : NavKey
+
+    @Serializable
     data object Home : NavKey
 
     @Serializable

@@ -58,14 +58,6 @@ fun MenuDropDown(menuDropdownCallbacks: HeaderMenuDropdownCallbacks, modifier: M
                 menuDropdownCallbacks.onFavoritesClick()
             },
         )
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.statistics)) },
-            leadingIcon = { Icon(Icons.Outlined.Calculate, contentDescription = null) },
-            onClick = {
-                expandedMenu = false
-                menuDropdownCallbacks.onStatisticsClick()
-            },
-        )
     }
 }
 
