@@ -93,3 +93,13 @@ inline fun <reified T : NavKey> EntryProviderBuilder<*>.entry(
         },
     )
 }
+
+/** Remove all element is not equal to [element] or add [element] if not exist */
+fun <T> MutableList<T>.removeAllOrAdd(element: T) {
+    val indexHome = this.lastIndexOf(element)
+    if (indexHome != -1) {
+        this.removeAll { it != element }
+    } else {
+        this.add(element)
+    }
+}

@@ -35,6 +35,7 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.profile.ProfileScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.session.SessionUiStatus
 import io.github.patrickvillarroel.wheel.vault.ui.screen.session.SessionViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.splash.OnboardingScreen
+import io.github.patrickvillarroel.wheel.vault.ui.screen.splash.OnboardingViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.splash.SplashScreen
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.uuid.ExperimentalUuidApi
@@ -42,8 +43,15 @@ import kotlin.uuid.toJavaUuid
 import kotlin.uuid.toKotlinUuid
 
 @Composable
-fun WheelVaultApp(modifier: Modifier = Modifier, sessionViewModel: SessionViewModel = koinViewModel()) {
+fun WheelVaultApp(
+    modifier: Modifier = Modifier,
+    sessionViewModel: SessionViewModel = koinViewModel(),
+    onboardingViewModel: OnboardingViewModel = koinViewModel(),
+) {
     val session by sessionViewModel.session.collectAsStateWithLifecycle(minActiveState = Lifecycle.State.CREATED)
+    val onboardingState by onboardingViewModel.uiState.collectAsStateWithLifecycle(
+        minActiveState = Lifecycle.State.CREATED,
+    )
     val backStack = rememberNavBackStack(NavigationKeys.Splash)
     var isSplashDone by rememberSaveable { mutableStateOf(false) }
 
@@ -86,7 +94,10 @@ fun WheelVaultApp(modifier: Modifier = Modifier, sessionViewModel: SessionViewMo
                 ) { _ ->
                     SplashScreen(onVideoFinish = {
                         isSplashDone = true
-                        backStack.add(NavigationKeys.Onboarding)
+                        if (onboardingState !is OnboardingViewModel.OnboardingUiState.Success) {
+                            backStack.remove(NavigationKeys.Splash)
+                            backStack.add(NavigationKeys.Onboarding)
+                        }
                     })
                 }
 
@@ -175,14 +186,7 @@ fun WheelVaultApp(modifier: Modifier = Modifier, sessionViewModel: SessionViewMo
                     GarageScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
-                        onHomeClick = {
-                            val indexHome = backStack.lastIndexOf(NavigationKeys.Home)
-                            if (indexHome != -1) {
-                                backStack.removeAll { it != NavigationKeys.Home }
-                            } else {
-                                backStack.add(NavigationKeys.Home)
-                            }
-                        },
+                        onHomeClick = { backStack.removeAllOrAdd(NavigationKeys.Home) },
                         onCarClick = { backStack.add(NavigationKeys.CarDetail(it.toKotlinUuid())) },
                         onAddClick = { backStack.add(NavigationKeys.AddCamera) },
                         onProfileClick = { backStack.add(NavigationKeys.Profile) },
