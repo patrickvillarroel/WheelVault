@@ -12,7 +12,9 @@ import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -29,14 +31,14 @@ fun CameraPreview(
     modifier: Modifier = Modifier,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
+    val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
+    val cameraExecutor: ExecutorService = remember { Executors.newSingleThreadExecutor() }
 
     AndroidView(
-        factory = { context ->
+        factory = { _ ->
             PreviewView(context).apply {
                 scaleType = PreviewView.ScaleType.FILL_CENTER
-
-                val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
-                val cameraExecutor: ExecutorService = Executors.newSingleThreadExecutor()
 
                 cameraProviderFuture.addListener({
                     val preview = Preview.Builder().build().also {
@@ -84,6 +86,8 @@ fun CameraPreview(
         },
         modifier = modifier.fillMaxSize().padding(bottom = 100.dp),
         onRelease = {
+            cameraProviderFuture.get().unbindAll()
+            cameraExecutor.shutdown()
             it.controller = null
             it.removeAllViews()
         },

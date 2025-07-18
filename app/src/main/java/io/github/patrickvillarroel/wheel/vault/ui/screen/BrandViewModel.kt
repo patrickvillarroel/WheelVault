@@ -31,6 +31,10 @@ data class BrandViewModel(private val brandRepository: BrandRepository) : ViewMo
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
+    init {
+        fetchAll()
+    }
+
     fun fetchAll() {
         if (brandsImages.value.isEmpty() ||
             _uiState.value is BrandUiState.Error ||

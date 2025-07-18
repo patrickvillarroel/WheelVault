@@ -78,7 +78,7 @@ fun ProfileCard(
                 readOnly = !isEditable,
                 label = { Text("Correo") },
                 trailingIcon = {
-                    IconButton(onClick = onEditClick) {
+                    IconButton(onClick = onEditClick, enabled = isEditable) {
                         Icon(imageVector = Icons.Default.Edit, contentDescription = "Editar correo")
                     }
                 },
@@ -88,6 +88,7 @@ fun ProfileCard(
                     focusedTextColor = Color.White,
                     focusedContainerColor = Color(0xFF2C2C2E),
                     focusedBorderColor = Color.Red,
+                    disabledBorderColor = Color.Gray,
                     unfocusedBorderColor = Color.Gray,
                     unfocusedLabelColor = Color.LightGray,
                     focusedLabelColor = Color.White,

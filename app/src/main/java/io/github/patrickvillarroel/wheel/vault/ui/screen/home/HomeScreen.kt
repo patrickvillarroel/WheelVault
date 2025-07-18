@@ -3,7 +3,6 @@ package io.github.patrickvillarroel.wheel.vault.ui.screen.home
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -26,11 +25,6 @@ fun HomeScreen(
     val recentCars by carViewModel.recentCarsImages.collectAsStateWithLifecycle()
     val news = remember { listOf(R.drawable.thumbnail_example) }
 
-    LaunchedEffect(true) {
-        brandViewModel.fetchAll()
-        carViewModel.fetchRecentCars()
-    }
-
     HomeContent(
         sharedTransitionScope = sharedTransitionScope,
         animatedVisibilityScope = animatedVisibilityScope,
@@ -44,6 +38,10 @@ fun HomeScreen(
             onBrandClick = callbacks.onBrandClick,
             onNewsClick = { /* TODO play the video in full screen */ },
             onCarClick = callbacks.onCarClick,
+            onRefresh = {
+                brandViewModel.fetchAll()
+                carViewModel.fetchAll()
+            },
             headerCallbacks = callbacks.headerCallbacks,
         ),
         modifier = modifier,

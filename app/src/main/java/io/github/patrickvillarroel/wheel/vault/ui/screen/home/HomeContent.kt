@@ -17,8 +17,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
@@ -29,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BrandCard
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.CarCard
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.RaceDivider
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.VideoCardPreview
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
@@ -43,97 +48,106 @@ fun HomeContent(
 ) {
     val (brands, news, recentCars) = remember(info.homeInfo) { info.homeInfo }
     val layoutDirection = LocalLayoutDirection.current
+    var isRefreshing by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier,
         floatingActionButton = { HomeFloatingButton(onAddClick = info.onAddClick, onSearchClick = info.onSearchClick) },
     ) { paddingValues ->
         with(sharedTransitionScope) {
-            LazyColumn(
-                Modifier.padding(
+            PullToRefreshBox(
+                isRefreshing,
+                onRefresh = {
+                    isRefreshing = true
+                    info.onRefresh()
+                    isRefreshing = false
+                },
+                Modifier.fillMaxSize().padding(
                     start = paddingValues.calculateStartPadding(layoutDirection),
                     end = paddingValues.calculateEndPadding(layoutDirection),
                     bottom = paddingValues.calculateBottomPadding(),
-                ).fillMaxSize(),
+                ),
             ) {
-                // mini TODO header have inside padding of top bar
-                item { HomeCarHeader(info, Modifier.fillMaxWidth()) }
-                // Sección de marcas
-                item {
-                    Text(
-                        text = stringResource(R.string.brands),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(start = 16.dp),
-                    )
-                }
+                LazyColumn(Modifier.fillMaxSize()) {
+                    // mini TODO header have inside padding of top bar
+                    item { HomeCarHeader(info, Modifier.fillMaxWidth()) }
+                    // Sección de marcas
+                    item {
+                        Text(
+                            text = stringResource(R.string.brands),
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 16.dp),
+                        )
+                    }
 
-                item {
-                    LazyRow(
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        items(brands, key = { (id, _) -> id }) { (id, image) ->
-                            BrandCard(
-                                logo = image,
-                                onClick = { info.onBrandClick(id) },
-                                modifier = Modifier.sharedBounds(
-                                    rememberSharedContentState("brand-$id"),
-                                    animatedVisibilityScope,
-                                ),
-                            )
+                    item {
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            items(brands, key = { (id, _) -> id }) { (id, image) ->
+                                BrandCard(
+                                    logo = image,
+                                    onClick = { info.onBrandClick(id) },
+                                    modifier = Modifier.sharedBounds(
+                                        rememberSharedContentState("brand-$id"),
+                                        animatedVisibilityScope,
+                                    ),
+                                )
+                            }
                         }
                     }
-                }
 
-                item { RaceDivider() }
+                    item { RaceDivider() }
 
-                // Sección de recientes
-                item {
-                    Text(
-                        text = stringResource(R.string.recently_added),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(start = 16.dp),
-                    )
-                }
+                    // Sección de recientes
+                    item {
+                        Text(
+                            text = stringResource(R.string.recently_added),
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 16.dp),
+                        )
+                    }
 
-                item {
-                    LazyRow(
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        items(recentCars, key = { (id, _) -> id }) { (id, image) ->
-                            CarCard(
-                                image = image,
-                                onClick = { info.onCarClick(id) },
-                                modifier = Modifier.sharedBounds(
-                                    rememberSharedContentState("car-$id"),
-                                    animatedVisibilityScope,
-                                ),
-                            )
+                    item {
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            items(recentCars, key = { (id, _) -> id }) { (id, image) ->
+                                CarCard(
+                                    image = image,
+                                    onClick = { info.onCarClick(id) },
+                                    modifier = Modifier.sharedBounds(
+                                        rememberSharedContentState("car-$id"),
+                                        animatedVisibilityScope,
+                                    ),
+                                )
+                            }
                         }
                     }
-                }
 
-                item { RaceDivider() }
+                    item { RaceDivider() }
 
-                item {
-                    Text(
-                        text = stringResource(R.string.information_interest),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(start = 16.dp),
-                    )
-                }
+                    item {
+                        Text(
+                            text = stringResource(R.string.information_interest),
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 16.dp),
+                        )
+                    }
 
-                item {
-                    LazyRow(
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        items(news, key = { it }) {
-                            VideoCardPreview(it, onPlayClick = { info.onNewsClick(it) })
+                    item {
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            items(news, key = { it }) {
+                                VideoCardPreview(it, onPlayClick = { info.onNewsClick(it) })
+                            }
                         }
                     }
                 }
@@ -161,10 +175,13 @@ private fun HomeContentPreview() {
                         onBrandClick = {},
                         onNewsClick = {},
                         onCarClick = {},
-                        onProfileClick = {},
-                        onGarageClick = {},
-                        onFavoritesClick = {},
-                        onStatisticsClick = {},
+                        onRefresh = {},
+                        headerCallbacks = HeaderCallbacks(
+                            onProfileClick = {},
+                            onGarageClick = {},
+                            onFavoritesClick = {},
+                            onStatisticsClick = {},
+                        ),
                     ),
                 )
             }

@@ -19,7 +19,11 @@ data class CarViewModel(private val carsRepository: CarsRepository) : ViewModel(
     private val _recentCarsImages = MutableStateFlow<List<Pair<UUID, Any>>>(emptyList())
     val recentCarsImages = _recentCarsImages.asStateFlow()
 
-    fun fetchRecentCars() {
+    init {
+        fetchAll()
+    }
+
+    fun fetchAll() {
         if (_recentCarsImages.value.isEmpty()) {
             viewModelScope.launch {
                 try {
