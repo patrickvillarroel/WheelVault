@@ -13,11 +13,11 @@ interface CarsRepository {
 
     suspend fun fetchAll(isFavorite: Boolean = false, limit: Int = 10): List<CarItem>
     suspend fun fetch(id: UUID): CarItem?
-    suspend fun fetchByModel(model: String, isFavorite: Boolean = false): CarItem?
-    suspend fun fetchByYear(year: Int, isFavorite: Boolean = false): CarItem?
-    suspend fun fetchByManufacturer(manufacturer: String, isFavorite: Boolean = false): CarItem?
-    suspend fun fetchByBrand(brand: String, isFavorite: Boolean = false): CarItem?
-    suspend fun fetchByCategory(category: String, isFavorite: Boolean = false): CarItem?
+    suspend fun fetchByModel(model: String, isFavorite: Boolean = false): List<CarItem>
+    suspend fun fetchByYear(year: Int, isFavorite: Boolean = false): List<CarItem>
+    suspend fun fetchByManufacturer(manufacturer: String, isFavorite: Boolean = false): List<CarItem>
+    suspend fun fetchByBrand(brand: String, isFavorite: Boolean = false): List<CarItem>
+    suspend fun fetchByCategory(category: String, isFavorite: Boolean = false): List<CarItem>
 
     suspend fun count(isFavorite: Boolean = false): Int
     suspend fun countByModel(model: String, isFavorite: Boolean = false): Int

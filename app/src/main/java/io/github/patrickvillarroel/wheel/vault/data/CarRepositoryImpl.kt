@@ -12,18 +12,16 @@ data class CarRepositoryImpl(private val supabase: CarSupabaseDataSource) : Cars
 
     override suspend fun fetch(id: UUID): CarItem? = supabase.fetch(id)
 
-    override suspend fun fetchByModel(model: String, isFavorite: Boolean): CarItem? =
-        supabase.fetchByModel(model, isFavorite)
+    override suspend fun fetchByModel(model: String, isFavorite: Boolean) = supabase.fetchByModel(model, isFavorite)
 
-    override suspend fun fetchByYear(year: Int, isFavorite: Boolean): CarItem? = supabase.fetchByYear(year, isFavorite)
+    override suspend fun fetchByYear(year: Int, isFavorite: Boolean) = supabase.fetchByYear(year, isFavorite)
 
-    override suspend fun fetchByManufacturer(manufacturer: String, isFavorite: Boolean): CarItem? =
+    override suspend fun fetchByManufacturer(manufacturer: String, isFavorite: Boolean) =
         supabase.fetchByManufacturer(manufacturer, isFavorite)
 
-    override suspend fun fetchByBrand(brand: String, isFavorite: Boolean): CarItem? =
-        supabase.fetchByBrand(brand, isFavorite)
+    override suspend fun fetchByBrand(brand: String, isFavorite: Boolean) = supabase.fetchByBrand(brand, isFavorite)
 
-    override suspend fun fetchByCategory(category: String, isFavorite: Boolean): CarItem? =
+    override suspend fun fetchByCategory(category: String, isFavorite: Boolean) =
         supabase.fetchByCategory(category, isFavorite)
 
     override suspend fun count(isFavorite: Boolean): Int = supabase.count(isFavorite)

@@ -8,7 +8,9 @@ import coil3.request.ImageRequest
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.query.Order
+import io.github.jan.supabase.postgrest.query.filter.TextSearchType
 import io.github.jan.supabase.storage.authenticatedStorageItem
 import io.github.jan.supabase.storage.storage
 import io.github.patrickvillarroel.wheel.vault.data.objects.CarObj
@@ -23,11 +25,25 @@ import java.util.UUID
 import java.util.concurrent.ConcurrentSkipListSet
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
+import kotlin.uuid.toKotlinUuid
 
 data class CarSupabaseDataSource(private val supabase: SupabaseClient, private val context: Context) : CarsRepository {
-    override suspend fun search(query: String, isFavorite: Boolean): List<CarItem> {
-        TODO()
-    }
+    override suspend fun search(query: String, isFavorite: Boolean): List<CarItem> = supabase
+        .from(CarObj.TABLE)
+        .select {
+            filter {
+                eq("user_id", supabase.auth.currentUserOrNull()!!.id)
+                textSearch(
+                    "document_with_weights",
+                    query,
+                    textSearchType = TextSearchType.PLAINTO,
+                )
+                if (isFavorite) CarObj::isFavorite eq true
+            }
+            order("created_at", Order.DESCENDING)
+        }
+        .decodeList<CarObj>()
+        .map { it.toDomain(fetchAllImages(it.id!!)) }
 
     override suspend fun fetchAll(isFavorite: Boolean, limit: Int): List<CarItem> = supabase.from(CarObj.TABLE).select {
         filter {
@@ -40,53 +56,68 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
         order("created_at", Order.DESCENDING)
     }.decodeList<CarObj>().map { it.toDomain(fetchAllImages(it.id!!)) }
 
-    override suspend fun fetch(id: UUID): CarItem? {
-        TODO()
-    }
+    override suspend fun fetch(id: UUID): CarItem? = supabase.from(CarObj.TABLE)
+        .select {
+            filter {
+                eq("user_id", supabase.auth.currentUserOrNull()!!.id)
+                CarObj::id eq id.toKotlinUuid()
+            }
+            order("created_at", Order.DESCENDING)
+        }.decodeSingleOrNull<CarObj>()?.toDomain(fetchAllImages(id.toKotlinUuid()))
 
-    override suspend fun fetchByModel(model: String, isFavorite: Boolean): CarItem? {
-        TODO()
-    }
+    override suspend fun fetchByModel(model: String, isFavorite: Boolean) = fetchByField("model", model, isFavorite)
 
-    override suspend fun fetchByYear(year: Int, isFavorite: Boolean): CarItem? {
-        TODO()
-    }
+    override suspend fun fetchByYear(year: Int, isFavorite: Boolean) = fetchByField("year", year, isFavorite)
 
-    override suspend fun fetchByManufacturer(manufacturer: String, isFavorite: Boolean): CarItem? {
-        TODO()
-    }
+    override suspend fun fetchByManufacturer(manufacturer: String, isFavorite: Boolean) =
+        fetchByField("manufacturer", manufacturer, isFavorite)
 
-    override suspend fun fetchByBrand(brand: String, isFavorite: Boolean): CarItem? {
-        TODO()
-    }
+    override suspend fun fetchByBrand(brand: String, isFavorite: Boolean) = fetchByField("brand", brand, isFavorite)
 
-    override suspend fun fetchByCategory(category: String, isFavorite: Boolean): CarItem? {
-        TODO()
-    }
+    override suspend fun fetchByCategory(category: String, isFavorite: Boolean) =
+        fetchByField("category", category, isFavorite)
 
-    override suspend fun count(isFavorite: Boolean): Int {
-        TODO()
-    }
+    private suspend fun <T : Any> fetchByField(field: String, value: T, isFavorite: Boolean) = supabase
+        .from(CarObj.TABLE)
+        .select {
+            filter {
+                eq("user_id", supabase.auth.currentUserOrNull()!!.id)
+                eq(field, value)
+                if (isFavorite) CarObj::isFavorite eq true
+            }
+            order("created_at", Order.DESCENDING)
+        }
+        .decodeList<CarObj>()
+        .map { it.toDomain(fetchAllImages(it.id!!)) }
 
-    override suspend fun countByModel(model: String, isFavorite: Boolean): Int {
-        TODO()
-    }
+    override suspend fun count(isFavorite: Boolean): Int = countByField(null, null, isFavorite)
 
-    override suspend fun countByYear(year: Int, isFavorite: Boolean): Int {
-        TODO()
-    }
+    override suspend fun countByModel(model: String, isFavorite: Boolean): Int =
+        countByField("model", model, isFavorite)
 
-    override suspend fun countByManufacturer(manufacturer: String, isFavorite: Boolean): Int {
-        TODO()
-    }
+    override suspend fun countByYear(year: Int, isFavorite: Boolean): Int = countByField("year", year, isFavorite)
 
-    override suspend fun countByBrand(brand: String, isFavorite: Boolean): Int {
-        TODO()
-    }
+    override suspend fun countByManufacturer(manufacturer: String, isFavorite: Boolean): Int =
+        countByField("manufacturer", manufacturer, isFavorite)
 
-    override suspend fun countByCategory(category: String, isFavorite: Boolean): Int {
-        TODO()
-    }
+    override suspend fun countByBrand(brand: String, isFavorite: Boolean): Int =
+        countByField("brand", brand, isFavorite)
+
+    override suspend fun countByCategory(category: String, isFavorite: Boolean): Int =
+        countByField("category", category, isFavorite)
+
+    private suspend fun <T : Any> countByField(field: String?, value: T?, isFavorite: Boolean): Int = supabase
+        .from(CarObj.TABLE)
+        .select {
+            count(count = Count.EXACT)
+            filter {
+                eq("user_id", supabase.auth.currentUserOrNull()!!.id)
+                if (field != null && value != null) eq(field, value)
+                if (isFavorite) CarObj::isFavorite eq true
+            }
+        }
+        .countOrNull()?.toInt()
+        ?: 0
 
     override suspend fun insert(car: CarItem): CarItem {
         val carObject = supabase.from(CarObj.TABLE).insert(car.toObject().copy(id = null)).decodeSingle<CarObj>()
@@ -105,11 +136,34 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
     }
 
     override suspend fun update(car: CarItem): CarItem {
-        TODO()
+        val updated = supabase.from(CarObj.TABLE)
+            .update(car.toObject()) {
+                filter {
+                    eq("id", car.id.toKotlinUuid())
+                }
+            }
+            .decodeSingle<CarObj>()
+
+        return updated.toDomain(fetchAllImages(updated.id!!))
     }
 
     override suspend fun delete(car: CarItem): Boolean {
-        TODO()
+        supabase.from(CarObj.TABLE).delete {
+            filter {
+                eq("id", car.id.toKotlinUuid())
+            }
+        }
+
+        val currentUserId = supabase.auth.currentUserOrNull()!!.id
+        val imagePaths = supabase.storage.from(CarObj.BUCKET_IMAGES)
+            .list("$currentUserId/${car.id}")
+            .map { "$currentUserId/${car.id}/${it.name}" }
+
+        if (imagePaths.isNotEmpty()) {
+            supabase.storage.from(CarObj.BUCKET_IMAGES).delete(imagePaths)
+        }
+
+        return true
     }
 
     private suspend fun fetchAllImages(carId: Uuid, userId: String = supabase.auth.currentUserOrNull()!!.id) =
