@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
@@ -44,15 +44,20 @@ import kotlin.uuid.toKotlinUuid
 fun WheelVaultApp(modifier: Modifier = Modifier, sessionViewModel: SessionViewModel = koinViewModel()) {
     val session by sessionViewModel.session.collectAsStateWithLifecycle(minActiveState = Lifecycle.State.CREATED)
     val backStack = rememberNavBackStack(NavigationKeys.Splash)
-    var isSplashDone by remember { mutableStateOf(false) }
+    var isSplashDone by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(session, isSplashDone) {
         if (!isSplashDone) return@LaunchedEffect
 
         when (session) {
             is SessionUiStatus.Authenticated -> {
-                backStack.clear()
-                backStack.add(NavigationKeys.Home)
+                if (backStack.lastOrNull() is NavigationKeys.LoginWithEmailAndPassword ||
+                    backStack.lastOrNull() is NavigationKeys.Login ||
+                    backStack.lastOrNull() is NavigationKeys.Splash
+                ) {
+                    backStack.clear()
+                    backStack.add(NavigationKeys.Home)
+                }
             }
 
             SessionUiStatus.NotAuthenticated,
@@ -131,7 +136,7 @@ fun WheelVaultApp(modifier: Modifier = Modifier, sessionViewModel: SessionViewMo
                     CameraLensScreen(
                         onBack = { backStack.removeLastOrNull() },
                         // TODO send more data like picture or save a partial in DB
-                        onAddDetail = { backStack.add(NavigationKeys.CarEdit(it)) },
+                        onAddDetail = { backStack.add(NavigationKeys.CarEdit(model = it)) },
                     )
                 }
 
