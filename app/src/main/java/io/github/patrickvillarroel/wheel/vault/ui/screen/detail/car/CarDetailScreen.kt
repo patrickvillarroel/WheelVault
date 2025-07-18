@@ -1,12 +1,24 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.LoadingIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
+import io.github.patrickvillarroel.wheel.vault.ui.screen.CarViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
+import org.koin.compose.viewmodel.koinViewModel
 import java.util.UUID
 
 @Composable
@@ -17,38 +29,47 @@ fun CarDetailScreen(
     onEditClick: (CarItem) -> Unit,
     headerBackCallbacks: HeaderBackCallbacks,
     modifier: Modifier = Modifier,
+    carViewModel: CarViewModel = koinViewModel(),
 ) {
-    // TODO replace with VM
-    val cars = remember {
-        List(10) {
-            CarItem(
-                model = "Ford Mustang GTD",
-                year = 2025,
-                manufacturer = "HotWheels",
-                quantity = 2,
-                images = setOf(
-                    "https://m.media-amazon.com/images/I/61iE8unK0XL._AC_SL1069_.jpg",
-                    "https://m.media-amazon.com/images/I/61ojzr1uMCL.jpg",
-                    "https://th.bing.com/th/id/R.6c22f47603c5163100d66383df8468fb?rik=J6k0pKwJXl45KQ&pid=ImgRaw&r=0",
-                ),
-                isFavorite = true,
-                brand = "Hot Wheels",
-            )
-        }
+    val carState by carViewModel.carDetailState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(carId) {
+        carViewModel.findById(carId)
     }
 
-    val carDetail = remember(carId) { cars.firstOrNull { it.id == carId } ?: cars.first().copy(id = carId) }
+    AnimatedContent(carState) { state ->
+        when (state) {
+            is CarViewModel.CarDetailUiState.Success -> {
+                val carDetail = state.car
+                CarDetailContent(
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    callbacks = CarDetailCallbacks(
+                        carDetail = carDetail,
+                        headersBackCallbacks = headerBackCallbacks,
+                        onEditClick = { onEditClick(carDetail) },
+                        onDeleteClick = { /* TODO add delete modal */ },
+                        onFavoriteToggle = {},
+                    ),
+                    modifier = modifier,
+                )
+            }
 
-    CarDetailContent(
-        sharedTransitionScope = sharedTransitionScope,
-        animatedVisibilityScope = animatedVisibilityScope,
-        callbacks = CarDetailCallbacks(
-            carDetail = carDetail,
-            headersBackCallbacks = headerBackCallbacks,
-            onEditClick = { onEditClick(carDetail) },
-            onDeleteClick = { /* TODO add delete modal */ },
-            onFavoriteToggle = {},
-        ),
-        modifier = modifier,
-    )
+            is CarViewModel.CarDetailUiState.Loading, CarViewModel.CarDetailUiState.Idle -> {
+                Scaffold(Modifier.fillMaxSize()) {
+                    LoadingIndicator(Modifier.padding(it).fillMaxSize())
+                }
+            }
+
+            is CarViewModel.CarDetailUiState.Error, is CarViewModel.CarDetailUiState.NotFound -> {
+                Dialog(headerBackCallbacks.onBackClick) {
+                    Text(
+                        text = "Something went wrong",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+            }
+        }
+    }
 }
