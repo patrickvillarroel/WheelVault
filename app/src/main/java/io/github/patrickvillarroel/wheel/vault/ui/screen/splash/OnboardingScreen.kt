@@ -14,7 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -105,17 +106,21 @@ fun OnboardingScreen(onFinish: () -> Unit, modifier: Modifier = Modifier) {
                     }
 
                     // Botón siguiente o empezar
-                    OutlinedButton(onClick = {
-                        scope.launch {
-                            if (pagerState.currentPage < pages.lastIndex) {
-                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                            } else {
-                                onFinish()
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                if (pagerState.currentPage < pages.lastIndex) {
+                                    pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                                } else {
+                                    onFinish()
+                                }
                             }
-                        }
-                    }) {
+                        },
+                        colors = ButtonDefaults.outlinedButtonColors(Color(0xFFE42E31)),
+                    ) {
                         Text(
                             if (pagerState.currentPage == pages.lastIndex) "Empezar" else "Siguiente",
+                            color = Color.White,
                         )
                     }
                 }

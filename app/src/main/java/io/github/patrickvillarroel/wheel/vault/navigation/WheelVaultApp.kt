@@ -34,6 +34,7 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.login.LoginWithEmailScr
 import io.github.patrickvillarroel.wheel.vault.ui.screen.profile.ProfileScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.session.SessionUiStatus
 import io.github.patrickvillarroel.wheel.vault.ui.screen.session.SessionViewModel
+import io.github.patrickvillarroel.wheel.vault.ui.screen.splash.OnboardingScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.splash.SplashScreen
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.uuid.ExperimentalUuidApi
@@ -83,14 +84,17 @@ fun WheelVaultApp(modifier: Modifier = Modifier, sessionViewModel: SessionViewMo
                     transitionSpec = { ContentTransform(slideInVertically { -it }, slideOutVertically { it }) },
                     popTransitionSpec = { ContentTransform(slideInVertically { it }, slideOutVertically { -it }) },
                 ) { _ ->
-                    SplashScreen(onVideoFinish = { isSplashDone = true })
+                    SplashScreen(onVideoFinish = {
+                        isSplashDone = true
+                        backStack.add(NavigationKeys.Onboarding)
+                    })
                 }
 
                 entry<NavigationKeys.Login> { _ ->
                     LoginScreen(
                         onLoginSuccess = {
                             backStack.remove(NavigationKeys.Login)
-                            backStack.add(NavigationKeys.Home)
+                            backStack.add(NavigationKeys.Onboarding)
                         },
                         onLoginWithEmail = {
                             backStack.add(NavigationKeys.LoginWithEmailAndPassword(isMagicLink = true))
@@ -110,6 +114,15 @@ fun WheelVaultApp(modifier: Modifier = Modifier, sessionViewModel: SessionViewMo
                         isMagicLink = isMagicLink,
                         onLoginSuccess = {
                             backStack.remove(NavigationKeys.Login)
+                            backStack.add(NavigationKeys.Home)
+                        },
+                    )
+                }
+
+                entry<NavigationKeys.Onboarding> { _ ->
+                    OnboardingScreen(
+                        onFinish = {
+                            backStack.remove(NavigationKeys.Onboarding)
                             backStack.add(NavigationKeys.Home)
                         },
                     )
