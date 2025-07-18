@@ -50,8 +50,8 @@ data class CarViewModel(
             carsState.value is CarsUiState.Loading
 
         if (shouldFetch) {
+            _carsState.update { CarsUiState.Loading }
             viewModelScope.launch(ioDispatcher) {
-                _carsState.update { CarsUiState.Loading }
                 try {
                     val result = carsRepository.fetchAll()
                     _carsState.update { CarsUiState.Success(result) }
@@ -73,8 +73,9 @@ data class CarViewModel(
             return
         }
 
+        _carDetailState.update { CarDetailUiState.Loading }
+
         viewModelScope.launch(ioDispatcher) {
-            _carDetailState.update { CarDetailUiState.Loading }
             try {
                 val car = carsRepository.fetch(id)
                 if (car != null) {
@@ -101,6 +102,16 @@ data class CarViewModel(
                 carsRepository.insert(built)
             }
             findById(newCarState.id, true)
+        }
+    }
+
+    fun delete(car: CarItem) {
+        viewModelScope.launch(ioDispatcher) {
+            carsRepository.delete(car)
+            fetchAll(true)
+            if ((_carDetailState.value as? CarDetailUiState.Success)?.car == car) {
+                _carDetailState.update { CarDetailUiState.Idle }
+            }
         }
     }
 

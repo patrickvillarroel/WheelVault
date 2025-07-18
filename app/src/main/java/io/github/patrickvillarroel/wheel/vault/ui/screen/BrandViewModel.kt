@@ -60,9 +60,9 @@ data class BrandViewModel(
             brandsState.value is BrandsUiState.Loading
 
         if (shouldFetch) {
+            _brandsState.update { BrandsUiState.Loading }
             viewModelScope.launch(ioDispatcher) {
                 Log.i("Brands", "Fetching all brands")
-                _brandsState.update { BrandsUiState.Loading }
                 try {
                     val result = brandRepository.fetchAll()
                     _brandsState.update { BrandsUiState.Success(result) }
@@ -90,9 +90,9 @@ data class BrandViewModel(
             }
         }
 
+        _brandDetailsState.update { BrandDetailsUiState.Loading }
         viewModelScope.launch(ioDispatcher) {
             Log.i("Brands", "Fetching brand by id $id")
-            _brandDetailsState.update { BrandDetailsUiState.Loading }
 
             try {
                 val brand = brandRepository.fetch(id)

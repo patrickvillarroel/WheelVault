@@ -5,13 +5,20 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -32,6 +39,7 @@ fun CarDetailScreen(
     carViewModel: CarViewModel = koinViewModel(),
 ) {
     val carState by carViewModel.carDetailState.collectAsStateWithLifecycle()
+    var showCancelDialog by rememberSaveable(carId) { mutableStateOf(false) }
 
     LaunchedEffect(carId) {
         carViewModel.findById(carId)
@@ -48,11 +56,37 @@ fun CarDetailScreen(
                         carDetail = carDetail,
                         headersBackCallbacks = headerBackCallbacks,
                         onEditClick = { onEditClick(carDetail) },
-                        onDeleteClick = { /* TODO add delete modal */ },
+                        onDeleteClick = { showCancelDialog = true },
                         onFavoriteToggle = {},
                     ),
                     modifier = modifier,
                 )
+                if (showCancelDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showCancelDialog = false },
+                        title = { Text("¿Eliminar carrito?") },
+                        text = {
+                            Text("El carrito y sus imagenes se perderán. ¿Estás seguro de que quieres eliminar?")
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    carViewModel.delete(carDetail)
+                                    showCancelDialog = false
+                                    headerBackCallbacks.onBackClick()
+                                },
+                                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error),
+                            ) {
+                                Text("Sí, eliminar")
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { showCancelDialog = false }) {
+                                Text("Cancelar")
+                            }
+                        },
+                    )
+                }
             }
 
             is CarViewModel.CarDetailUiState.Loading, CarViewModel.CarDetailUiState.Idle -> {
