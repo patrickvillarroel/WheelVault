@@ -62,7 +62,8 @@ fun WheelVaultApp(
             is SessionUiStatus.Authenticated -> {
                 if (backStack.lastOrNull() is NavigationKeys.LoginWithEmailAndPassword ||
                     backStack.lastOrNull() is NavigationKeys.Login ||
-                    backStack.lastOrNull() is NavigationKeys.Splash
+                    backStack.lastOrNull() is NavigationKeys.Splash ||
+                    backStack.lastOrNull() is NavigationKeys.Onboarding
                 ) {
                     backStack.clear()
                     backStack.add(NavigationKeys.Home)
@@ -93,11 +94,11 @@ fun WheelVaultApp(
                     popTransitionSpec = { ContentTransform(slideInVertically { it }, slideOutVertically { -it }) },
                 ) { _ ->
                     SplashScreen(onVideoFinish = {
-                        isSplashDone = true
                         if (onboardingState !is OnboardingViewModel.OnboardingUiState.Success) {
-                            backStack.remove(NavigationKeys.Splash)
                             backStack.add(NavigationKeys.Onboarding)
+                            return@SplashScreen
                         }
+                        isSplashDone = true
                     })
                 }
 
@@ -131,12 +132,7 @@ fun WheelVaultApp(
                 }
 
                 entry<NavigationKeys.Onboarding> { _ ->
-                    OnboardingScreen(
-                        onFinish = {
-                            backStack.remove(NavigationKeys.Onboarding)
-                            backStack.add(NavigationKeys.Home)
-                        },
-                    )
+                    OnboardingScreen(onFinish = { isSplashDone = true })
                 }
 
                 entry<NavigationKeys.Home> { _ ->
