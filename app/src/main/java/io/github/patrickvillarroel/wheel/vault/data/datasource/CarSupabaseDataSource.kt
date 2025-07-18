@@ -28,13 +28,30 @@ import kotlin.uuid.Uuid
 import kotlin.uuid.toKotlinUuid
 
 data class CarSupabaseDataSource(private val supabase: SupabaseClient, private val context: Context) : CarsRepository {
+    override suspend fun exist(id: UUID): Boolean {
+        val count = supabase.from(CarObj.TABLE).select {
+            filter {
+                eq("user_id", supabase.auth.currentUserOrNull()!!.id)
+                CarObj::id eq id.toKotlinUuid()
+            }
+            count(Count.EXACT)
+        }.countOrNull() ?: return false
+
+        if (count > 1L) {
+            // impossible
+            Log.e("Car Supabase", "Exist count find more than 1 car with id $id")
+        }
+
+        return true
+    }
+
     override suspend fun search(query: String, isFavorite: Boolean): List<CarItem> = supabase
         .from(CarObj.TABLE)
         .select {
             filter {
-                eq("user_id", supabase.auth.currentUserOrNull()!!.id)
+                eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
                 textSearch(
-                    "document_with_weights",
+                    CarObj.FULL_TEXT_SEARCH_FIELD,
                     query,
                     textSearchType = TextSearchType.PLAINTO,
                 )
@@ -47,7 +64,7 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
 
     override suspend fun fetchAll(isFavorite: Boolean, limit: Int): List<CarItem> = supabase.from(CarObj.TABLE).select {
         filter {
-            eq("user_id", supabase.auth.currentUserOrNull()!!.id)
+            eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
             if (isFavorite) {
                 CarObj::isFavorite eq true
             }
@@ -59,7 +76,7 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
     override suspend fun fetch(id: UUID): CarItem? = supabase.from(CarObj.TABLE)
         .select {
             filter {
-                eq("user_id", supabase.auth.currentUserOrNull()!!.id)
+                eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
                 CarObj::id eq id.toKotlinUuid()
             }
             order("created_at", Order.DESCENDING)
@@ -81,7 +98,7 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
         .from(CarObj.TABLE)
         .select {
             filter {
-                eq("user_id", supabase.auth.currentUserOrNull()!!.id)
+                eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
                 eq(field, value)
                 if (isFavorite) CarObj::isFavorite eq true
             }
@@ -111,7 +128,7 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
         .select {
             count(count = Count.EXACT)
             filter {
-                eq("user_id", supabase.auth.currentUserOrNull()!!.id)
+                eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
                 if (field != null && value != null) eq(field, value)
                 if (isFavorite) CarObj::isFavorite eq true
             }
@@ -139,10 +156,16 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
         val updated = supabase.from(CarObj.TABLE)
             .update(car.toObject()) {
                 filter {
-                    eq("id", car.id.toKotlinUuid())
+                    CarObj::id eq car.id.toKotlinUuid()
+                    eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
                 }
+                select()
             }
-            .decodeSingle<CarObj>()
+            .decodeSingleOrNull<CarObj>()
+            ?: run {
+                Log.e("Car Supabase", "update return null, manual fetching")
+                return fetch(car.id)!!
+            }
 
         return updated.toDomain(fetchAllImages(updated.id!!))
     }
@@ -150,7 +173,8 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
     override suspend fun delete(car: CarItem): Boolean {
         supabase.from(CarObj.TABLE).delete {
             filter {
-                eq("id", car.id.toKotlinUuid())
+                CarObj::id eq car.id.toKotlinUuid()
+                eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
             }
         }
 

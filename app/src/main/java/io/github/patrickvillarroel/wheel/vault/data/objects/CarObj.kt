@@ -25,5 +25,7 @@ data class CarObj(
     companion object {
         const val TABLE = "cars"
         const val BUCKET_IMAGES = "cars-images"
+        const val USER_ID_FIELD = "user_id"
+        const val FULL_TEXT_SEARCH_FIELD = "document_with_weights"
     }
 }

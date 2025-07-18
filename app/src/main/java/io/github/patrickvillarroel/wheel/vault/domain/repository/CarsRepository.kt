@@ -9,6 +9,7 @@ import java.util.UUID
  * @param isFavorite If true, only favorite cars will be returned.
  */
 interface CarsRepository {
+    suspend fun exist(id: UUID): Boolean
     suspend fun search(query: String, isFavorite: Boolean = false): List<CarItem>
 
     suspend fun fetchAll(isFavorite: Boolean = false, limit: Int = 10): List<CarItem>
