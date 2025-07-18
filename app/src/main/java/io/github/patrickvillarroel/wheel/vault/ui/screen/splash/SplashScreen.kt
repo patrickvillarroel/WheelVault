@@ -19,10 +19,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.compose.PlayerSurface
 import io.github.patrickvillarroel.wheel.vault.R
 
+@androidx.annotation.OptIn(UnstableApi::class)
 @Composable
 fun SplashScreen(onVideoFinish: () -> Unit, modifier: Modifier = Modifier) {
     val onVideoFinishLatest by rememberUpdatedState(onVideoFinish)
