@@ -1,17 +1,7 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.splash
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Button
@@ -32,9 +22,14 @@ import androidx.compose.ui.unit.dp
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 import kotlinx.coroutines.launch
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun OnboardingScreen(onFinish: () -> Unit, modifier: Modifier = Modifier) {
+fun OnboardingScreen(
+    onFinish: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: OnboardingViewModel = koinViewModel(),
+) {
     val pages = listOf(
         R.drawable.onboarding_1,
         R.drawable.onboarding_2,
@@ -43,6 +38,14 @@ fun OnboardingScreen(onFinish: () -> Unit, modifier: Modifier = Modifier) {
         R.drawable.onboarding_5,
     )
 
+    OnboardingContent(pages, onFinish = {
+        viewModel.updateOnboardingState()
+        onFinish()
+    }, modifier)
+}
+
+@Composable
+private fun OnboardingContent(pages: List<Int>, onFinish: () -> Unit, modifier: Modifier = Modifier) {
     val pagerState = rememberPagerState(pageCount = { pages.size })
     val scope = rememberCoroutineScope()
 
@@ -58,74 +61,76 @@ fun OnboardingScreen(onFinish: () -> Unit, modifier: Modifier = Modifier) {
             // Imagen de fondo por página
             HorizontalPager(
                 state = pagerState,
-                modifier = Modifier.fillMaxSize().align(Alignment.Center),
-            ) { page ->
-                Image(
-                    painter = painterResource(id = pages[page]),
-                    contentDescription = null,
-                    contentScale = ContentScale.FillWidth,
-                    modifier = Modifier.aspectRatio(9f / 16f).fillMaxHeight().align(Alignment.Center),
-                )
-            }
-
-            // Botón Omitir reposicionado (no tan arriba)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 5.dp, end = 14.dp),
-                contentAlignment = Alignment.TopEnd,
-            ) {
-                TextButton(onClick = onFinish) {
-                    Text("Omitir", color = Color.White)
-                }
-            }
-
-            // Controles abajo
-            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.Bottom,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    .align(Alignment.Center),
+            ) { page ->
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    // Botón anterior
-                    if (pagerState.currentPage > 0) {
-                        TextButton(onClick = {
-                            scope.launch {
-                                pagerState.animateScrollToPage(pagerState.currentPage - 1)
-                            }
-                        }) {
-                            Text("Anterior", color = Color.White)
-                        }
-                    } else {
-                        Spacer(modifier = Modifier.width(80.dp)) // espacio fantasma
-                    }
-
-                    // Botón siguiente o empezar
-                    Button(
-                        onClick = {
-                            scope.launch {
-                                if (pagerState.currentPage < pages.lastIndex) {
-                                    pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                                } else {
-                                    onFinish()
-                                }
-                            }
-                        },
-                        colors = ButtonDefaults.outlinedButtonColors(Color(0xFFE42E31)),
-                    ) {
-                        Text(
-                            if (pagerState.currentPage == pages.lastIndex) "Empezar" else "Siguiente",
-                            color = Color.White,
-                        )
-                    }
+                    Image(
+                        painter = painterResource(id = pages[page]),
+                        contentDescription = "Onboarding step ${page + 1}",
+                        contentScale = ContentScale.FillHeight,
+                        modifier = Modifier.fillMaxHeight(),
+                    )
                 }
             }
+
+            // Botón Omitir arriba
+            TextButton(onClick = onFinish, Modifier.padding(top = 5.dp, end = 14.dp).align(Alignment.TopEnd)) {
+                Text("Omitir", color = Color.White)
+            }
+
+            OnboardingControls(
+                currentPage = pagerState.currentPage,
+                lastIndex = pages.lastIndex,
+                onPreviousClick = {
+                    scope.launch {
+                        if (pagerState.currentPage > 0) {
+                            pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                        }
+                    }
+                },
+                onNextClick = {
+                    scope.launch {
+                        if (pagerState.currentPage < pages.lastIndex) {
+                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                        } else {
+                            onFinish()
+                        }
+                    }
+                },
+            )
         }
+    }
+}
+
+@Composable
+private fun BoxScope.OnboardingControls(
+    currentPage: Int,
+    lastIndex: Int,
+    onPreviousClick: () -> Unit,
+    onNextClick: () -> Unit,
+) {
+    // Botón anterior
+    if (currentPage > 0) {
+        TextButton(onClick = onPreviousClick, Modifier.padding(24.dp).align(Alignment.BottomStart)) {
+            Text("Anterior", color = Color.White)
+        }
+    }
+
+    // Botón siguiente o empezar
+    Button(
+        onClick = onNextClick,
+        modifier = Modifier.padding(24.dp).align(Alignment.BottomEnd),
+        colors = ButtonDefaults.buttonColors(Color(0xFFE42E31)),
+    ) {
+        Text(
+            if (currentPage == lastIndex) "Empezar" else "Siguiente",
+            color = Color.White,
+        )
     }
 }
 
@@ -134,6 +139,15 @@ fun OnboardingScreen(onFinish: () -> Unit, modifier: Modifier = Modifier) {
 @Composable
 private fun OnboardingPreview() {
     WheelVaultTheme {
-        OnboardingScreen(onFinish = {})
+        OnboardingContent(
+            listOf(
+                R.drawable.onboarding_1,
+                R.drawable.onboarding_2,
+                R.drawable.onboarding_3,
+                R.drawable.onboarding_4,
+                R.drawable.onboarding_5,
+            ),
+            onFinish = {},
+        )
     }
 }

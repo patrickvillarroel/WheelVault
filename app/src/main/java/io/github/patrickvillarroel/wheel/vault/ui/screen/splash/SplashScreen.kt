@@ -3,7 +3,6 @@ package io.github.patrickvillarroel.wheel.vault.ui.screen.splash
 import android.content.ContentResolver
 import android.net.Uri
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -73,9 +72,7 @@ fun SplashScreen(onVideoFinish: () -> Unit, modifier: Modifier = Modifier) {
         ) {
             PlayerSurface(
                 player = player,
-                modifier = Modifier
-                    .aspectRatio(9f / 16f)
-                    .fillMaxHeight(),
+                modifier = Modifier.fillMaxHeight(),
             )
         }
     }
