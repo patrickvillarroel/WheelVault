@@ -3,12 +3,14 @@ package io.github.patrickvillarroel.wheel.vault.ui.screen.detail.brand
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -40,7 +42,7 @@ fun BrandHeader(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(170.dp)
+            .height(200.dp)
             .background(
                 color = Color(0xFFE42E31),
                 shape = RoundedCornerShape(
@@ -53,27 +55,30 @@ fun BrandHeader(
     ) {
         MenuButtonHeader(headerBackCallbacks)
         val (icon, description) = logoAndDescription
-        Box(Modifier.fillMaxSize().padding(10.dp)) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.statusBars),
+        ) {
             if (icon is Painter) {
                 Image(
                     icon,
                     description,
-                    Modifier.align(Alignment.Center).width(300.dp),
-                    contentScale = ContentScale.Crop,
+                    Modifier.align(Alignment.Center).width(300.dp).padding(bottom = 30.dp),
+                    contentScale = ContentScale.Fit,
                 )
             } else {
                 AsyncImage(
                     icon,
                     description,
-                    Modifier.align(Alignment.Center).width(300.dp),
-                    contentScale = ContentScale.Crop,
+                    Modifier.align(Alignment.Center).width(300.dp).padding(bottom = 30.dp),
+                    contentScale = ContentScale.Fit,
                 )
             }
             TextButton(
                 headerBackCallbacks.onBackClick,
                 modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .offset(y = (15).dp),
+                    .align(Alignment.BottomStart),
             ) {
                 Icon(Icons.AutoMirrored.Default.KeyboardArrowLeft, stringResource(R.string.back), tint = Color.Black)
                 Text(stringResource(R.string.back), color = Color.Black, style = MaterialTheme.typography.labelLarge)

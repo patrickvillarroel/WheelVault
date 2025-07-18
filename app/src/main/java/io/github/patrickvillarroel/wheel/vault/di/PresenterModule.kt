@@ -14,6 +14,6 @@ val presenterModule = module {
     viewModel { CameraPermissionViewModel() }
     viewModel { LoginViewModel(get()) }
     viewModel { SessionViewModel(get()) }
-    viewModel { BrandViewModel(get()) }
+    viewModel { BrandViewModel(get(), get()) }
     viewModel { CarViewModel(get()) }
 }
