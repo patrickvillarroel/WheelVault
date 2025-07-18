@@ -53,6 +53,7 @@ data class CarItem(
         category = category,
         images = images,
         isFavorite = isFavorite,
+        id = id,
     )
 
     data class Partial(
@@ -65,16 +66,20 @@ data class CarItem(
         val category: String? = null,
         val images: Set<Any> = setOf(),
         val isFavorite: Boolean = false,
+        val id: UUID? = null,
     ) {
         fun toCarItem(): CarItem? {
             return CarItem(
+                id = this.id ?: UUID.randomUUID(),
                 model = model ?: return null,
                 year = year ?: return null,
                 manufacturer = manufacturer ?: brand ?: return null,
                 quantity = quantity,
                 brand = brand ?: manufacturer ?: return null,
-                images = images.takeIf { it.isNotEmpty() } ?: return null,
+                images = images.takeIf { it.isNotEmpty() } ?: setOfNotNull(EmptyImage),
                 isFavorite = isFavorite,
+                description = this.description,
+                category = this.category,
             )
         }
     }

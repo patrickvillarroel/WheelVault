@@ -1,5 +1,6 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.edit
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,12 +15,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,30 +47,36 @@ import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
 fun CarEditContent(
-    carDetailPartial: CarItem.Partial,
+    initial: CarItem.Partial,
     isEditAction: Boolean,
     onConfirmClick: (CarItem.Partial) -> Unit,
     headersBackCallbacks: HeaderBackCallbacks,
     modifier: Modifier = Modifier,
 ) {
     // Internal states
-    var car by remember(carDetailPartial) { mutableStateOf(carDetailPartial) }
-    var marca by rememberSaveable { mutableStateOf(carDetailPartial.brand ?: "") }
-    var modelo by rememberSaveable { mutableStateOf(carDetailPartial.model ?: "") }
-    var descripcion by rememberSaveable { mutableStateOf(carDetailPartial.description ?: "") }
-    var manufacturer by rememberSaveable { mutableStateOf(carDetailPartial.manufacturer ?: "") }
-    var cantidad by rememberSaveable { mutableStateOf(carDetailPartial.quantity.toString()) }
-    var categoria by rememberSaveable { mutableStateOf(carDetailPartial.category ?: "") }
-    val imagenes by rememberSaveable { mutableStateOf(carDetailPartial.images + R.drawable.car_add) }
+    var car by remember(initial) { mutableStateOf(initial) }
+    var marca by rememberSaveable { mutableStateOf(initial.brand ?: "") }
+    var modelo by rememberSaveable { mutableStateOf(initial.model ?: "") }
+    var descripcion by rememberSaveable { mutableStateOf(initial.description ?: "") }
+    var manufacturer by rememberSaveable { mutableStateOf(initial.manufacturer ?: "") }
+    var cantidad by rememberSaveable { mutableStateOf(initial.quantity.toString()) }
+    var categoria by rememberSaveable { mutableStateOf(initial.category ?: "") }
+    val imagenes by rememberSaveable { mutableStateOf(initial.images + R.drawable.car_add) }
+    var showCancelDialog by rememberSaveable { mutableStateOf(false) }
     val headerCallbacks = remember {
         InterceptedHeaderBackCallbacks(
             headersBackCallbacks,
-            { _, _ ->
-                /* TODO Lanzar modal de cancelacion */
+            { _, action ->
+                if (showCancelDialog) {
+                    action()
+                } else {
+                    showCancelDialog = true
+                }
             },
         )
     }
 
+    BackHandler { showCancelDialog = true }
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -91,7 +100,7 @@ fun CarEditContent(
                         style = MaterialTheme.typography.headlineSmall,
                         modifier = Modifier.padding(top = 16.dp),
                     )
-                    FavoriteIcon(carDetailPartial.isFavorite, onFavoriteToggle = {
+                    FavoriteIcon(car.isFavorite, onFavoriteToggle = {
                         car = car.copy(isFavorite = it)
                     })
                 }
@@ -170,20 +179,43 @@ fun CarEditContent(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
                     Button(
-                        onClick = { /* TODO Add cancel confirm modal */ },
+                        onClick = { showCancelDialog = true },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),
                     ) {
                         Icon(Icons.Default.Close, null, tint = Color.White)
                     }
 
                     Button(
-                        onClick = { onConfirmClick(carDetailPartial) },
+                        onClick = { onConfirmClick(car) },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                     ) {
                         Icon(Icons.Default.Check, null, tint = Color.White)
                     }
                 }
             }
+        }
+
+        if (showCancelDialog) {
+            AlertDialog(
+                onDismissRequest = { showCancelDialog = false },
+                title = { Text("¿Descartar cambios?") },
+                text = { Text("Los cambios que hiciste se perderán. ¿Estás seguro de que quieres salir?") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showCancelDialog = false
+                            headersBackCallbacks.onBackClick()
+                        },
+                    ) {
+                        Text("Sí, salir")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showCancelDialog = false }) {
+                        Text("Cancelar")
+                    }
+                },
+            )
         }
     }
 }
@@ -195,7 +227,7 @@ private fun EditPreview() {
 
     WheelVaultTheme {
         CarEditContent(
-            carDetailPartial = carDetailPartial,
+            initial = carDetailPartial,
             onConfirmClick = {},
             isEditAction = true,
             headersBackCallbacks = HeaderBackCallbacks(

@@ -63,12 +63,12 @@ data class CarViewModel(
         }
     }
 
-    fun findById(id: UUID) {
+    fun findById(id: UUID, force: Boolean = false) {
         val localMatch = (carsState.value as? CarsUiState.Success)
             ?.cars
             ?.firstOrNull { it.id == id }
 
-        if (localMatch != null) {
+        if (localMatch != null && !force) {
             _carDetailState.update { CarDetailUiState.Success(localMatch) }
             return
         }
@@ -86,6 +86,21 @@ data class CarViewModel(
                 Log.e("CarViewModel", "Failed to find car by id", e)
                 _carDetailState.update { CarDetailUiState.Error }
             }
+        }
+    }
+
+    fun save(car: CarItem.Partial) {
+        viewModelScope.launch(ioDispatcher) {
+            Log.i("Car VM", "Going to save this car $car")
+            val built = car.toCarItem() ?: return@launch
+            Log.i("Car VM", "Convert as item: $built")
+            val newCarState = if (carsRepository.exist(built.id)) {
+                Log.i("Car VM", "The car exist")
+                carsRepository.update(built)
+            } else {
+                carsRepository.insert(built)
+            }
+            findById(newCarState.id, true)
         }
     }
 

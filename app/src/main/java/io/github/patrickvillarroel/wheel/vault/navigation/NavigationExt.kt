@@ -11,12 +11,16 @@ import androidx.navigation3.runtime.entry
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import androidx.navigation3.ui.NavDisplay
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.toJavaUuid
+import kotlin.uuid.toKotlinUuid
 
 /** Extension function to convert a [CarItem] to a [NavigationKeys.CarEdit], only callable in a [EntryProviderBuilder] */
 context(_: EntryProviderBuilder<NavKey>)
 fun CarItem.toCarEdit(): NavigationKeys.CarEdit = this.toPartial().toCarEdit()
 
 /** Extension function to convert a [CarItem.Partial] to a [NavigationKeys.CarEdit], only callable in a [EntryProviderBuilder] */
+@OptIn(ExperimentalUuidApi::class)
 context(_: EntryProviderBuilder<NavKey>)
 fun CarItem.Partial.toCarEdit(): NavigationKeys.CarEdit {
     val partial = this
@@ -27,13 +31,16 @@ fun CarItem.Partial.toCarEdit(): NavigationKeys.CarEdit {
         quantity = partial.quantity,
         manufacturer = partial.manufacturer,
         isFavorite = partial.isFavorite,
+        // TODO this convert is unsafe
         images = partial.images.map { it.toString() }.toSet(),
         description = partial.description,
         category = partial.category,
+        id = partial.id?.toKotlinUuid(),
     )
 }
 
 /** Extension function to convert a [NavigationKeys.CarEdit] to [CarItem.Partial], especial only callable in a [EntryProviderBuilder] */
+@OptIn(ExperimentalUuidApi::class)
 context(_: EntryProviderBuilder<NavKey>)
 fun NavigationKeys.CarEdit.toCarPartial(): CarItem.Partial {
     val partial = this
@@ -47,6 +54,7 @@ fun NavigationKeys.CarEdit.toCarPartial(): CarItem.Partial {
         images = partial.images,
         description = partial.description,
         category = partial.category,
+        id = partial.id?.toJavaUuid(),
     )
 }
 

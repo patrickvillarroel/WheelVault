@@ -40,6 +40,7 @@ object NavigationKeys {
         val category: String? = null,
         val images: Set<String> = emptySet(),
         val isFavorite: Boolean = false,
+        val id: Uuid? = null,
     ) : NavKey
 
     @Serializable
