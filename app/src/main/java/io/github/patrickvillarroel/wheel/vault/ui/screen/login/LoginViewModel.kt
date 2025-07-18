@@ -66,7 +66,12 @@ data class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
                 }
                 _state.update { LoginUiState.Success }
             } catch (e: AuthRestException) {
-                _state.update { LoginUiState.Error(LoginUiState.ErrorType.INVALID_CREDENTIALS, e.errorDescription) }
+                _state.update {
+                    LoginUiState.Error(
+                        LoginUiState.ErrorType.INVALID_CREDENTIALS,
+                        e.errorCode?.value ?: e.errorDescription,
+                    )
+                }
             } catch (_: HttpRequestException) {
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.NETWORK, "Network") }
             } catch (_: HttpRequestTimeoutException) {
