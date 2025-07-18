@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,8 +25,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import io.github.patrickvillarroel.wheel.vault.R
+import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 import kotlinx.coroutines.launch
 
 @Composable
@@ -52,13 +57,13 @@ fun OnboardingScreen(onFinish: () -> Unit, modifier: Modifier = Modifier) {
             // Imagen de fondo por página
             HorizontalPager(
                 state = pagerState,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().align(Alignment.Center),
             ) { page ->
                 Image(
                     painter = painterResource(id = pages[page]),
                     contentDescription = null,
                     contentScale = ContentScale.FillWidth,
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.aspectRatio(9f / 16f).fillMaxHeight().align(Alignment.Center),
                 )
             }
 
@@ -116,5 +121,14 @@ fun OnboardingScreen(onFinish: () -> Unit, modifier: Modifier = Modifier) {
                 }
             }
         }
+    }
+}
+
+@PreviewScreenSizes
+@PreviewLightDark
+@Composable
+private fun OnboardingPreview() {
+    WheelVaultTheme {
+        OnboardingScreen(onFinish = {})
     }
 }
