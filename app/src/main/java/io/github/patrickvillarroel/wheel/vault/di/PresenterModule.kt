@@ -6,6 +6,7 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.camera.CameraPermission
 import io.github.patrickvillarroel.wheel.vault.ui.screen.camera.CameraViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.login.LoginViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.session.SessionViewModel
+import io.github.patrickvillarroel.wheel.vault.ui.screen.splash.OnboardingViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -16,4 +17,5 @@ val presenterModule = module {
     viewModel { SessionViewModel(get()) }
     viewModel { BrandViewModel(get(), get()) }
     viewModel { CarViewModel(get()) }
+    viewModel { OnboardingViewModel(get()) }
 }
