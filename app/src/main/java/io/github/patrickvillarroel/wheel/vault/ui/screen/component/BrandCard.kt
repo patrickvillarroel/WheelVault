@@ -32,14 +32,14 @@ fun BrandCard(logo: Any, onClick: () -> Unit, modifier: Modifier = Modifier) {
                 Image(
                     painter = logo,
                     contentDescription = stringResource(R.string.car),
-                    modifier = Modifier.size(40.dp),
+                    modifier = Modifier.size(70.dp),
                     contentScale = ContentScale.Fit,
                 )
             } else {
                 AsyncImage(
                     logo,
                     contentDescription = stringResource(R.string.car),
-                    modifier = Modifier.size(40.dp),
+                    modifier = Modifier.size(70.dp),
                     contentScale = ContentScale.Fit,
                 )
             }
