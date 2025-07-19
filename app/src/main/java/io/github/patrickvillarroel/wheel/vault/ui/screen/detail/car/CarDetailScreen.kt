@@ -57,7 +57,9 @@ fun CarDetailScreen(
                         headersBackCallbacks = headerBackCallbacks,
                         onEditClick = { onEditClick(carDetail) },
                         onDeleteClick = { showCancelDialog = true },
-                        onFavoriteToggle = {},
+                        onFavoriteToggle = {
+                            carViewModel.save(carDetail.copy(isFavorite = it).toPartial())
+                        },
                     ),
                     modifier = modifier,
                 )

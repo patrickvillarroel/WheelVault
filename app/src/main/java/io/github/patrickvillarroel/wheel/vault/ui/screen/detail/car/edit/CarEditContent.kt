@@ -49,6 +49,7 @@ import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 fun CarEditContent(
     initial: CarItem.Partial,
     isEditAction: Boolean,
+    onAddPictureClick: (CarItem.Partial) -> Unit,
     onConfirmClick: (CarItem.Partial) -> Unit,
     headersBackCallbacks: HeaderBackCallbacks,
     modifier: Modifier = Modifier,
@@ -59,9 +60,10 @@ fun CarEditContent(
     var modelo by rememberSaveable { mutableStateOf(initial.model ?: "") }
     var descripcion by rememberSaveable { mutableStateOf(initial.description ?: "") }
     var manufacturer by rememberSaveable { mutableStateOf(initial.manufacturer ?: "") }
+    var year by rememberSaveable { mutableStateOf(initial.year?.toString() ?: "") }
     var cantidad by rememberSaveable { mutableStateOf(initial.quantity.toString()) }
     var categoria by rememberSaveable { mutableStateOf(initial.category ?: "") }
-    val imagenes by rememberSaveable { mutableStateOf(initial.images + R.drawable.car_add) }
+    val imagenes by remember { mutableStateOf(initial.images + R.drawable.car_add) }
     var showCancelDialog by rememberSaveable { mutableStateOf(false) }
     val headerCallbacks = remember {
         InterceptedHeaderBackCallbacks(
@@ -108,20 +110,37 @@ fun CarEditContent(
 
             item {
                 RedOutlinedTextField(marca, {
-                    marca = it
-                    car = car.copy(brand = it)
+                    marca = it.trim()
+                    car = car.copy(brand = it.takeIf(String::isNotBlank)?.trim())
                 }, "Marca")
             }
+
             item {
-                RedOutlinedTextField(modelo, {
-                    modelo = it
-                    car = car.copy(model = it)
-                }, "Modelo")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    RedOutlinedTextField(modelo, {
+                        modelo = it
+                        car = car.copy(model = it)
+                    }, "Modelo", Modifier.weight(1f))
+                    RedOutlinedTextField(
+                        year,
+                        {
+                            year = it.trim()
+                            car = car.copy(year = it.trim().takeIf(String::isNotBlank)?.toIntOrNull())
+                        },
+                        "Año",
+                        Modifier.weight(1f),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    )
+                }
             }
+
             item {
                 RedOutlinedTextField(descripcion, {
-                    descripcion = it
-                    car = car.copy(description = it)
+                    descripcion = it.trim()
+                    car = car.copy(description = it.takeIf(String::isNotBlank)?.trim())
                 }, "Descripción")
             }
 
@@ -131,14 +150,14 @@ fun CarEditContent(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     RedOutlinedTextField(manufacturer, {
-                        manufacturer = it
-                        car = car.copy(manufacturer = it)
+                        manufacturer = it.trim()
+                        car = car.copy(manufacturer = it.takeIf(String::isNotBlank)?.trim())
                     }, "Manufactura", Modifier.weight(1f))
                     RedOutlinedTextField(
                         cantidad,
                         {
-                            cantidad = it
-                            car = car.copy(quantity = it.toIntOrNull() ?: 0)
+                            cantidad = it.trim()
+                            car = car.copy(quantity = it.takeIf(String::isNotBlank)?.toIntOrNull() ?: 0)
                         },
                         "Cantidad",
                         Modifier.weight(1f),
@@ -151,8 +170,8 @@ fun CarEditContent(
                 RedOutlinedTextField(
                     categoria,
                     {
-                        categoria = it
-                        car = car.copy(category = it)
+                        categoria = it.trim()
+                        car = car.copy(category = it.takeIf(String::isNotBlank)?.trim())
                     },
                     "Categoría",
                 )
@@ -162,8 +181,7 @@ fun CarEditContent(
                 Spacer(Modifier.height(8.dp))
                 Text("Imágenes Extra")
                 Button(
-                    // car = car.copy(images = car.images + onAddPictureClick(imagenes))
-                    onClick = { /* TODO Lanzar modal o dropdown menu elegir camara o galeria, lanzar el intent */ },
+                    onClick = { onAddPictureClick(car) },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                     modifier = Modifier.padding(vertical = 8.dp),
                 ) {
@@ -201,11 +219,12 @@ fun CarEditContent(
                 title = { Text("¿Descartar cambios?") },
                 text = { Text("Los cambios que hiciste se perderán. ¿Estás seguro de que quieres salir?") },
                 confirmButton = {
-                    TextButton(
+                    Button(
                         onClick = {
                             showCancelDialog = false
                             headersBackCallbacks.onBackClick()
                         },
+                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error),
                     ) {
                         Text("Sí, salir")
                     }
@@ -230,6 +249,7 @@ private fun EditPreview() {
             initial = carDetailPartial,
             onConfirmClick = {},
             isEditAction = true,
+            onAddPictureClick = {},
             headersBackCallbacks = HeaderBackCallbacks(
                 onBackClick = {},
                 onProfileClick = {},
