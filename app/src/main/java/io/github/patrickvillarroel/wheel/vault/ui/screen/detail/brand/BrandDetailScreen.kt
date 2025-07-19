@@ -1,7 +1,7 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.detail.brand
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -37,7 +37,7 @@ fun BrandDetailScreen(
         brandViewModel.findById(brandId)
     }
 
-    AnimatedContent(brandState, label = "BrandDetail") { state ->
+    Crossfade(brandState, label = "BrandDetail") { state ->
         when (state) {
             is BrandViewModel.BrandDetailsUiState.Success -> BrandDetailContent(
                 sharedTransitionScope = sharedTransitionScope,

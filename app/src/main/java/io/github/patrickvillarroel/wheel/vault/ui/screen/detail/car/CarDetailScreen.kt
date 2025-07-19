@@ -1,7 +1,7 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -45,7 +45,7 @@ fun CarDetailScreen(
         carViewModel.findById(carId)
     }
 
-    AnimatedContent(carState) { state ->
+    Crossfade(carState) { state ->
         when (state) {
             is CarViewModel.CarDetailUiState.Success -> {
                 val carDetail = state.car
