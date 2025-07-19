@@ -8,7 +8,7 @@ data class CarItem(
     val year: Int,
     val manufacturer: String,
     val brand: String,
-    val images: Set<Any> = setOf(EmptyImage),
+    val images: Set<Any> = setOfNotNull(EmptyImage),
     val quantity: Int = 0,
     val isFavorite: Boolean = false,
     val description: String? = null,
@@ -84,5 +84,7 @@ data class CarItem(
         }
     }
 
-    data object EmptyImage
+    companion object {
+        val EmptyImage = io.github.patrickvillarroel.wheel.vault.R.drawable.car_add
+    }
 }
