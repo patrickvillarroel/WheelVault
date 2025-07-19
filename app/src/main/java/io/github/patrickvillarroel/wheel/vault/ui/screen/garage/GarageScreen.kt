@@ -3,10 +3,12 @@ package io.github.patrickvillarroel.wheel.vault.ui.screen.garage
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.github.patrickvillarroel.wheel.vault.ui.screen.CarViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderCallbacks
+import org.koin.compose.viewmodel.koinViewModel
 import java.util.UUID
 
 @Composable
@@ -18,34 +20,27 @@ fun GarageScreen(
     onCarClick: (UUID) -> Unit,
     onProfileClick: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: CarViewModel = koinViewModel(),
 ) {
-    // TODO add VM replace this fake
-    // TODO receive filters and apply it
-    val result = remember {
-        List(10) {
-            CarItem(
-                model = "Ford Mustang GTD",
-                year = 2025,
-                manufacturer = "HotWheels",
-                quantity = 2,
-                imageUrl =
-                "https://tse1.mm.bing.net/th/id/OIP.zfsbW7lEIwYgeUt7Fd1knwHaHg?rs=1&pid=ImgDetMain&o=7&rm=3",
-                isFavorite = true,
-            )
-        }
+    val carsState by viewModel.carsState.collectAsStateWithLifecycle()
+
+    val carResults = when (carsState) {
+        is CarViewModel.CarsUiState.Success -> (carsState as CarViewModel.CarsUiState.Success).cars
+        else -> emptyList()
     }
 
-    // TODO replace all clicks with VM
     GarageContent(
         sharedTransitionScope = sharedTransitionScope,
         animatedVisibilityScope = animatedVisibilityScope,
-        carResults = result,
+        carResults = carResults,
         callbacks = GarageCallbacks(
             onHomeClick = onHomeClick,
-            onSearch = {},
+            onSearch = { /* No se aun como hacer esto */ },
             onAddClick = onAddClick,
-            onCarClick = { onCarClick(it.id) },
-            onToggleFavorite = { _, _ -> },
+            onCarClick = { carItem -> onCarClick(carItem.id) },
+            onToggleFavorite = { carItem, newValue ->
+                viewModel.save(carItem.copy(isFavorite = newValue).toPartial())
+            },
             headersCallbacks = HeaderCallbacks(
                 onProfileClick = onProfileClick,
                 onGarageClick = {},
