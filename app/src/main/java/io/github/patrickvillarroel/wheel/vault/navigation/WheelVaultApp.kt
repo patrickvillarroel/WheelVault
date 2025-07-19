@@ -156,7 +156,10 @@ fun WheelVaultApp(
                     CameraLensScreen(
                         onBack = { backStack.removeLastOrNull() },
                         // TODO send more data like picture or save a partial in DB
-                        onAddDetail = { backStack.add(NavigationKeys.CarEdit(model = it)) },
+                        onAddDetail = {
+                            backStack.add(NavigationKeys.CarEdit(model = it))
+                            backStack.remove(NavigationKeys.AddCamera)
+                        },
                     )
                 }
 

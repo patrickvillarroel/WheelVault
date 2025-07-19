@@ -1,5 +1,6 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.camera
 
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.annotation.OptIn
 import androidx.camera.core.ExperimentalGetImage
@@ -106,7 +107,8 @@ class CameraViewModel : ViewModel() {
         }
     }
 
-    fun saveImage(imageBytes: ByteArray) {
+    fun saveImage(imageBytes: Bitmap) {
+        /* TODO */
     }
 
     override fun onCleared() {
