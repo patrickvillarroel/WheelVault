@@ -58,7 +58,7 @@ fun CarDetailScreen(
                         onEditClick = { onEditClick(carDetail) },
                         onDeleteClick = { showCancelDialog = true },
                         onFavoriteToggle = {
-                            carViewModel.save(carDetail.copy(isFavorite = it).toPartial())
+                            carViewModel.save(carDetail.copy(isFavorite = it))
                         },
                         onRefresh = {
                             carViewModel.findById(carDetail.id, true)

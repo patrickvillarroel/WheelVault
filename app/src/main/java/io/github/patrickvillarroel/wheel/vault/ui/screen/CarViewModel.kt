@@ -11,7 +11,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -30,7 +29,7 @@ data class CarViewModel(
     private val _carDetailState = MutableStateFlow<CarDetailUiState>(CarDetailUiState.Idle)
     val carDetailState = _carDetailState.asStateFlow()
 
-    val recentCarsImages: StateFlow<List<Pair<UUID, Any>>> = carsState.map { state ->
+    val recentCarsImages = carsState.map { state ->
         if (state is CarsUiState.Success) {
             state.cars.mapNotNull { car -> car.images.firstOrNull()?.let { car.id to it } }
         } else {
@@ -99,12 +98,19 @@ data class CarViewModel(
             Log.i("Car VM", "Going to save this car $car")
             val built = car.toCarItem() ?: return@launch
             Log.i("Car VM", "Convert as item: $built")
+            save(built)
+        }
+    }
+
+    fun save(car: CarItem) {
+        viewModelScope.launch(ioDispatcher) {
+            Log.i("Car VM", "Going to save this car $car")
             try {
-                val newCarState = if (carsRepository.exist(built.id)) {
+                val newCarState = if (carsRepository.exist(car.id)) {
                     Log.i("Car VM", "The car exist")
-                    carsRepository.update(built)
+                    carsRepository.update(car)
                 } else {
-                    carsRepository.insert(built)
+                    carsRepository.insert(car)
                 }
                 findById(newCarState.id, true)
             } catch (e: Exception) {
