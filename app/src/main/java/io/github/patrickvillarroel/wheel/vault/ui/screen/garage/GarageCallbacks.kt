@@ -14,6 +14,10 @@ data class GarageCallbacks(
     val onUiStateChange: (GarageUiState) -> Unit,
     val onSearchClick: () -> Unit,
     val headersCallbacks: HeaderCallbacks,
+    val onFilterByBrand: (String) -> Unit,
+    val onFilterByFavorite: (Boolean) -> Unit,
+    val onSortByRecent: () -> Unit,
+    val onSortByLast: () -> Unit,
 ) {
     data class Partial(
         val onHomeClick: () -> Unit,
