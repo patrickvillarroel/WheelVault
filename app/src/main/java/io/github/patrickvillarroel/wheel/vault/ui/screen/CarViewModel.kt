@@ -1,12 +1,18 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen
 
+import android.content.Context
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import coil3.Uri
+import coil3.toAndroidUri
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
+import io.github.patrickvillarroel.wheel.vault.util.bitmapToByteArray
+import io.github.patrickvillarroel.wheel.vault.util.uriToByteArray
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -93,19 +99,38 @@ data class CarViewModel(
         }
     }
 
-    fun save(car: CarItem.Partial) {
+    fun save(car: CarItem.Partial, context: Context? = null) {
         viewModelScope.launch(ioDispatcher) {
             Log.i("Car VM", "Going to save this car $car")
             val built = car.toCarItem() ?: return@launch
             Log.i("Car VM", "Convert as item: $built")
-            save(built)
+            save(built, context)
         }
     }
 
-    fun save(car: CarItem) {
+    fun save(car: CarItem, context: Context? = null) {
         viewModelScope.launch(ioDispatcher) {
             Log.i("Car VM", "Going to save this car $car")
             try {
+                val pictures = car.images.mapNotNull {
+                    when (it) {
+                        is Bitmap -> bitmapToByteArray(it)
+
+                        is Uri -> {
+                            if (context == null) {
+                                Log.e("Car VM", "Context is null and image is a uri")
+                                return@mapNotNull null
+                            }
+                            uriToByteArray(context, it.toAndroidUri())
+                        }
+
+                        else -> null
+                    }
+                }
+                    .toSet()
+                    .ifEmpty { setOfNotNull(CarItem.EmptyImage) }
+                val car = car.copy(images = pictures, imageUrl = pictures.first())
+                Log.i("Car VM", "Final car: $car")
                 val newCarState = if (carsRepository.exist(car.id)) {
                     Log.i("Car VM", "The car exist")
                     carsRepository.update(car)
@@ -128,10 +153,6 @@ data class CarViewModel(
                 _carDetailState.update { CarDetailUiState.Idle }
             }
         }
-    }
-
-    fun resetDetailToLoading() {
-        _carDetailState.update { CarDetailUiState.Loading }
     }
 
     sealed interface CarsUiState {

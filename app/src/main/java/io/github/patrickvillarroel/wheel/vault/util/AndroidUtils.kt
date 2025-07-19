@@ -1,17 +1,22 @@
 package io.github.patrickvillarroel.wheel.vault.util
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
-import java.io.File
-import java.io.IOException
+import android.util.Log
+import java.io.ByteArrayOutputStream
 
-fun uriToByteArray(context: Context, uri: Uri): ByteArray {
-    val inputStream = context.contentResolver.openInputStream(uri)
-    return inputStream?.readBytes() ?: throw IOException("No se pudo leer el archivo")
+fun uriToByteArray(context: Context, uri: Uri): ByteArray? = try {
+    context.contentResolver.openInputStream(uri)?.use { inputStream ->
+        inputStream.readBytes()
+    }
+} catch (e: Exception) {
+    Log.e("ImageUtil", "Error reading uri to bytes", e)
+    null
 }
 
-fun createTempFileForImage(context: Context): File {
-    val tempDir = File(context.cacheDir, "images_preview")
-    tempDir.mkdirs()
-    return File.createTempFile("captured_", ".jpg", tempDir)
+fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
+    val stream = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
+    return stream.toByteArray()
 }
