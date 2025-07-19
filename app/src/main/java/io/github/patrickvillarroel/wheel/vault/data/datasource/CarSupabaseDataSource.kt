@@ -42,7 +42,7 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
             Log.e("Car Supabase", "Exist count find more than 1 car with id $id")
         }
 
-        return true
+        return count >= 1L
     }
 
     override suspend fun search(query: String, isFavorite: Boolean): List<CarItem> = supabase
@@ -71,7 +71,7 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
         }
         limit(limit.toLong())
         order("created_at", Order.DESCENDING)
-    }.decodeList<CarObj>().map { it.toDomain(fetchAllImages(it.id!!)) }
+    }.decodeList<CarObj>().map { it.toDomain(fetchAllImages(it.id!!).ifEmpty { setOf(CarItem.EmptyImage) }) }
 
     override suspend fun fetch(id: UUID): CarItem? = supabase.from(CarObj.TABLE)
         .select {
@@ -137,7 +137,11 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
         ?: 0
 
     override suspend fun insert(car: CarItem): CarItem {
-        val carObject = supabase.from(CarObj.TABLE).insert(car.toObject().copy(id = null)).decodeSingle<CarObj>()
+        val carObject = supabase.from(CarObj.TABLE)
+            .insert(car.toObject().copy(id = null)) {
+                select()
+            }.decodeSingleOrNull<CarObj>() ?: error("Car not found after insert it")
+
         val images =
             if (car.images.isNotEmpty()) {
                 val realImages = car.images.filterIsInstance<ByteArray>().toSet()
@@ -164,7 +168,7 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
             .decodeSingleOrNull<CarObj>()
             ?: run {
                 Log.e("Car Supabase", "update return null, manual fetching")
-                return fetch(car.id)!!
+                return fetch(car.id) ?: error("Car not found after update it")
             }
 
         return updated.toDomain(fetchAllImages(updated.id!!))

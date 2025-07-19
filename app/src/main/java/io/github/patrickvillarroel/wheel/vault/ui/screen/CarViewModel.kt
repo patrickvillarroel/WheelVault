@@ -95,13 +95,18 @@ data class CarViewModel(
             Log.i("Car VM", "Going to save this car $car")
             val built = car.toCarItem() ?: return@launch
             Log.i("Car VM", "Convert as item: $built")
-            val newCarState = if (carsRepository.exist(built.id)) {
-                Log.i("Car VM", "The car exist")
-                carsRepository.update(built)
-            } else {
-                carsRepository.insert(built)
+            try {
+                val newCarState = if (carsRepository.exist(built.id)) {
+                    Log.i("Car VM", "The car exist")
+                    carsRepository.update(built)
+                } else {
+                    carsRepository.insert(built)
+                }
+                findById(newCarState.id, true)
+            } catch (e: Exception) {
+                Log.e("Car VM", "Failed to save car", e)
+                fetchAll(true)
             }
-            findById(newCarState.id, true)
         }
     }
 
@@ -113,6 +118,10 @@ data class CarViewModel(
                 _carDetailState.update { CarDetailUiState.Idle }
             }
         }
+    }
+
+    fun resetDetailToLoading() {
+        _carDetailState.update { CarDetailUiState.Loading }
     }
 
     sealed interface CarsUiState {
