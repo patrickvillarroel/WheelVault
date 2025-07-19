@@ -4,8 +4,10 @@ package io.github.patrickvillarroel.wheel.vault.data.objects
 
 import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
+import io.github.patrickvillarroel.wheel.vault.domain.model.VideoNews
 import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
 import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
+import io.github.patrickvillarroel.wheel.vault.domain.usecase.GetVideosNewsUseCase
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -28,13 +30,6 @@ fun BrandObj.toDomain(image: (BrandObj) -> Any): Brand {
     contract { callsInPlace(image, InvocationKind.EXACTLY_ONCE) }
     return this.toDomain(image(this))
 }
-
-context(_: BrandRepository)
-fun Brand.toObject() = BrandObj(
-    name = this.name,
-    description = this.description,
-    id = this.id.toKotlinUuid(),
-)
 
 context(_: CarsRepository)
 fun CarItem.toObject() = CarObj(
@@ -61,4 +56,13 @@ fun CarObj.toDomain(images: Set<Any>) = CarItem(
     quantity = this.quantity,
     isFavorite = this.isFavorite,
     images = images,
+)
+
+context(_: GetVideosNewsUseCase)
+fun VideoObj.toDomain(thumbnail: Any) = VideoNews(
+    id = this.id.toJavaUuid(),
+    name = this.name,
+    link = this.link,
+    thumbnail = thumbnail,
+    description = this.description,
 )

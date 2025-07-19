@@ -4,6 +4,7 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.BrandViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.CarViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.camera.CameraPermissionViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.camera.CameraViewModel
+import io.github.patrickvillarroel.wheel.vault.ui.screen.home.HomeViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.login.LoginViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.session.SessionViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.splash.OnboardingViewModel
@@ -18,4 +19,5 @@ val presenterModule = module {
     viewModel { BrandViewModel(get(), get()) }
     viewModel { CarViewModel(get()) }
     viewModel { OnboardingViewModel(get()) }
+    viewModel { HomeViewModel(get()) }
 }
