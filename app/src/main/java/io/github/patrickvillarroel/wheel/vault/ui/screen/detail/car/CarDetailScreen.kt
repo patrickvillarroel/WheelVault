@@ -60,6 +60,9 @@ fun CarDetailScreen(
                         onFavoriteToggle = {
                             carViewModel.save(carDetail.copy(isFavorite = it).toPartial())
                         },
+                        onRefresh = {
+                            carViewModel.findById(carDetail.id, true)
+                        },
                     ),
                     modifier = modifier,
                 )

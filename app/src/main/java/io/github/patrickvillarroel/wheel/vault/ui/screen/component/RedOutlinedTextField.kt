@@ -32,7 +32,6 @@ fun RedOutlinedTextField(
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = Color.Red,
             unfocusedBorderColor = Color.Red,
-            focusedTextColor = Color.White,
             focusedLabelColor = Color.Red,
             unfocusedLabelColor = Color.Gray,
         ),

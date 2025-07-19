@@ -8,5 +8,6 @@ data class CarDetailCallbacks(
     val onEditClick: () -> Unit,
     val onDeleteClick: () -> Unit,
     val onFavoriteToggle: (Boolean) -> Unit,
+    val onRefresh: () -> Unit,
     val headersBackCallbacks: HeaderBackCallbacks,
 )
