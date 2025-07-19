@@ -169,16 +169,16 @@ private fun HomeContentPreview() {
                     animatedVisibilityScope = this,
                     info = HomeCallbacks(
                         brands = List(10) { UUID.randomUUID() to R.drawable.hot_wheels_logo_black },
-                        news = listOf(
+                        news = List(10) {
                             VideoNews(
                                 thumbnail = R.drawable.thumbnail_example,
                                 id = UUID.randomUUID(),
                                 name = "Example",
                                 link = "Example",
                                 description = "A video of hot wheels events.",
-                            ),
-                        ),
-                        recentCars = listOf(UUID.randomUUID() to R.drawable.batman_car),
+                            )
+                        },
+                        recentCars = List(10) { UUID.randomUUID() to R.drawable.batman_car },
                         onAddClick = {},
                         onSearchClick = {},
                         onBrandClick = {},

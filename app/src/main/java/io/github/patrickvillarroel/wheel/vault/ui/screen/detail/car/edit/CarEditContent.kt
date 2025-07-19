@@ -183,7 +183,7 @@ fun CarEditContent(
 
             item {
                 Spacer(Modifier.height(8.dp))
-                Text("Imágenes Extra")
+                Text("Imágenes Extras")
                 Button(
                     onClick = { onAddPictureClick(car.removeEmptyProperties()) },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
