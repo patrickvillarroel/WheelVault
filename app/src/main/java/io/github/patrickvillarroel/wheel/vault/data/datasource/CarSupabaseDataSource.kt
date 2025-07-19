@@ -141,6 +141,7 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
         ?: 0
 
     override suspend fun insert(car: CarItem): CarItem {
+        Log.i("Car Supabase", "Inserting car $car")
         val carObject = supabase.from(CarObj.TABLE)
             .insert(car.toObject().copy(id = null)) {
                 select()
@@ -150,11 +151,14 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
             if (car.images.isNotEmpty()) {
                 val realImages = car.images.filterIsInstance<ByteArray>().toSet()
                 if (realImages.isNotEmpty()) {
+                    Log.i("Car Supabase", "Uploading images for car ${car.id}")
                     uploadImages(car.id, realImages)
                 } else {
+                    Log.i("Car Supabase", "No images to upload for car ${car.id} after filter is ByteArray")
                     setOf(CarItem.EmptyImage)
                 }
             } else {
+                Log.i("Car Supabase", "No images to upload for car ${car.id}")
                 setOf(CarItem.EmptyImage)
             }
         return carObject.toDomain(images)
@@ -175,7 +179,22 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
                 return fetch(car.id) ?: error("Car not found after update it")
             }
 
-        return updated.toDomain(fetchAllImages(updated.id!!).ifEmpty { setOf(CarItem.EmptyImage) })
+        val images =
+            if (car.images.isNotEmpty()) {
+                val realImages = car.images.filterIsInstance<ByteArray>().toSet()
+                if (realImages.isNotEmpty()) {
+                    Log.i("Car Supabase", "Uploading images for car ${car.id}")
+                    uploadImages(car.id, realImages)
+                } else {
+                    Log.i("Car Supabase", "No images to upload for car ${car.id} after filter is ByteArray")
+                    setOf(CarItem.EmptyImage)
+                }
+            } else {
+                Log.i("Car Supabase", "No images to upload for car ${car.id}")
+                setOf(CarItem.EmptyImage)
+            }
+
+        return updated.toDomain(images)
     }
 
     override suspend fun delete(car: CarItem): Boolean {

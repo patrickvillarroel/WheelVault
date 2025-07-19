@@ -31,7 +31,7 @@ import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
 fun ModalAddImage(
-    onResult: (Uri) -> Unit,
+    onResultGallery: (Uri) -> Unit,
     onModalClose: () -> Unit,
     onResultCamera: (Bitmap) -> Unit,
     isCameraPermission: Boolean,
@@ -41,17 +41,19 @@ fun ModalAddImage(
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
+            Log.i("ModalAddImage", "photoPickerLauncher result $uri")
             if (uri != null) {
-                onResult(uri)
-            } else {
-                onModalClose()
+                onResultGallery(uri)
             }
+            onModalClose()
         },
     )
     val cameraLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
     ) { result ->
+        Log.i("ModalAddImage", "cameraLauncher result ${result.resultCode}")
         if (result.resultCode == Activity.RESULT_OK) {
+            Log.i("ModalAddImage", "cameraLauncher result data ${result.data}")
             val imageBitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 result.data?.extras?.getParcelable("data", Bitmap::class.java)
             } else {
@@ -60,10 +62,9 @@ fun ModalAddImage(
             }
             if (imageBitmap != null) {
                 onResultCamera(imageBitmap)
-            } else {
-                onModalClose()
             }
         }
+        onModalClose()
     }
 
     ModalBottomSheet(onDismissRequest = onModalClose, modifier = modifier) {
@@ -77,13 +78,12 @@ fun ModalAddImage(
             OutlinedButton(
                 onClick = {
                     try {
+                        Log.i("ModalAddImage", "takePictureIntent")
                         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                         cameraLauncher.launch(takePictureIntent)
                     } catch (e: ActivityNotFoundException) {
                         Log.e("ModalAddImage", "Error al lanzar la cámara", e)
                         Toast.makeText(context, "La cámara no esta disponible.", Toast.LENGTH_SHORT).show()
-                    } finally {
-                        onModalClose()
                     }
                 },
                 enabled = isCameraPermission,
@@ -94,10 +94,10 @@ fun ModalAddImage(
             Spacer(modifier = Modifier.height(8.dp))
             Button(
                 onClick = {
+                    Log.i("ModalAddImage", "photoPickerLauncher")
                     photoPickerLauncher.launch(
                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
                     )
-                    onModalClose()
                 },
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -111,6 +111,6 @@ fun ModalAddImage(
 @Composable
 private fun ModalPreview() {
     WheelVaultTheme {
-        ModalAddImage(onResult = {}, onModalClose = {}, onResultCamera = {}, isCameraPermission = false)
+        ModalAddImage(onResultGallery = {}, onModalClose = {}, onResultCamera = {}, isCameraPermission = false)
     }
 }
