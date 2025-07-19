@@ -15,10 +15,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,13 +37,13 @@ import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 fun GarageContent(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
+    uiState: GarageUiState,
+    searchQuery: String,
     carResults: List<CarItem>,
     callbacks: GarageCallbacks,
     modifier: Modifier = Modifier,
 ) {
-    // TODO move the state to parent composable or receive the query to make the query from other screens
-    var uiState by rememberSaveable { mutableStateOf(GarageUiState.DEFAULT) }
-    var searchQuery by rememberSaveable { mutableStateOf("") }
+    var isRefreshing by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -50,12 +51,10 @@ fun GarageContent(
             GarageTopBar(
                 uiState,
                 searchQuery = searchQuery,
-                onSearchQueryChange = {
-                    searchQuery = it
-                    callbacks.onSearch(it)
-                },
-                onStateChange = { uiState = it },
+                onSearchQueryChange = callbacks.onSearchQueryChange,
+                onStateChange = callbacks.onUiStateChange,
                 onHomeClick = callbacks.onHomeClick,
+                onSearch = callbacks.onSearchClick,
                 headersCallbacks = callbacks.headersCallbacks,
             )
         },
@@ -66,24 +65,34 @@ fun GarageContent(
         },
     ) { paddingValues ->
         with(sharedTransitionScope) {
-            LazyColumn(Modifier.padding(paddingValues).fillMaxSize().padding(start = 15.dp, end = 15.dp)) {
-                item {
-                    Text(
-                        stringResource(R.string.garage),
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(top = 15.dp, start = 15.dp, bottom = 5.dp),
-                    )
-                }
-                items(carResults, key = { it.id }) { item ->
-                    CarItemCard(
-                        carItem = item,
-                        onClick = { callbacks.onCarClick(item) },
-                        onFavoriteToggle = { callbacks.onToggleFavorite(item, it) },
-                        modifier = Modifier
-                            .padding(3.dp)
-                            .sharedBounds(rememberSharedContentState("car-${item.id}"), animatedVisibilityScope),
-                    )
+            PullToRefreshBox(
+                isRefreshing,
+                onRefresh = {
+                    isRefreshing = true
+                    callbacks.onRefresh()
+                    isRefreshing = false
+                },
+                Modifier.fillMaxSize().padding(paddingValues),
+            ) {
+                LazyColumn(Modifier.fillMaxSize().padding(start = 15.dp, end = 15.dp)) {
+                    item {
+                        Text(
+                            stringResource(R.string.garage),
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(top = 15.dp, start = 15.dp, bottom = 5.dp),
+                        )
+                    }
+                    items(carResults, key = { it.id }) { item ->
+                        CarItemCard(
+                            carItem = item,
+                            onClick = { callbacks.onCarClick(item) },
+                            onFavoriteToggle = { callbacks.onToggleFavorite(item, it) },
+                            modifier = Modifier
+                                .padding(3.dp)
+                                .sharedBounds(rememberSharedContentState("car-${item.id}"), animatedVisibilityScope),
+                        )
+                    }
                 }
             }
         }
@@ -99,6 +108,8 @@ private fun GaragePreview() {
                 GarageContent(
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
+                    uiState = GarageUiState.DEFAULT,
+                    searchQuery = "",
                     carResults = List(10) {
                         CarItem(
                             model = "Ford Mustang GTD",
@@ -112,9 +123,12 @@ private fun GaragePreview() {
                     },
                     callbacks = GarageCallbacks(
                         onHomeClick = {},
-                        onSearch = {},
+                        onSearchQueryChange = {},
                         onAddClick = {},
                         onCarClick = {},
+                        onRefresh = {},
+                        onUiStateChange = {},
+                        onSearchClick = {},
                         onToggleFavorite = { _, _ -> },
                         headersCallbacks = HeaderCallbacks(
                             onProfileClick = {},

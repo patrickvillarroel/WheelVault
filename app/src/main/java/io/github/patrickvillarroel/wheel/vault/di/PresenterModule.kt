@@ -3,6 +3,7 @@ package io.github.patrickvillarroel.wheel.vault.di
 import io.github.patrickvillarroel.wheel.vault.ui.screen.BrandViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.CarViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.camera.CameraViewModel
+import io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.home.HomeViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.login.LoginViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.session.SessionViewModel
@@ -18,4 +19,5 @@ val presenterModule = module {
     viewModel { CarViewModel(get()) }
     viewModel { OnboardingViewModel(get()) }
     viewModel { HomeViewModel(get()) }
+    viewModel { GarageViewModel(get()) }
 }

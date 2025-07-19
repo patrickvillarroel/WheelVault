@@ -26,6 +26,7 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCal
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.brand.BrandDetailScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarDetailScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.edit.CarEditScreen
+import io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.home.HomeNavCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.home.HomeScreen
@@ -180,15 +181,19 @@ fun WheelVaultApp(
                     )
                 }
 
-                entry<NavigationKeys.Garage> {
+                entry<NavigationKeys.Garage> { (query, favorites) ->
                     // TODO pass the state from others screens
                     GarageScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
-                        onHomeClick = { backStack.removeAllOrAdd(NavigationKeys.Home) },
-                        onCarClick = { backStack.add(NavigationKeys.CarDetail(it.toKotlinUuid())) },
-                        onAddClick = { backStack.add(NavigationKeys.AddCamera) },
-                        onProfileClick = { backStack.add(NavigationKeys.Profile) },
+                        query = query ?: "",
+                        favorites = favorites,
+                        callbacks = GarageCallbacks.Partial(
+                            onHomeClick = { backStack.removeAllOrAdd(NavigationKeys.Home) },
+                            onCarClick = { backStack.add(NavigationKeys.CarDetail(it.toKotlinUuid())) },
+                            onAddClick = { backStack.add(NavigationKeys.AddCamera) },
+                            onProfileClick = { backStack.add(NavigationKeys.Profile) },
+                        ),
                     )
                 }
 
