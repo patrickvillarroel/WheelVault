@@ -26,6 +26,7 @@ fun GarageTopBar(
     onSearchQueryChange: (String) -> Unit,
     onStateChange: (GarageUiState) -> Unit,
     onHomeClick: () -> Unit,
+    onSearch: () -> Unit,
     headersCallbacks: HeaderCallbacks,
     modifier: Modifier = Modifier,
 ) {
@@ -52,6 +53,7 @@ fun GarageTopBar(
                     SearchBarInput(
                         query = searchQuery,
                         onQueryChange = onSearchQueryChange,
+                        onSearch = onSearch,
                         onClose = {
                             onSearchQueryChange("")
                             onStateChange(GarageUiState.DEFAULT)
@@ -76,6 +78,7 @@ private fun TopBarPreview() {
             onSearchQueryChange = { searchQuery = it },
             onStateChange = { uiState = it },
             onHomeClick = {},
+            onSearch = {},
             headersCallbacks = HeaderCallbacks(
                 onProfileClick = {},
                 onGarageClick = {},
