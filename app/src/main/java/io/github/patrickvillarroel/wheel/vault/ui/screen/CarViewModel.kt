@@ -69,6 +69,7 @@ data class CarViewModel(
             ?.firstOrNull { it.id == id }
 
         if (localMatch != null && !force) {
+            Log.i("CarViewModel", "Found car in local state")
             _carDetailState.update { CarDetailUiState.Success(localMatch) }
             return
         }
@@ -77,10 +78,13 @@ data class CarViewModel(
 
         viewModelScope.launch(ioDispatcher) {
             try {
+                Log.i("CarViewModel", "Going to find car by id $id")
                 val car = carsRepository.fetch(id)
                 if (car != null) {
+                    Log.i("CarViewModel", "Found car by id $id")
                     _carDetailState.update { CarDetailUiState.Success(car) }
                 } else {
+                    Log.i("CarViewModel", "Car not found by id $id")
                     _carDetailState.update { CarDetailUiState.NotFound }
                 }
             } catch (e: Exception) {
@@ -114,7 +118,7 @@ data class CarViewModel(
         viewModelScope.launch(ioDispatcher) {
             carsRepository.delete(car)
             fetchAll(true)
-            if ((_carDetailState.value as? CarDetailUiState.Success)?.car == car) {
+            if ((_carDetailState.value as? CarDetailUiState.Success)?.car?.id == car.id) {
                 _carDetailState.update { CarDetailUiState.Idle }
             }
         }

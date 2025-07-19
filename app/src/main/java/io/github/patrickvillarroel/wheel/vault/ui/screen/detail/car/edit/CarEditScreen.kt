@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -29,13 +30,15 @@ fun CarEditScreen(
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
     val permissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
     val detailState by carViewModel.carDetailState.collectAsStateWithLifecycle()
-    var initial = if (detailState is CarViewModel.CarDetailUiState.Success &&
-        (detailState as CarViewModel.CarDetailUiState.Success).car.id == partialCarItem.id
-    ) {
-        // Recover the full state of the car because navigation don't preserve network images, only links (strings)
-        (detailState as CarViewModel.CarDetailUiState.Success).car.toPartial()
-    } else {
-        partialCarItem
+    var initial = remember(partialCarItem) {
+        if (detailState is CarViewModel.CarDetailUiState.Success &&
+            (detailState as CarViewModel.CarDetailUiState.Success).car.id == partialCarItem.id
+        ) {
+            // Recover the full state of the car because navigation don't preserve network images, only links (strings)
+            (detailState as CarViewModel.CarDetailUiState.Success).car.toPartial()
+        } else {
+            partialCarItem
+        }
     }
 
     DisposableEffect(partialCarItem.id) {

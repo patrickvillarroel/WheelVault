@@ -60,7 +60,7 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
             order("created_at", Order.DESCENDING)
         }
         .decodeList<CarObj>()
-        .map { it.toDomain(fetchAllImages(it.id!!)) }
+        .map { it.toDomain(fetchAllImages(it.id!!).ifEmpty { setOf(CarItem.EmptyImage) }) }
 
     override suspend fun fetchAll(isFavorite: Boolean, limit: Int): List<CarItem> = supabase.from(CarObj.TABLE).select {
         filter {
@@ -80,7 +80,11 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
                 CarObj::id eq id.toKotlinUuid()
             }
             order("created_at", Order.DESCENDING)
-        }.decodeSingleOrNull<CarObj>()?.toDomain(fetchAllImages(id.toKotlinUuid()))
+        }.decodeSingleOrNull<CarObj>()?.toDomain(
+            fetchAllImages(id.toKotlinUuid()).ifEmpty {
+                setOf(CarItem.EmptyImage)
+            },
+        )
 
     override suspend fun fetchByModel(model: String, isFavorite: Boolean) = fetchByField("model", model, isFavorite)
 
@@ -105,7 +109,7 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
             order("created_at", Order.DESCENDING)
         }
         .decodeList<CarObj>()
-        .map { it.toDomain(fetchAllImages(it.id!!)) }
+        .map { it.toDomain(fetchAllImages(it.id!!).ifEmpty { setOf(CarItem.EmptyImage) }) }
 
     override suspend fun count(isFavorite: Boolean): Int = countByField(null, null, isFavorite)
 
@@ -148,10 +152,10 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
                 if (realImages.isNotEmpty()) {
                     uploadImages(car.id, realImages)
                 } else {
-                    emptySet()
+                    setOf(CarItem.EmptyImage)
                 }
             } else {
-                emptySet()
+                setOf(CarItem.EmptyImage)
             }
         return carObject.toDomain(images)
     }
@@ -171,7 +175,7 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
                 return fetch(car.id) ?: error("Car not found after update it")
             }
 
-        return updated.toDomain(fetchAllImages(updated.id!!))
+        return updated.toDomain(fetchAllImages(updated.id!!).ifEmpty { setOf(CarItem.EmptyImage) })
     }
 
     override suspend fun delete(car: CarItem): Boolean {
