@@ -1,5 +1,6 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.edit
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -55,15 +56,18 @@ fun CarEditContent(
     modifier: Modifier = Modifier,
 ) {
     // Internal states
-    var car by remember(initial) { mutableStateOf(initial) }
-    var marca by rememberSaveable { mutableStateOf(initial.brand ?: "") }
-    var modelo by rememberSaveable { mutableStateOf(initial.model ?: "") }
-    var descripcion by rememberSaveable { mutableStateOf(initial.description ?: "") }
-    var manufacturer by rememberSaveable { mutableStateOf(initial.manufacturer ?: "") }
-    var year by rememberSaveable { mutableStateOf(initial.year?.toString() ?: "") }
-    var cantidad by rememberSaveable { mutableStateOf(initial.quantity.toString()) }
-    var categoria by rememberSaveable { mutableStateOf(initial.category ?: "") }
-    val imagenes by remember { mutableStateOf(initial.images + R.drawable.car_add) }
+    var car by remember(initial) {
+        Log.i("CarEditContent", "recomposer with $initial")
+        mutableStateOf(initial)
+    }
+    var marca by rememberSaveable(initial.brand) { mutableStateOf(initial.brand ?: "") }
+    var modelo by rememberSaveable(initial.model) { mutableStateOf(initial.model ?: "") }
+    var descripcion by rememberSaveable(initial.description) { mutableStateOf(initial.description ?: "") }
+    var manufacturer by rememberSaveable(initial.manufacturer) { mutableStateOf(initial.manufacturer ?: "") }
+    var year by rememberSaveable(initial.year) { mutableStateOf(initial.year?.toString() ?: "") }
+    var cantidad by rememberSaveable(initial.quantity) { mutableStateOf(initial.quantity.toString()) }
+    var categoria by rememberSaveable(initial.category) { mutableStateOf(initial.category ?: "") }
+    val imagenes by remember(initial.images) { mutableStateOf(initial.images + R.drawable.car_add) }
     var showCancelDialog by rememberSaveable { mutableStateOf(false) }
     val headerCallbacks = remember {
         InterceptedHeaderBackCallbacks(
@@ -181,7 +185,7 @@ fun CarEditContent(
                 Spacer(Modifier.height(8.dp))
                 Text("Imágenes Extra")
                 Button(
-                    onClick = { onAddPictureClick(car) },
+                    onClick = { onAddPictureClick(car.removeEmptyProperties()) },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                     modifier = Modifier.padding(vertical = 8.dp),
                 ) {
@@ -204,7 +208,7 @@ fun CarEditContent(
                     }
 
                     Button(
-                        onClick = { onConfirmClick(car) },
+                        onClick = { onConfirmClick(car.removeEmptyProperties()) },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                     ) {
                         Icon(Icons.Default.Check, null, tint = Color.White)

@@ -82,6 +82,23 @@ data class CarItem(
                 category = this.category,
             )
         }
+
+        fun removeEmptyProperties() = this.copy(
+            model = model?.takeIf { it.isNotBlank() },
+            year = year?.takeIf { it > 0 },
+            manufacturer = manufacturer?.takeIf { it.isNotBlank() },
+            quantity = quantity.takeIf { it >= 0 } ?: 0,
+            brand = brand?.takeIf { it.isNotBlank() },
+            description = description?.takeIf { it.isNotBlank() },
+            category = category?.takeIf { it.isNotBlank() },
+            images =
+            images.filterNot {
+                // Use this filter to remove empty image and the default add thumbnail
+                it == EmptyImage || it == io.github.patrickvillarroel.wheel.vault.R.drawable.car_add
+            }.takeIf { it.isNotEmpty() }?.toSet() ?: emptySet(),
+            isFavorite = isFavorite,
+            id = id,
+        )
     }
 
     companion object {
