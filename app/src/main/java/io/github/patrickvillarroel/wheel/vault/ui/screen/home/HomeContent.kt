@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import io.github.patrickvillarroel.wheel.vault.R
+import io.github.patrickvillarroel.wheel.vault.domain.model.VideoNews
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BrandCard
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.CarCard
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderCallbacks
@@ -145,8 +146,8 @@ fun HomeContent(
                             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
-                            items(news, key = { it }) {
-                                VideoCardPreview(it, onPlayClick = { info.onNewsClick(it) })
+                            items(news, key = { it.id }) { video ->
+                                VideoCardPreview(video.thumbnail, onPlayClick = { info.onNewsClick(video) })
                             }
                         }
                     }
@@ -168,7 +169,15 @@ private fun HomeContentPreview() {
                     animatedVisibilityScope = this,
                     info = HomeCallbacks(
                         brands = List(10) { UUID.randomUUID() to R.drawable.hot_wheels_logo_black },
-                        news = listOf(R.drawable.thumbnail_example),
+                        news = listOf(
+                            VideoNews(
+                                thumbnail = R.drawable.thumbnail_example,
+                                id = UUID.randomUUID(),
+                                name = "Example",
+                                link = "Example",
+                                description = "A video of hot wheels events.",
+                            ),
+                        ),
                         recentCars = listOf(UUID.randomUUID() to R.drawable.batman_car),
                         onAddClick = {},
                         onSearchClick = {},

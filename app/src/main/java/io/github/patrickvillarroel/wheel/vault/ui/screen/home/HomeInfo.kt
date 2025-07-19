@@ -2,6 +2,7 @@ package io.github.patrickvillarroel.wheel.vault.ui.screen.home
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import io.github.patrickvillarroel.wheel.vault.domain.model.VideoNews
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderCallbacks
 import java.util.UUID
 
@@ -10,14 +11,18 @@ import java.util.UUID
  * @param recentCars where the first element is the id and the second is the image
  */
 @Immutable
-data class HomeInfo(val brands: List<Pair<UUID, Any>>, val news: List<Any>, val recentCars: List<Pair<UUID, Any>>)
+data class HomeInfo(
+    @Stable val brands: List<Pair<UUID, Any>>,
+    @Stable val news: List<VideoNews>,
+    @Stable val recentCars: List<Pair<UUID, Any>>,
+)
 
 class HomeCallbacks(
     @Stable val homeInfo: HomeInfo,
     val onAddClick: () -> Unit,
     val onSearchClick: () -> Unit,
     val onBrandClick: (UUID) -> Unit,
-    val onNewsClick: (Any) -> Unit,
+    val onNewsClick: (VideoNews) -> Unit,
     val onCarClick: (UUID) -> Unit,
     val onRefresh: () -> Unit,
     headersCallbacks: HeaderCallbacks,
@@ -29,12 +34,12 @@ class HomeCallbacks(
 ) {
     constructor(
         brands: List<Pair<UUID, Any>>,
-        news: List<Any>,
+        news: List<VideoNews>,
         recentCars: List<Pair<UUID, Any>>,
         onAddClick: () -> Unit,
         onSearchClick: () -> Unit,
         onBrandClick: (UUID) -> Unit,
-        onNewsClick: (Any) -> Unit,
+        onNewsClick: (VideoNews) -> Unit,
         onCarClick: (UUID) -> Unit,
         onRefresh: () -> Unit,
         headerCallbacks: HeaderCallbacks,

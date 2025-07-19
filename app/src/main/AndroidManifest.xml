@@ -2,12 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!--  Network  -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!--  Notifications  -->
-    <!--
-    <uses-permission
-        android:name="android.permission.POST_NOTIFICATIONS"
-        android:minSdkVersion="33" />
-    -->
     <!-- Camera -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature
@@ -46,4 +40,7 @@
         </activity>
     </application>
 
+    <queries>
+        <package android:name="com.google.android.youtube" />
+    </queries>
 </manifest>
