@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "io.github.patrickvillarroel"
-version = "0.0.1"
+version = "1.0.0"
 
 kotlin {
     compilerOptions {
@@ -33,7 +33,7 @@ android {
         applicationId = "$group.wheel.vault"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
+        versionCode = 2
         versionName = version.toString()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -45,7 +45,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
