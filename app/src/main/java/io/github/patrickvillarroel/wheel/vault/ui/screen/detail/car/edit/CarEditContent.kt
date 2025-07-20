@@ -3,6 +3,7 @@ package io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.edit
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,7 +12,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
@@ -19,8 +24,14 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -46,6 +57,8 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuHeader
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.RedOutlinedTextField
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
+val manufacturerList = listOf("HotWheels", "MiniGT", "Maisto", "Bburago", "Matchbox").sorted()
+
 @Composable
 fun CarEditContent(
     initial: CarItem.Partial,
@@ -63,7 +76,7 @@ fun CarEditContent(
     var marca by rememberSaveable(initial.brand) { mutableStateOf(initial.brand ?: "") }
     var modelo by rememberSaveable(initial.model) { mutableStateOf(initial.model ?: "") }
     var descripcion by rememberSaveable(initial.description) { mutableStateOf(initial.description ?: "") }
-    var manufacturer by rememberSaveable(initial.manufacturer) { mutableStateOf(initial.manufacturer ?: "") }
+    var manufacturerExpanded by rememberSaveable { mutableStateOf(false) }
     var year by rememberSaveable(initial.year) { mutableStateOf(initial.year?.toString() ?: "") }
     var cantidad by rememberSaveable(initial.quantity) { mutableStateOf(initial.quantity.toString()) }
     var categoria by rememberSaveable(initial.category) { mutableStateOf(initial.category ?: "") }
@@ -153,10 +166,54 @@ fun CarEditContent(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    RedOutlinedTextField(manufacturer, {
-                        manufacturer = it
-                        car = car.copy(manufacturer = it.takeIf(String::isNotBlank)?.trim())
-                    }, "Manufactura", Modifier.weight(1f))
+                    Box(modifier = Modifier.weight(1f)) {
+                        val textFieldState = rememberTextFieldState(manufacturerList[0])
+
+                        ExposedDropdownMenuBox(expanded = manufacturerExpanded, onExpandedChange = {
+                            manufacturerExpanded =
+                                it
+                        }) {
+                            OutlinedTextField(
+
+                                state = textFieldState,
+                                readOnly = true,
+                                lineLimits = TextFieldLineLimits.SingleLine,
+                                label = { Text("Manufactura") },
+                                trailingIcon = {
+                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = manufacturerExpanded)
+                                },
+                                modifier = Modifier
+                                    .menuAnchor(
+                                        ExposedDropdownMenuAnchorType.PrimaryNotEditable,
+                                    )
+                                    .padding(vertical = 4.dp),
+                                shape = RoundedCornerShape(8.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color.Red,
+                                    unfocusedBorderColor = Color.Red,
+                                    focusedLabelColor = Color.Red,
+                                    unfocusedLabelColor = Color.Gray,
+                                ),
+                            )
+                            ExposedDropdownMenu(expanded = manufacturerExpanded, onDismissRequest = {
+                                manufacturerExpanded =
+                                    false
+                            }) {
+                                manufacturerList.forEach { option ->
+                                    DropdownMenuItem(
+                                        text = { Text(option, style = MaterialTheme.typography.bodyLarge) },
+                                        onClick = {
+                                            textFieldState.setTextAndPlaceCursorAtEnd(option)
+                                            car = car.copy(manufacturer = option)
+                                            manufacturerExpanded = false
+                                        },
+                                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                                    )
+                                }
+                            }
+                        }
+                    }
+
                     RedOutlinedTextField(
                         cantidad,
                         {

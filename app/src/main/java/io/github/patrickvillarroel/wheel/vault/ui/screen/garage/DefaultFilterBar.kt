@@ -154,7 +154,7 @@ fun DefaultFilterBar(onSearchClick: () -> Unit, callbacks: GarageCallbacks.Filte
             FilterChip(
                 selected = isSelected,
                 onClick = { callbacks.onFilterByBrand("Matchbox") },
-                label = { Text("Maisto") },
+                label = { Text("Matchbox") },
                 colors = FilterChipDefaults.filterChipColors(
                     containerColor = Color(0xFF1D1B20),
                     labelColor = Color.White,
