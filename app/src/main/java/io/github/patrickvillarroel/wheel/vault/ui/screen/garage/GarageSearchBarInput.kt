@@ -17,9 +17,11 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
@@ -33,15 +35,15 @@ fun SearchBarInput(
     TextField(
         value = query,
         onValueChange = onQueryChange,
-        placeholder = { Text("Buscar en garaje") },
+        placeholder = { Text(stringResource(R.string.search_in_garage)) },
         leadingIcon = {
             IconButton(onClick = onClose) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Cerrar búsqueda")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.close))
             }
         },
         trailingIcon = {
             IconButton(onClick = onSearch) {
-                Icon(Icons.Filled.Search, "Buscar")
+                Icon(Icons.Filled.Search, stringResource(R.string.search))
             }
         },
         singleLine = true,

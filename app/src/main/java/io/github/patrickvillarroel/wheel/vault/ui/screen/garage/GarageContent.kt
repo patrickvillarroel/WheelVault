@@ -126,9 +126,12 @@ fun GarageContent(
                         Modifier.padding(16.dp).fillMaxWidth(0.8f),
                     )
                     if (uiState is GarageViewModel.GarageUiState.Error) {
-                        Text("Error loading car", color = MaterialTheme.colorScheme.error)
+                        Text(
+                            stringResource(R.string.error_loading_of, stringResource(R.string.cars)),
+                            color = MaterialTheme.colorScheme.error,
+                        )
                     } else {
-                        Text("No cars found")
+                        Text(stringResource(R.string.cars_not_found))
                     }
                 }
 

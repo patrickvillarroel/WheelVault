@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
@@ -21,7 +22,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import io.github.patrickvillarroel.wheel.vault.R
+import io.github.patrickvillarroel.wheel.vault.ui.screen.BrandViewModel
 
 @Composable
 fun DefaultFilterBar(onSearchClick: () -> Unit, callbacks: GarageCallbacks.FilterBar, modifier: Modifier = Modifier) {
@@ -39,7 +43,7 @@ fun DefaultFilterBar(onSearchClick: () -> Unit, callbacks: GarageCallbacks.Filte
         item {
             AssistChip(
                 onClick = callbacks.onHomeClick,
-                label = { Icon(Icons.Filled.Home, "Home", tint = Color.White) },
+                label = { Icon(Icons.Filled.Home, stringResource(R.string.home), tint = Color.White) },
                 colors = AssistChipDefaults.assistChipColors(containerColor = Color(0xFF1D1B20)),
                 border = AssistChipDefaults.assistChipBorder(enabled = true, borderColor = Color(0xFF1D1B20)),
             )
@@ -48,9 +52,9 @@ fun DefaultFilterBar(onSearchClick: () -> Unit, callbacks: GarageCallbacks.Filte
         item {
             AssistChip(
                 onClick = onSearchClick,
-                label = { Text("Buscar") },
+                label = { Text(stringResource(R.string.search)) },
                 leadingIcon = {
-                    Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.White)
+                    Icon(Icons.Default.Search, stringResource(R.string.search), tint = Color.White)
                 },
                 colors = AssistChipDefaults.assistChipColors(
                     containerColor = Color(0xFF1D1B20),
@@ -81,7 +85,7 @@ fun DefaultFilterBar(onSearchClick: () -> Unit, callbacks: GarageCallbacks.Filte
             FilterChip(
                 selected = selectedRecientes,
                 onClick = { callbacks.onSortByRecent() },
-                label = { Text("Recientes") },
+                label = { Text(stringResource(R.string.recent)) },
                 colors = FilterChipDefaults.filterChipColors(
                     containerColor = Color(0xFF1D1B20),
                     labelColor = Color.White,
@@ -98,7 +102,7 @@ fun DefaultFilterBar(onSearchClick: () -> Unit, callbacks: GarageCallbacks.Filte
             FilterChip(
                 selected = selectedUltimos,
                 onClick = { callbacks.onSortByLast() },
-                label = { Text("Antiguos") },
+                label = { Text(stringResource(R.string.last)) },
                 colors = FilterChipDefaults.filterChipColors(
                     containerColor = Color(0xFF1D1B20),
                     labelColor = Color.White,
@@ -111,86 +115,12 @@ fun DefaultFilterBar(onSearchClick: () -> Unit, callbacks: GarageCallbacks.Filte
             )
         }
 
-        item {
-            val isSelected = selectedBrand == "Hot Wheels"
+        items(BrandViewModel.manufacturerList) { brand ->
+            val isSelected = selectedBrand == brand
             FilterChip(
                 selected = isSelected,
-                onClick = {
-                    callbacks.onFilterByBrand("Hot Wheels")
-                },
-                label = { Text("HotWheels") },
-                colors = FilterChipDefaults.filterChipColors(
-                    containerColor = Color(0xFF1D1B20),
-                    labelColor = Color.White,
-                ),
-                border = FilterChipDefaults.filterChipBorder(
-                    enabled = true,
-                    isSelected,
-                    borderColor = Color(0xFF1D1B20),
-                ),
-            )
-        }
-
-        item {
-            val isSelected = selectedBrand == "MiniGt"
-            FilterChip(
-                selected = isSelected,
-                onClick = { callbacks.onFilterByBrand("MiniGT") },
-                label = { Text("MiniGT") },
-                colors = FilterChipDefaults.filterChipColors(
-                    containerColor = Color(0xFF1D1B20),
-                    labelColor = Color.White,
-                ),
-                border = FilterChipDefaults.filterChipBorder(
-                    enabled = true,
-                    isSelected,
-                    borderColor = Color(0xFF1D1B20),
-                ),
-            )
-        }
-
-        item {
-            val isSelected = selectedBrand == "Matchbox"
-            FilterChip(
-                selected = isSelected,
-                onClick = { callbacks.onFilterByBrand("Matchbox") },
-                label = { Text("Matchbox") },
-                colors = FilterChipDefaults.filterChipColors(
-                    containerColor = Color(0xFF1D1B20),
-                    labelColor = Color.White,
-                ),
-                border = FilterChipDefaults.filterChipBorder(
-                    enabled = true,
-                    isSelected,
-                    borderColor = Color(0xFF1D1B20),
-                ),
-            )
-        }
-
-        item {
-            val isSelected = selectedBrand == "Maisto"
-            FilterChip(
-                selected = isSelected,
-                onClick = { callbacks.onFilterByBrand("Maisto") },
-                label = { Text("Maisto") },
-                colors = FilterChipDefaults.filterChipColors(
-                    containerColor = Color(0xFF1D1B20),
-                    labelColor = Color.White,
-                ),
-                border = FilterChipDefaults.filterChipBorder(
-                    enabled = true,
-                    isSelected,
-                    borderColor = Color(0xFF1D1B20),
-                ),
-            )
-        }
-
-        item {
-            val isSelected = selectedBrand == "Bburago"
-            FilterChip(
-                selected = isSelected,
-                onClick = { callbacks.onFilterByBrand("Bburago") },
-                label = { Text("Bburago") },
+                onClick = { callbacks.onFilterByBrand(brand) },
+                label = { Text(brand) },
                 colors = FilterChipDefaults.filterChipColors(
                     containerColor = Color(0xFF1D1B20),
                     labelColor = Color.White,

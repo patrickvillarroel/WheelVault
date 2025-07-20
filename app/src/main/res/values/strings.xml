@@ -15,6 +15,7 @@
     <string name="capturing_image_instruction">Encuadre el modelo y presione el botón de la cámara.</string>
     <string name="car">Auto</string>
     <string name="cars">Autos</string>
+    <string name="cars_not_found">No se encontraron carritos</string>
     <string name="car_informal">Carro</string>
     <string name="car_in_collection">Carritos en la colección:</string>
     <string name="car_not_found">Carrito no encontrado</string>
@@ -44,14 +45,18 @@
     <string name="from_camera">Desde la cámara</string>
     <string name="from_gallery">Desde la galería</string>
     <string name="garage">Garaje</string>
+    <string name="home">Inicio</string>
+    <string name="last">Antiguos</string>
     <string name="manufacture">Fabricante</string>
     <string name="manufacture_of">Fabricante: %s</string>
     <string name="menu">Menú</string>
     <string name="model">Modelo</string>
     <string name="no_retry">Reintentar</string>
+    <string name="recent">Recientes</string>
     <string name="recently_added">Agregados recientes</string>
     <string name="request_permission">Dar permiso</string>
     <string name="search">Buscar</string>
+    <string name="search_in_garage">Buscar en el garaje</string>
     <string name="select_image">Seleccionar Imagen</string>
     <string name="skip">Omitir</string>
     <string name="take_picture">Capturar Imagen</string>

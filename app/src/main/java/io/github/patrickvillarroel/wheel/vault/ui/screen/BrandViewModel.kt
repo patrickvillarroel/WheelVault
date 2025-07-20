@@ -126,4 +126,8 @@ data class BrandViewModel(
         data object NotFound : BrandDetailsUiState
         data object Error : BrandDetailsUiState
     }
+
+    companion object {
+        val manufacturerList = listOf("HotWheels", "MiniGT", "Maisto", "Bburago", "Matchbox").sorted()
+    }
 }
