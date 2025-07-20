@@ -4,13 +4,16 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LoadingIndicator
@@ -23,8 +26,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -104,11 +109,27 @@ fun GarageContent(
                         }
                     }
 
-                GarageViewModel.GarageUiState.Error -> BasicAlertDialog(
-                    callbacks.filterBar.onHomeClick,
-                    modifier = Modifier.padding(paddingValues),
+                GarageViewModel.GarageUiState.Error, is GarageViewModel.GarageUiState.Empty -> Column(
+                    Modifier.padding(paddingValues).fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
                 ) {
-                    Text(text = "Error", color = MaterialTheme.colorScheme.error)
+                    Image(
+                        painterResource(
+                            if (uiState is GarageViewModel.GarageUiState.Error) {
+                                R.drawable.error
+                            } else {
+                                R.drawable.no_data
+                            },
+                        ),
+                        null,
+                        Modifier.padding(16.dp).fillMaxWidth(0.8f),
+                    )
+                    if (uiState is GarageViewModel.GarageUiState.Error) {
+                        Text("Error loading car", color = MaterialTheme.colorScheme.error)
+                    } else {
+                        Text("No cars found")
+                    }
                 }
 
                 GarageViewModel.GarageUiState.Loading -> LoadingIndicator(Modifier.padding(paddingValues).fillMaxSize())

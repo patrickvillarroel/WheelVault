@@ -28,7 +28,7 @@ import kotlin.uuid.ExperimentalUuidApi
 import io.github.jan.supabase.auth.providers.builtin.Email as ProviderEmail
 
 data class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
-    private val _state = MutableStateFlow<LoginUiState>(LoginUiState.Loading)
+    private val _state = MutableStateFlow<LoginUiState>(LoginUiState.Waiting)
     val state = _state.asStateFlow()
 
     /** Register a new user with email and password */
@@ -78,6 +78,8 @@ data class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.TIMEOUT, "Timeout") }
             } catch (_: RestException) {
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
+            } catch (_: Exception) {
+                _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
             }
         }
     }
@@ -122,6 +124,8 @@ data class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.TIMEOUT, "Timeout") }
             } catch (_: RestException) {
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
+            } catch (_: Exception) {
+                _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
             }
         }
     }
@@ -138,6 +142,8 @@ data class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
             } catch (_: HttpRequestTimeoutException) {
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.TIMEOUT, "Timeout") }
             } catch (_: RestException) {
+                _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
+            } catch (_: Exception) {
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
             }
         }

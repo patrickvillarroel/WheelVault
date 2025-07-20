@@ -1,11 +1,26 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.login
 
-import android.widget.Toast
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.LoadingIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.github.patrickvillarroel.wheel.vault.R
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -17,22 +32,7 @@ fun LoginWithEmailScreen(
     loginViewModel: LoginViewModel = koinViewModel(),
 ) {
     val uiState by loginViewModel.state.collectAsStateWithLifecycle()
-    val context = LocalContext.current
-
-    when (uiState) {
-        is LoginUiState.Success -> {
-            onLoginSuccess()
-        }
-
-        is LoginUiState.Loading -> {
-            // Show loading indicator
-        }
-
-        is LoginUiState.Error -> {
-            // TODO
-            Toast.makeText(context, "Error $uiState", Toast.LENGTH_SHORT).show()
-        }
-    }
+    var showDialog by rememberSaveable { mutableStateOf(true) }
 
     LoginWithEmailContent(
         onClick = { email, password ->
@@ -48,4 +48,41 @@ fun LoginWithEmailScreen(
         isMagicLink = isMagicLink,
         modifier = modifier,
     )
+
+    when (uiState) {
+        is LoginUiState.Success -> {
+            onLoginSuccess()
+        }
+
+        is LoginUiState.Loading -> {
+            LoadingIndicator(Modifier.fillMaxSize())
+        }
+
+        is LoginUiState.Waiting -> {}
+
+        is LoginUiState.Error -> {
+            if (showDialog) {
+                Dialog(onDismissRequest = { showDialog = false }) {
+                    Column(
+                        Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                    ) {
+                        Image(
+                            painterResource(
+                                R.drawable.error,
+                            ),
+                            null,
+                            Modifier.padding(16.dp).fillMaxWidth(0.8f),
+                        )
+                        Text(
+                            "Error $uiState",
+                            color = MaterialTheme.colorScheme.error,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        )
+                    }
+                }
+            }
+        }
+    }
 }

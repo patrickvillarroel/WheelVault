@@ -3,6 +3,7 @@ package io.github.patrickvillarroel.wheel.vault.ui.screen.login
 sealed interface LoginUiState {
     data object Loading : LoginUiState
     data object Success : LoginUiState
+    data object Waiting : LoginUiState
     data class Error(val type: ErrorType, val message: String) : LoginUiState
 
     enum class ErrorType {

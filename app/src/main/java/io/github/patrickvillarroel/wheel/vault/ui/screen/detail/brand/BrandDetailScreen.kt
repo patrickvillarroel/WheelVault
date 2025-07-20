@@ -3,18 +3,24 @@ package io.github.patrickvillarroel.wheel.vault.ui.screen.detail.brand
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.LoadingIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.ui.screen.BrandViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
 import org.koin.compose.viewmodel.koinViewModel
@@ -61,12 +67,25 @@ fun BrandDetailScreen(
             }
 
             BrandViewModel.BrandDetailsUiState.Error, BrandViewModel.BrandDetailsUiState.NotFound -> {
-                Dialog(headerBackCallbacks.onBackClick) {
-                    Text(
-                        text = "Something went wrong",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.error,
-                    )
+                Scaffold(Modifier.fillMaxSize()) {
+                    Column(
+                        Modifier.padding(it).fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                    ) {
+                        Image(
+                            painterResource(
+                                if (state is BrandViewModel.BrandDetailsUiState.Error) {
+                                    R.drawable.error
+                                } else {
+                                    R.drawable.no_data
+                                },
+                            ),
+                            null,
+                            Modifier.padding(16.dp).fillMaxWidth(0.8f),
+                        )
+                        Text("Error loading brand", color = androidx.compose.material3.MaterialTheme.colorScheme.error)
+                    }
                 }
             }
         }

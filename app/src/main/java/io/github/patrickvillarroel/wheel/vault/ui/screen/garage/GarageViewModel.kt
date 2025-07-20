@@ -35,7 +35,11 @@ data class GarageViewModel(
             viewModelScope.launch(ioDispatcher) {
                 try {
                     val result = carsRepository.fetchAll(orderAsc = orderAsc)
-                    _garageState.update { GarageUiState.Success(result) }
+                    if (result.isEmpty()) {
+                        _garageState.update { GarageUiState.Empty }
+                    } else {
+                        _garageState.update { GarageUiState.Success(result) }
+                    }
                 } catch (e: Exception) {
                     Log.e("CarViewModel", "Failed to fetch cars", e)
                     _garageState.update { GarageUiState.Error }
@@ -48,7 +52,11 @@ data class GarageViewModel(
         viewModelScope.launch(ioDispatcher) {
             try {
                 val result = carsRepository.search(query, favoritesOnly)
-                _garageState.update { GarageUiState.Success(result) }
+                if (result.isEmpty()) {
+                    _garageState.update { GarageUiState.Empty }
+                } else {
+                    _garageState.update { GarageUiState.Success(result) }
+                }
             } catch (e: Exception) {
                 Log.e("CarViewModel", "Failed to search cars", e)
                 _garageState.update { GarageUiState.Error }
@@ -61,7 +69,11 @@ data class GarageViewModel(
             try {
                 _garageState.update { GarageUiState.Loading }
                 val result = carsRepository.fetchAll(true, 25)
-                _garageState.update { GarageUiState.Success(result) }
+                if (result.isEmpty()) {
+                    _garageState.update { GarageUiState.Empty }
+                } else {
+                    _garageState.update { GarageUiState.Success(result) }
+                }
             } catch (e: Exception) {
                 Log.e("CarViewModel", "Failed to get favorites", e)
                 _garageState.update { GarageUiState.Error }
@@ -89,5 +101,7 @@ data class GarageViewModel(
         data class Success(@Stable val cars: List<CarItem>) : GarageUiState
 
         data object Error : GarageUiState
+
+        data object Empty : GarageUiState
     }
 }
