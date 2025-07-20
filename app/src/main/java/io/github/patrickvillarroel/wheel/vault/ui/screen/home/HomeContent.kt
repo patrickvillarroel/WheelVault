@@ -4,6 +4,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -25,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -113,6 +116,13 @@ fun HomeContent(
                     }
 
                     item {
+                        if (recentCars.isEmpty()) {
+                            Image(
+                                painterResource(R.drawable.baner_add_car),
+                                stringResource(R.string.add_car),
+                                Modifier.fillMaxWidth().clickable(onClick = info.onAddClick),
+                            )
+                        }
                         LazyRow(
                             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -179,6 +189,39 @@ private fun HomeContentPreview() {
                             )
                         },
                         recentCars = List(10) { UUID.randomUUID() to R.drawable.batman_car },
+                        onAddClick = {},
+                        onSearchClick = {},
+                        onBrandClick = {},
+                        onNewsClick = {},
+                        onCarClick = {},
+                        onRefresh = {},
+                        headerCallbacks = HeaderCallbacks(
+                            onProfileClick = {},
+                            onGarageClick = {},
+                            onFavoritesClick = {},
+                            onStatisticsClick = {},
+                        ),
+                    ),
+                )
+            }
+        }
+    }
+}
+
+@PreviewScreenSizes
+@PreviewLightDark
+@Composable
+private fun HomeNoContentPreview() {
+    SharedTransitionLayout {
+        AnimatedVisibility(true) {
+            WheelVaultTheme {
+                HomeContent(
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    animatedVisibilityScope = this,
+                    info = HomeCallbacks(
+                        brands = emptyList(),
+                        news = emptyList(),
+                        recentCars = emptyList(),
                         onAddClick = {},
                         onSearchClick = {},
                         onBrandClick = {},
