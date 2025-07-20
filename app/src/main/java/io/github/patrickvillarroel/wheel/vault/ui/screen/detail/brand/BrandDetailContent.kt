@@ -59,7 +59,7 @@ fun BrandDetailContent(
             LazyColumn(Modifier.padding(paddingValues).fillMaxSize().padding(top = 15.dp, start = 15.dp, end = 15.dp)) {
                 item {
                     Text(
-                        "Info ${brandDetail.brand.name}",
+                        stringResource(R.string.info_of, brandDetail.brand.name),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                     )
@@ -75,7 +75,7 @@ fun BrandDetailContent(
 
                 item {
                     Text(
-                        "Carritos en la colección:",
+                        stringResource(R.string.car_in_collection),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(top = 10.dp),

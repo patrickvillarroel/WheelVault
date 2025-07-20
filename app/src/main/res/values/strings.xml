@@ -1,7 +1,10 @@
 <resources>
     <string name="app_name">Wheel Vault</string>
     <string name="add">Añadir</string>
+    <string name="add_variant">Agregar</string>
+    <string name="add_car">Agregar Carrito</string>
     <string name="back">Volver</string>
+    <string name="brand">Marca</string>
     <string name="brands">Marcas</string>
     <string name="camera_permission">Permiso de cámara</string>
     <string name="camera_permission_title">Permiso de cámara requerido</string>
@@ -11,15 +14,31 @@
     <string name="captured_image">Imagen captura por confirmar</string>
     <string name="capturing_image_instruction">Encuadre el modelo y presione el botón de la cámara.</string>
     <string name="car">Auto</string>
+    <string name="cars">Autos</string>
     <string name="car_informal">Carro</string>
+    <string name="car_in_collection">Carritos en la colección:</string>
+    <string name="car_not_found">Carrito no encontrado</string>
+    <string name="category">Categoría</string>
     <string name="close">Cerrar</string>
     <string name="collectors_project">Collector\'s Project</string>
     <string name="collectors_project_lines">Collector\'s\nProject</string>
     <string name="confirm_text">¿Es Correcto?</string>
     <string name="confirm_image">¿Confirmar esta imagen?</string>
     <string name="completed">Completado</string>
+    <string name="delete">Eliminar</string>
+    <string name="delete_car">¿Eliminar carrito?</string>
+    <string name="delete_car_confirmation">El carrito y sus imagenes se perderán. ¿Estás seguro de que quieres eliminar?</string>
+    <string name="descart_progress">¿Descartar cambios?</string>
+    <string name="descart_progress_text">Los cambios que hiciste se perderán. ¿Estás seguro de que quieres salir?</string>
+    <string name="description">Descripción</string>
+    <string name="edit">Editar</string>
+    <string name="edit_car">Editar Carrito</string>
+    <string name="error_loading_of">Error al cargar %s</string>
     <string name="image_of">Imagen %i</string>
+    <string name="image_extras">Imágenes extras</string>
+    <string name="info_of">Info %s</string>
     <string name="information_interest">Información de Interés</string>
+    <string name="information_of_car">Información de Carrito</string>
     <string name="statistics">Estadísticas</string>
     <string name="favorites">Favoritos</string>
     <string name="from_camera">Desde la cámara</string>
@@ -28,6 +47,7 @@
     <string name="manufacture">Fabricante</string>
     <string name="manufacture_of">Fabricante: %s</string>
     <string name="menu">Menú</string>
+    <string name="model">Modelo</string>
     <string name="no_retry">Reintentar</string>
     <string name="recently_added">Agregados recientes</string>
     <string name="request_permission">Dar permiso</string>
@@ -44,4 +64,6 @@
     <string name="year">Año</string>
     <string name="year_of">Año: %s</string>
     <string name="yes_confirm">Sí, continuar</string>
+    <string name="yes_exit">Sí, salir</string>
+    <string name="yes_delete">Sí, eliminar</string>
 </resources>

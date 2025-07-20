@@ -43,6 +43,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -57,6 +58,7 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuHeader
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.RedOutlinedTextField
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
+// TODO Move to data
 val manufacturerList = listOf("HotWheels", "MiniGT", "Maisto", "Bburago", "Matchbox").sorted()
 
 @Composable
@@ -115,7 +117,13 @@ fun CarEditContent(
             item {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(
-                        text = if (isEditAction) "Editar Carrito" else "Agregar Carrito",
+                        text = if (isEditAction) {
+                            stringResource(
+                                R.string.edit_car,
+                            )
+                        } else {
+                            stringResource(R.string.add_car)
+                        },
                         style = MaterialTheme.typography.headlineSmall,
                         modifier = Modifier.padding(top = 16.dp),
                     )
@@ -129,7 +137,7 @@ fun CarEditContent(
                 RedOutlinedTextField(marca, {
                     marca = it
                     car = car.copy(brand = it.takeIf(String::isNotBlank)?.trim())
-                }, "Marca")
+                }, stringResource(R.string.brand))
             }
 
             item {
@@ -140,14 +148,14 @@ fun CarEditContent(
                     RedOutlinedTextField(modelo, {
                         modelo = it
                         car = car.copy(model = it)
-                    }, "Modelo", Modifier.weight(1f))
+                    }, stringResource(R.string.model), Modifier.weight(1f))
                     RedOutlinedTextField(
                         year,
                         {
                             year = it
                             car = car.copy(year = it.trim().takeIf(String::isNotBlank)?.toIntOrNull())
                         },
-                        "Año",
+                        stringResource(R.string.year),
                         Modifier.weight(1f),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     )
@@ -158,7 +166,7 @@ fun CarEditContent(
                 RedOutlinedTextField(descripcion, {
                     descripcion = it.trim()
                     car = car.copy(description = it.takeIf(String::isNotBlank)?.trim())
-                }, "Descripción")
+                }, stringResource(R.string.description))
             }
 
             item {
@@ -169,23 +177,20 @@ fun CarEditContent(
                     Box(modifier = Modifier.weight(1f)) {
                         val textFieldState = rememberTextFieldState(manufacturerList[0])
 
-                        ExposedDropdownMenuBox(expanded = manufacturerExpanded, onExpandedChange = {
-                            manufacturerExpanded =
-                                it
-                        }) {
+                        ExposedDropdownMenuBox(
+                            expanded = manufacturerExpanded,
+                            onExpandedChange = { manufacturerExpanded = it },
+                        ) {
                             OutlinedTextField(
-
                                 state = textFieldState,
                                 readOnly = true,
                                 lineLimits = TextFieldLineLimits.SingleLine,
-                                label = { Text("Manufactura") },
+                                label = { Text(stringResource(R.string.manufacture)) },
                                 trailingIcon = {
                                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = manufacturerExpanded)
                                 },
                                 modifier = Modifier
-                                    .menuAnchor(
-                                        ExposedDropdownMenuAnchorType.PrimaryNotEditable,
-                                    )
+                                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                                     .padding(vertical = 4.dp),
                                 shape = RoundedCornerShape(8.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
@@ -195,10 +200,10 @@ fun CarEditContent(
                                     unfocusedLabelColor = Color.Gray,
                                 ),
                             )
-                            ExposedDropdownMenu(expanded = manufacturerExpanded, onDismissRequest = {
-                                manufacturerExpanded =
-                                    false
-                            }) {
+                            ExposedDropdownMenu(
+                                expanded = manufacturerExpanded,
+                                onDismissRequest = { manufacturerExpanded = false },
+                            ) {
                                 manufacturerList.forEach { option ->
                                     DropdownMenuItem(
                                         text = { Text(option, style = MaterialTheme.typography.bodyLarge) },
@@ -220,7 +225,7 @@ fun CarEditContent(
                             cantidad = it
                             car = car.copy(quantity = it.takeIf(String::isNotBlank)?.toIntOrNull() ?: 0)
                         },
-                        "Cantidad",
+                        stringResource(R.string.quantity),
                         Modifier.weight(1f),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     )
@@ -234,13 +239,13 @@ fun CarEditContent(
                         categoria = it
                         car = car.copy(category = it.takeIf(String::isNotBlank)?.trim())
                     },
-                    "Categoría",
+                    stringResource(R.string.category),
                 )
             }
 
             item {
                 Spacer(Modifier.height(8.dp))
-                Text("Imágenes Extras")
+                Text(stringResource(R.string.image_extras), style = MaterialTheme.typography.titleMedium)
                 Button(
                     onClick = { onAddPictureClick(car.removeEmptyProperties()) },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
@@ -248,7 +253,7 @@ fun CarEditContent(
                 ) {
                     Icon(Icons.Default.Add, contentDescription = null, tint = Color.White)
                     Spacer(Modifier.width(4.dp))
-                    Text("Agregar", color = Color.White)
+                    Text(stringResource(R.string.add_variant), color = Color.White)
                 }
             }
 
@@ -277,8 +282,8 @@ fun CarEditContent(
         if (showCancelDialog) {
             AlertDialog(
                 onDismissRequest = { showCancelDialog = false },
-                title = { Text("¿Descartar cambios?") },
-                text = { Text("Los cambios que hiciste se perderán. ¿Estás seguro de que quieres salir?") },
+                title = { Text(stringResource(R.string.descart_progress)) },
+                text = { Text(stringResource(R.string.descart_progress_text)) },
                 confirmButton = {
                     Button(
                         onClick = {
@@ -287,12 +292,12 @@ fun CarEditContent(
                         },
                         colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error),
                     ) {
-                        Text("Sí, salir")
+                        Text(stringResource(R.string.yes_exit))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { showCancelDialog = false }) {
-                        Text("Cancelar")
+                        Text(stringResource(R.string.cancel))
                     }
                 },
             )

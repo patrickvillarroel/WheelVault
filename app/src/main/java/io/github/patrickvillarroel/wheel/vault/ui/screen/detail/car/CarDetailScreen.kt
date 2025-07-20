@@ -3,11 +3,7 @@ package io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -23,10 +19,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
@@ -76,9 +70,9 @@ fun CarDetailScreen(
                 if (showCancelDialog) {
                     AlertDialog(
                         onDismissRequest = { showCancelDialog = false },
-                        title = { Text("¿Eliminar carrito?") },
+                        title = { Text(stringResource(R.string.delete_car)) },
                         text = {
-                            Text("El carrito y sus imagenes se perderán. ¿Estás seguro de que quieres eliminar?")
+                            Text(stringResource(R.string.delete_car_confirmation))
                         },
                         confirmButton = {
                             Button(
@@ -89,46 +83,25 @@ fun CarDetailScreen(
                                 },
                                 colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error),
                             ) {
-                                Text("Sí, eliminar")
+                                Text(stringResource(R.string.yes_delete))
                             }
                         },
                         dismissButton = {
                             TextButton(onClick = { showCancelDialog = false }) {
-                                Text("Cancelar")
+                                Text(stringResource(R.string.cancel))
                             }
                         },
                     )
                 }
             }
 
-            is CarViewModel.CarDetailUiState.Loading, CarViewModel.CarDetailUiState.Idle -> {
-                Scaffold(Modifier.fillMaxSize()) {
-                    LoadingIndicator(Modifier.padding(it).fillMaxSize())
-                }
+            is CarViewModel.CarDetailUiState.Loading, CarViewModel.CarDetailUiState.Idle -> Scaffold(
+                Modifier.fillMaxSize(),
+            ) {
+                LoadingIndicator(Modifier.padding(it).fillMaxSize())
             }
 
-            is CarViewModel.CarDetailUiState.Error, is CarViewModel.CarDetailUiState.NotFound -> {
-                Scaffold(Modifier.fillMaxSize()) {
-                    Column(
-                        Modifier.padding(it).fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
-                    ) {
-                        Image(
-                            painterResource(
-                                if (state is CarViewModel.CarDetailUiState.Error) {
-                                    R.drawable.error
-                                } else {
-                                    R.drawable.no_data
-                                },
-                            ),
-                            null,
-                            Modifier.padding(16.dp).fillMaxWidth(0.8f),
-                        )
-                        Text("Error loading car", color = MaterialTheme.colorScheme.error)
-                    }
-                }
-            }
+            is CarViewModel.CarDetailUiState.Error, is CarViewModel.CarDetailUiState.NotFound -> CarErrorScreen(state)
         }
     }
 }

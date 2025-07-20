@@ -31,9 +31,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BackTextButton
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.FavoriteIcon
@@ -90,7 +92,7 @@ fun CarDetailContent(
                     item {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                             Text(
-                                text = "Información de Carrito",
+                                stringResource(R.string.information_of_car),
                                 style = MaterialTheme.typography.headlineSmall,
                                 modifier = Modifier.padding(top = 16.dp),
                             )
@@ -99,44 +101,44 @@ fun CarDetailContent(
                     }
 
                     item {
-                        Text("Marca", style = MaterialTheme.typography.labelLarge)
+                        Text(stringResource(R.string.brand), style = MaterialTheme.typography.labelLarge)
                         Text(carDetail.brand, style = MaterialTheme.typography.bodyLarge)
                         RaceDivider()
                     }
 
                     item {
-                        Text("Modelo", style = MaterialTheme.typography.labelLarge)
+                        Text(stringResource(R.string.model), style = MaterialTheme.typography.labelLarge)
                         Text(carDetail.model, style = MaterialTheme.typography.bodyLarge)
                         RaceDivider()
                     }
 
                     item {
-                        Text("Año", style = MaterialTheme.typography.labelLarge)
+                        Text(stringResource(R.string.year), style = MaterialTheme.typography.labelLarge)
                         Text(carDetail.year.toString(), style = MaterialTheme.typography.bodyLarge)
                         RaceDivider()
                     }
 
                     item {
-                        Text("Fabricante", style = MaterialTheme.typography.labelLarge)
+                        Text(stringResource(R.string.manufacture), style = MaterialTheme.typography.labelLarge)
                         Text(carDetail.manufacturer, style = MaterialTheme.typography.bodyLarge)
                         RaceDivider()
                     }
 
                     item {
-                        Text("Categoría", style = MaterialTheme.typography.labelLarge)
+                        Text(stringResource(R.string.category), style = MaterialTheme.typography.labelLarge)
                         Text(carDetail.category ?: "--", style = MaterialTheme.typography.bodyLarge)
                         RaceDivider()
                     }
 
                     item {
-                        Text("Descripción", style = MaterialTheme.typography.labelLarge)
+                        Text(stringResource(R.string.description), style = MaterialTheme.typography.labelLarge)
                         Text(carDetail.description ?: "--", style = MaterialTheme.typography.bodyLarge)
                         RaceDivider()
                     }
 
                     item {
                         Text(
-                            text = "Cantidad: ${carDetail.quantity}",
+                            stringResource(R.string.quantity_of, carDetail.quantity),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Medium,
                         )
@@ -155,18 +157,23 @@ fun CarDetailContent(
                                     onClick = callbacks.onEditClick,
                                     modifier = Modifier.size(65.dp),
                                 ) {
-                                    Icon(Icons.Filled.Edit, "Editar", Modifier.size(32.dp))
+                                    Icon(Icons.Filled.Edit, stringResource(R.string.edit), Modifier.size(32.dp))
                                 }
-                                Text("Editar", fontWeight = FontWeight.SemiBold)
+                                Text(stringResource(R.string.edit), fontWeight = FontWeight.SemiBold)
                             }
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 OutlinedIconButton(
                                     onClick = callbacks.onDeleteClick,
                                     modifier = Modifier.size(65.dp),
                                 ) {
-                                    Icon(Icons.Outlined.Delete, "Eliminar", Modifier.size(32.dp), Color(0xFFE42E31))
+                                    Icon(
+                                        Icons.Outlined.Delete,
+                                        stringResource(R.string.delete),
+                                        Modifier.size(32.dp),
+                                        Color(0xFFE42E31),
+                                    )
                                 }
-                                Text("Eliminar", fontWeight = FontWeight.SemiBold)
+                                Text(stringResource(R.string.delete), fontWeight = FontWeight.SemiBold)
                             }
                         }
                     }
