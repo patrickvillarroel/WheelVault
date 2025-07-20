@@ -137,7 +137,9 @@ data class CarViewModel(
                 } else {
                     carsRepository.insert(car)
                 }
-                findById(newCarState.id, true)
+                Log.i("Car VM", "New car state: $newCarState")
+                findById(car.id, true)
+                fetchAll(true)
             } catch (e: Exception) {
                 Log.e("Car VM", "Failed to save car", e)
                 fetchAll(true)
