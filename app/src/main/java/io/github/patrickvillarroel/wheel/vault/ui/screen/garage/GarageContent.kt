@@ -53,8 +53,8 @@ fun GarageContent(
                 searchQuery = searchQuery,
                 onSearchQueryChange = callbacks.onSearchQueryChange,
                 onStateChange = callbacks.onUiStateChange,
-                onHomeClick = callbacks.onHomeClick,
                 onSearch = callbacks.onSearchClick,
+                topBar = callbacks.filterBar,
                 headersCallbacks = callbacks.headersCallbacks,
             )
         },
@@ -129,13 +129,17 @@ private fun GaragePreview() {
                         onRefresh = {},
                         onUiStateChange = {},
                         onSearchClick = {},
-                        onToggleFavorite = { _, _ -> },
                         headersCallbacks = HeaderCallbacks(
                             onProfileClick = {},
                             onGarageClick = {},
                             onFavoritesClick = {},
                             onStatisticsClick = {},
                         ),
+                        onToggleFavorite = { _, _ -> },
+                        onFilterByBrand = {},
+                        onFilterByFavorite = {},
+                        onSortByRecent = {},
+                        onSortByLast = {},
                     ),
                 )
             }

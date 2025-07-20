@@ -39,7 +39,7 @@ fun GarageScreen(
 
     LaunchedEffect(query, favorites) {
         when {
-            favorites && query.isBlank() -> viewModel.getFavorites()
+            favorites && query.isBlank() -> viewModel.fetchFavorites()
             favorites && query.isNotBlank() -> viewModel.search(query, true)
             !favorites && query.isBlank() -> viewModel.fetchAll(true)
             !favorites && query.isNotBlank() -> viewModel.search(query)
@@ -49,11 +49,10 @@ fun GarageScreen(
     Crossfade(carState) { state ->
         when (state) {
             is GarageViewModel.CarsUiState.Success -> {
-                val result = state.cars
                 GarageContent(
                     sharedTransitionScope = sharedTransitionScope,
                     animatedVisibilityScope = animatedVisibilityScope,
-                    carResults = result,
+                    carResults = state.cars,
                     uiState = uiState,
                     searchQuery = searchQuery,
                     callbacks = GarageCallbacks(
@@ -79,10 +78,22 @@ fun GarageScreen(
                                 viewModel.fetchAll(true)
                             },
                             onFavoritesClick = {
-                                viewModel.getFavorites()
+                                viewModel.fetchFavorites()
                             },
                             onStatisticsClick = {},
                         ),
+                        onFilterByBrand = {
+                            viewModel.filterByBrand(it)
+                        },
+                        onFilterByFavorite = {
+                            if (it) viewModel.fetchFavorites() else viewModel.fetchAll(true)
+                        },
+                        onSortByRecent = {
+                            viewModel.fetchAll(force = true, orderAsc = false)
+                        },
+                        onSortByLast = {
+                            viewModel.fetchAll(force = true, orderAsc = true)
+                        },
                     ),
                     modifier = modifier,
                 )

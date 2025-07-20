@@ -25,7 +25,7 @@ data class GarageViewModel(
         fetchAll()
     }
 
-    fun fetchAll(force: Boolean = false) {
+    fun fetchAll(force: Boolean = false, orderAsc: Boolean = false) {
         val shouldFetch = force ||
             carsState.value is CarsUiState.Error ||
             carsState.value is CarsUiState.Loading
@@ -34,7 +34,7 @@ data class GarageViewModel(
             _carsState.update { CarsUiState.Loading }
             viewModelScope.launch(ioDispatcher) {
                 try {
-                    val result = carsRepository.fetchAll()
+                    val result = carsRepository.fetchAll(orderAsc = orderAsc)
                     _carsState.update { CarsUiState.Success(result) }
                 } catch (e: Exception) {
                     Log.e("CarViewModel", "Failed to fetch cars", e)
@@ -56,7 +56,7 @@ data class GarageViewModel(
         }
     }
 
-    fun getFavorites() {
+    fun fetchFavorites() {
         viewModelScope.launch(ioDispatcher) {
             try {
                 _carsState.update { CarsUiState.Loading }
@@ -64,6 +64,19 @@ data class GarageViewModel(
                 _carsState.update { CarsUiState.Success(result) }
             } catch (e: Exception) {
                 Log.e("CarViewModel", "Failed to get favorites", e)
+                _carsState.update { CarsUiState.Error }
+            }
+        }
+    }
+
+    fun filterByBrand(brand: String) {
+        viewModelScope.launch(ioDispatcher) {
+            try {
+                _carsState.update { CarsUiState.Loading }
+                val result = carsRepository.fetchByBrand(brand)
+                _carsState.update { CarsUiState.Success(result) }
+            } catch (e: Exception) {
+                Log.e("CarViewModel", "Failed to filter by brand", e)
                 _carsState.update { CarsUiState.Error }
             }
         }

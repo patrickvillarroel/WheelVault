@@ -22,36 +22,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderCallbacks
 
 @Composable
-fun DefaultFilterBar(onSearchClick: () -> Unit, onHomeClick: () -> Unit, modifier: Modifier = Modifier) {
+fun DefaultFilterBar(onSearchClick: () -> Unit, callbacks: GarageCallbacks.FilterBar, modifier: Modifier = Modifier) {
     var selectedRecientes by rememberSaveable { mutableStateOf(false) }
     var selectedBrand by rememberSaveable { mutableStateOf("") }
     var selectedUltimos by rememberSaveable { mutableStateOf(false) }
     var selectedFav by rememberSaveable { mutableStateOf(false) }
-    var selectedModel by rememberSaveable { mutableStateOf(false) }
-
-    val callbacks = GarageCallbacks(
-        onHomeClick = onHomeClick,
-        onSearchClick = onSearchClick,
-        onAddClick = {},
-        onCarClick = {},
-        onToggleFavorite = { _, _ -> },
-        onRefresh = {},
-        onUiStateChange = {},
-        headersCallbacks = HeaderCallbacks(
-            onProfileClick = {},
-            onGarageClick = {},
-            onFavoritesClick = {},
-            onStatisticsClick = {},
-        ),
-        onSearchQueryChange = {},
-        onFilterByBrand = { selectedBrand = it },
-        onFilterByFavorite = { selectedFav = it },
-        onSortByRecent = { selectedRecientes = true },
-        onSortByLast = { selectedUltimos = true },
-    )
 
     LazyRow(
         contentPadding = PaddingValues(horizontal = 8.dp),
@@ -61,12 +38,13 @@ fun DefaultFilterBar(onSearchClick: () -> Unit, onHomeClick: () -> Unit, modifie
     ) {
         item {
             AssistChip(
-                onClick = onHomeClick,
+                onClick = callbacks.onHomeClick,
                 label = { Icon(Icons.Filled.Home, "Home", tint = Color.White) },
                 colors = AssistChipDefaults.assistChipColors(containerColor = Color(0xFF1D1B20)),
                 border = AssistChipDefaults.assistChipBorder(enabled = true, borderColor = Color(0xFF1D1B20)),
             )
         }
+
         item {
             AssistChip(
                 onClick = onSearchClick,
@@ -81,6 +59,7 @@ fun DefaultFilterBar(onSearchClick: () -> Unit, onHomeClick: () -> Unit, modifie
                 border = AssistChipDefaults.assistChipBorder(enabled = true, borderColor = Color(0xFF1D1B20)),
             )
         }
+
         item {
             FilterChip(
                 selected = selectedFav,
@@ -92,11 +71,12 @@ fun DefaultFilterBar(onSearchClick: () -> Unit, onHomeClick: () -> Unit, modifie
                 ),
                 border = FilterChipDefaults.filterChipBorder(
                     enabled = true,
-                    selectedRecientes,
+                    selectedFav,
                     borderColor = Color(0xFF1D1B20),
                 ),
             )
         }
+
         item {
             FilterChip(
                 selected = selectedRecientes,
@@ -113,11 +93,12 @@ fun DefaultFilterBar(onSearchClick: () -> Unit, onHomeClick: () -> Unit, modifie
                 ),
             )
         }
+
         item {
             FilterChip(
                 selected = selectedUltimos,
                 onClick = { callbacks.onSortByLast() },
-                label = { Text("Ultimos") },
+                label = { Text("Antiguos") },
                 colors = FilterChipDefaults.filterChipColors(
                     containerColor = Color(0xFF1D1B20),
                     labelColor = Color.White,
@@ -129,6 +110,7 @@ fun DefaultFilterBar(onSearchClick: () -> Unit, onHomeClick: () -> Unit, modifie
                 ),
             )
         }
+
         item {
             val isSelected = selectedBrand == "Hot Wheels"
             FilterChip(
@@ -148,6 +130,7 @@ fun DefaultFilterBar(onSearchClick: () -> Unit, onHomeClick: () -> Unit, modifie
                 ),
             )
         }
+
         item {
             val isSelected = selectedBrand == "MiniGt"
             FilterChip(
@@ -165,6 +148,7 @@ fun DefaultFilterBar(onSearchClick: () -> Unit, onHomeClick: () -> Unit, modifie
                 ),
             )
         }
+
         item {
             val isSelected = selectedBrand == "Matchbox"
             FilterChip(
@@ -182,6 +166,7 @@ fun DefaultFilterBar(onSearchClick: () -> Unit, onHomeClick: () -> Unit, modifie
                 ),
             )
         }
+
         item {
             val isSelected = selectedBrand == "Maisto"
             FilterChip(
@@ -199,6 +184,7 @@ fun DefaultFilterBar(onSearchClick: () -> Unit, onHomeClick: () -> Unit, modifie
                 ),
             )
         }
+
         item {
             val isSelected = selectedBrand == "Bburago"
             FilterChip(

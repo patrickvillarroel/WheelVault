@@ -5,7 +5,6 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderCallbac
 import java.util.UUID
 
 data class GarageCallbacks(
-    val onHomeClick: () -> Unit,
     val onSearchQueryChange: (String) -> Unit,
     val onAddClick: () -> Unit,
     val onCarClick: (CarItem) -> Unit,
@@ -13,12 +12,43 @@ data class GarageCallbacks(
     val onRefresh: () -> Unit,
     val onUiStateChange: (GarageUiState) -> Unit,
     val onSearchClick: () -> Unit,
+    val filterBar: FilterBar,
     val headersCallbacks: HeaderCallbacks,
-    val onFilterByBrand: (String) -> Unit,
-    val onFilterByFavorite: (Boolean) -> Unit,
-    val onSortByRecent: () -> Unit,
-    val onSortByLast: () -> Unit,
 ) {
+    constructor(
+        onHomeClick: () -> Unit,
+        onSearchQueryChange: (String) -> Unit,
+        onAddClick: () -> Unit,
+        onCarClick: (CarItem) -> Unit,
+        onToggleFavorite: (CarItem, Boolean) -> Unit,
+        onRefresh: () -> Unit,
+        onUiStateChange: (GarageUiState) -> Unit,
+        onSearchClick: () -> Unit,
+        headersCallbacks: HeaderCallbacks,
+        onFilterByBrand: (String) -> Unit,
+        onFilterByFavorite: (Boolean) -> Unit,
+        onSortByRecent: () -> Unit,
+        onSortByLast: () -> Unit,
+    ) : this(
+        onSearchQueryChange,
+        onAddClick,
+        onCarClick,
+        onToggleFavorite,
+        onRefresh,
+        onUiStateChange,
+        onSearchClick,
+        FilterBar(onHomeClick, onFilterByBrand, onFilterByFavorite, onSortByRecent, onSortByLast),
+        headersCallbacks,
+    )
+
+    data class FilterBar(
+        val onHomeClick: () -> Unit,
+        val onFilterByBrand: (String) -> Unit,
+        val onFilterByFavorite: (Boolean) -> Unit,
+        val onSortByRecent: () -> Unit,
+        val onSortByLast: () -> Unit,
+    )
+
     data class Partial(
         val onHomeClick: () -> Unit,
         val onAddClick: () -> Unit,
