@@ -59,21 +59,21 @@ fun HeroImageCarousel(images: Set<Any>, modifier: Modifier = Modifier) {
             .height(300.dp)
             .padding(top = 5.dp),
     ) { page ->
+        val image = images.elementAt(page)
+        val page = page + 1
         Card(
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = Color(0xFF7F7F7F)),
             elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         ) {
-            val image = images.elementAt(page)
-            val page = page + 1
             when (image) {
                 is Painter -> {
                     Image(
                         image,
                         contentDescription = "Imagen $page",
                         Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Fit,
+                        contentScale = ContentScale.Crop,
                     )
                 }
 
@@ -82,7 +82,7 @@ fun HeroImageCarousel(images: Set<Any>, modifier: Modifier = Modifier) {
                         image.asImageBitmap(),
                         contentDescription = "Imagen $page",
                         modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Fit,
+                        contentScale = ContentScale.Crop,
                     )
                 }
 
@@ -91,7 +91,7 @@ fun HeroImageCarousel(images: Set<Any>, modifier: Modifier = Modifier) {
                         image,
                         contentDescription = "Imagen $page",
                         modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Fit,
+                        contentScale = ContentScale.Crop,
                     )
                 }
 
@@ -99,7 +99,7 @@ fun HeroImageCarousel(images: Set<Any>, modifier: Modifier = Modifier) {
                     AsyncImage(
                         model = image,
                         contentDescription = "Imagen $page",
-                        contentScale = ContentScale.Fit,
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize(),
                     )
                 }

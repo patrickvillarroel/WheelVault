@@ -32,14 +32,14 @@ fun CarCard(image: Any, onClick: () -> Unit, modifier: Modifier = Modifier) {
                 painter = image,
                 contentDescription = stringResource(R.string.car),
                 modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Fit,
+                contentScale = ContentScale.Crop,
             )
         } else {
             AsyncImage(
                 model = image,
                 contentDescription = stringResource(R.string.car),
                 modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Fit,
+                contentScale = ContentScale.Crop,
             )
         }
     }
