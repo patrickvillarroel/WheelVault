@@ -1,6 +1,7 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen
 
 import android.util.Log
+import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
@@ -42,7 +43,7 @@ data class BrandViewModel(
 
     val brandsNames = brandsState.map { state ->
         if (state is BrandsUiState.Success) {
-            state.brands.map { it.name }
+            state.brands.map { it.name }.sorted()
         } else {
             emptyList()
         }
@@ -128,6 +129,7 @@ data class BrandViewModel(
     }
 
     companion object {
+        @VisibleForTesting
         val manufacturerList = listOf("HotWheels", "MiniGT", "Maisto", "Bburago", "Matchbox").sorted()
     }
 }

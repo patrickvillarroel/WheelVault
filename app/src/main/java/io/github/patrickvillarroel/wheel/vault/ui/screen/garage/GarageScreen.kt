@@ -10,6 +10,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.github.patrickvillarroel.wheel.vault.ui.screen.BrandViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.CarViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderCallbacks
 import org.koin.compose.viewmodel.koinViewModel
@@ -24,7 +25,9 @@ fun GarageScreen(
     modifier: Modifier = Modifier,
     viewModel: GarageViewModel = koinViewModel(),
     carViewModel: CarViewModel = koinViewModel(),
+    brandViewModel: BrandViewModel = koinViewModel(),
 ) {
+    val brandsNames by brandViewModel.brandsNames.collectAsStateWithLifecycle()
     val carState by viewModel.garageState.collectAsStateWithLifecycle()
     var uiState by rememberSaveable { mutableStateOf(GarageTopBarState.DEFAULT) }
     var searchQuery by rememberSaveable { mutableStateOf(query.trim()) }
@@ -44,6 +47,7 @@ fun GarageScreen(
         uiState = carState,
         topBarState = uiState,
         searchQuery = searchQuery,
+        manufacturerList = brandsNames,
         callbacks = GarageCallbacks(
             onHomeClick = callbacks.onHomeClick,
             onSearchQueryChange = {
@@ -72,7 +76,7 @@ fun GarageScreen(
                 onStatisticsClick = {},
             ),
             onFilterByBrand = {
-                viewModel.filterByBrand(it)
+                viewModel.filterByManufacturer(it)
             },
             onFilterByFavorite = {
                 if (it) viewModel.fetchFavorites() else viewModel.fetchAll(true)

@@ -25,10 +25,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.github.patrickvillarroel.wheel.vault.R
-import io.github.patrickvillarroel.wheel.vault.ui.screen.BrandViewModel
 
 @Composable
-fun DefaultFilterBar(onSearchClick: () -> Unit, callbacks: GarageCallbacks.FilterBar, modifier: Modifier = Modifier) {
+fun DefaultFilterBar(
+    manufacturerList: List<String>,
+    onSearchClick: () -> Unit,
+    callbacks: GarageCallbacks.FilterBar,
+    modifier: Modifier = Modifier,
+) {
     var selectedRecientes by rememberSaveable { mutableStateOf(false) }
     var selectedBrand by rememberSaveable { mutableStateOf("") }
     var selectedUltimos by rememberSaveable { mutableStateOf(false) }
@@ -115,7 +119,7 @@ fun DefaultFilterBar(onSearchClick: () -> Unit, callbacks: GarageCallbacks.Filte
             )
         }
 
-        items(BrandViewModel.manufacturerList) { brand ->
+        items(manufacturerList) { brand ->
             val isSelected = selectedBrand == brand
             FilterChip(
                 selected = isSelected,

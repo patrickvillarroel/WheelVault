@@ -16,6 +16,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
+import io.github.patrickvillarroel.wheel.vault.ui.screen.BrandViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.CarViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.camera.CameraViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
@@ -29,6 +30,7 @@ fun CarEditScreen(
     fromCamera: Boolean,
     headersBackCallbacks: HeaderBackCallbacks,
     modifier: Modifier = Modifier,
+    brandViewModel: BrandViewModel = koinViewModel(),
     carViewModel: CarViewModel = koinViewModel(),
     cameraViewModel: CameraViewModel = koinViewModel(),
 ) {
@@ -36,6 +38,7 @@ fun CarEditScreen(
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
     val permissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
     val detailState by carViewModel.carDetailState.collectAsStateWithLifecycle()
+    val brandsNames by brandViewModel.brandsNames.collectAsStateWithLifecycle()
     var initial by remember(partialCarItem) {
         mutableStateOf(
             if (detailState is CarViewModel.CarDetailUiState.Success &&
@@ -76,6 +79,7 @@ fun CarEditScreen(
         },
         isEditAction = partialCarItem.id != null,
         headersBackCallbacks = headersBackCallbacks,
+        manufacturerList = brandsNames,
         modifier = modifier,
     )
 

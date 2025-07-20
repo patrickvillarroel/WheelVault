@@ -49,7 +49,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
-import io.github.patrickvillarroel.wheel.vault.ui.screen.BrandViewModel.Companion.manufacturerList
+import io.github.patrickvillarroel.wheel.vault.ui.screen.BrandViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BackTextButton
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.FavoriteIcon
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
@@ -58,6 +58,7 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.component.InterceptedHe
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuHeader
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.RedOutlinedTextField
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
+import kotlin.text.isNotBlank
 
 @Composable
 fun CarEditContent(
@@ -65,6 +66,7 @@ fun CarEditContent(
     isEditAction: Boolean,
     onAddPictureClick: (CarItem.Partial) -> Unit,
     onConfirmClick: (CarItem.Partial) -> Unit,
+    manufacturerList: List<String>,
     headersBackCallbacks: HeaderBackCallbacks,
     modifier: Modifier = Modifier,
 ) {
@@ -162,7 +164,7 @@ fun CarEditContent(
 
             item {
                 RedOutlinedTextField(descripcion, {
-                    descripcion = it.trim()
+                    descripcion = it
                     car = car.copy(description = it.takeIf(String::isNotBlank)?.trim())
                 }, stringResource(R.string.description))
             }
@@ -173,7 +175,9 @@ fun CarEditContent(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Box(modifier = Modifier.weight(1f)) {
-                        val textFieldState = rememberTextFieldState(manufacturerList[0])
+                        val textFieldState = rememberTextFieldState(
+                            manufacturerList.firstOrNull { it == car.manufacturer } ?: manufacturerList[0],
+                        )
 
                         ExposedDropdownMenuBox(
                             expanded = manufacturerExpanded,
@@ -314,6 +318,7 @@ private fun EditPreview() {
             onConfirmClick = {},
             isEditAction = true,
             onAddPictureClick = {},
+            manufacturerList = BrandViewModel.manufacturerList,
             headersBackCallbacks = HeaderBackCallbacks(
                 onBackClick = {},
                 onProfileClick = {},

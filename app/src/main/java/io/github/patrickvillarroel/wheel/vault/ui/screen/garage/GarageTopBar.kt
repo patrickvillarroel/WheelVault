@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.github.patrickvillarroel.wheel.vault.ui.screen.BrandViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuHeader
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
@@ -26,6 +27,7 @@ fun GarageTopBar(
     onSearchQueryChange: (String) -> Unit,
     onStateChange: (GarageTopBarState) -> Unit,
     onSearch: () -> Unit,
+    manufacturerList: List<String>,
     topBar: GarageCallbacks.FilterBar,
     headersCallbacks: HeaderCallbacks,
     modifier: Modifier = Modifier,
@@ -44,8 +46,9 @@ fun GarageTopBar(
         ) { state ->
             when (state) {
                 GarageTopBarState.DEFAULT -> DefaultFilterBar(
+                    manufacturerList = manufacturerList,
                     onSearchClick = { onStateChange(GarageTopBarState.SEARCH) },
-                    topBar,
+                    callbacks = topBar,
                 )
 
                 GarageTopBarState.SEARCH -> {
@@ -85,6 +88,7 @@ private fun TopBarPreview() {
                 onSortByRecent = {},
                 onSortByLast = {},
             ),
+            manufacturerList = BrandViewModel.manufacturerList,
             headersCallbacks = HeaderCallbacks(
                 onProfileClick = {},
                 onGarageClick = {},

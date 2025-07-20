@@ -81,11 +81,11 @@ data class GarageViewModel(
         }
     }
 
-    fun filterByBrand(brand: String) {
+    fun filterByManufacturer(manufacturer: String) {
         viewModelScope.launch(ioDispatcher) {
             try {
                 _garageState.update { GarageUiState.Loading }
-                val result = carsRepository.fetchByBrand(brand)
+                val result = carsRepository.fetchByManufacturer(manufacturer)
                 _garageState.update { GarageUiState.Success(result) }
             } catch (e: Exception) {
                 Log.e("CarViewModel", "Failed to filter by brand", e)

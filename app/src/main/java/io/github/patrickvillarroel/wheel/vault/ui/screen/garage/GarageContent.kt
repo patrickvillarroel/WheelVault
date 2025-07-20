@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
+import io.github.patrickvillarroel.wheel.vault.ui.screen.BrandViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.CarItemCard
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
@@ -47,6 +48,7 @@ fun GarageContent(
     uiState: GarageViewModel.GarageUiState,
     topBarState: GarageTopBarState,
     searchQuery: String,
+    manufacturerList: List<String>,
     callbacks: GarageCallbacks,
     modifier: Modifier = Modifier,
 ) {
@@ -62,6 +64,7 @@ fun GarageContent(
                 onStateChange = callbacks.onUiStateChange,
                 onSearch = callbacks.onSearchClick,
                 topBar = callbacks.filterBar,
+                manufacturerList = manufacturerList,
                 headersCallbacks = callbacks.headersCallbacks,
             )
         },
@@ -165,6 +168,7 @@ private fun GaragePreview() {
                     ),
                     topBarState = GarageTopBarState.DEFAULT,
                     searchQuery = "",
+                    manufacturerList = BrandViewModel.manufacturerList,
                     callbacks = GarageCallbacks(
                         onHomeClick = {},
                         onSearchQueryChange = {},
