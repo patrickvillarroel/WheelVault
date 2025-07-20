@@ -17,8 +17,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
@@ -40,36 +42,36 @@ fun CameraPermissionModal(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Icon(
-                imageVector = Icons.Default.PhotoCamera,
-                contentDescription = null,
+                Icons.Default.PhotoCamera,
+                stringResource(R.string.camera_permission),
                 modifier = Modifier.size(48.dp),
                 tint = MaterialTheme.colorScheme.primary,
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Permiso de cámara requerido",
+                stringResource(R.string.camera_permission_title),
                 style = MaterialTheme.typography.titleMedium,
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Necesitamos acceso a la cámara para capturar la imagen y extraer los datos del carrito.",
+                stringResource(R.string.camera_permission_description),
                 style = MaterialTheme.typography.bodyMedium,
             )
             Spacer(modifier = Modifier.height(24.dp))
 
             if (isPermanentlyDenied) {
                 Button(onClick = onGoToSettings) {
-                    Text("Abrir configuración")
+                    Text(stringResource(R.string.open_settings))
                 }
             } else {
                 Button(onClick = onRequestPermission) {
-                    Text("Dar permiso")
+                    Text(stringResource(R.string.request_permission))
                 }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(stringResource(R.string.cancel))
             }
         }
     }

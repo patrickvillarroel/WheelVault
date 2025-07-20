@@ -5,7 +5,6 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -35,39 +34,45 @@ fun CameraLensContent(
         callbacks.onBack()
     }
     Scaffold(modifier, topBar = {
-        Row(
-            modifier = Modifier
-                .windowInsetsPadding(TopAppBarDefaults.windowInsets)
-                .fillMaxWidth()
-                .background(Color.Black)
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Row(Modifier.clickable(onClick = callbacks.onBack)) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.back),
-                    tint = Color.White,
-                    modifier = Modifier.size(24.dp),
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(stringResource(R.string.back), color = Color.White)
-            }
-            TextButton(onClick = callbacks.onSkip) {
-                Icon(
-                    imageVector = Icons.Default.FastForward,
-                    contentDescription = stringResource(R.string.skip),
-                    tint = Color.White,
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = stringResource(R.string.skip),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
-        }
+        TopAppBar(
+            title = {},
+            navigationIcon = {
+                TextButton(
+                    onClick = callbacks.onBack,
+                    modifier = Modifier.padding(start = 16.dp),
+                ) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        stringResource(R.string.back),
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp),
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.back), color = Color.White)
+                }
+            },
+            actions = {
+                TextButton(onClick = callbacks.onSkip) {
+                    Icon(
+                        Icons.Default.FastForward,
+                        stringResource(R.string.skip),
+                        tint = Color.White,
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        stringResource(R.string.skip),
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = Color.Black,
+                titleContentColor = Color.White,
+                navigationIconContentColor = Color.White,
+                actionIconContentColor = Color.White,
+            ),
+        )
     }) { paddingValues ->
         Box(
             modifier = Modifier
@@ -84,7 +89,7 @@ fun CameraLensContent(
 
             when (uiState) {
                 is CameraUiState.RequestingPermission -> {
-                    instructionText = "Solicitando permiso de cámara..."
+                    instructionText = stringResource(R.string.camera_permission_requesting)
                     showProcessingIndicator = true
                 }
 
@@ -97,21 +102,21 @@ fun CameraLensContent(
                 is CameraUiState.ConfirmRecognizedText -> {
                     showCameraPreview = true
                     recognizedTextForConfirmation = uiState.recognizedText
-                    instructionText = "¿Es Correcto?"
+                    instructionText = stringResource(R.string.confirm_text)
                 }
 
                 is CameraUiState.CapturingImage -> {
                     showCameraPreview = true
-                    instructionText = "Encuadre el modelo y presione el botón de la cámara."
+                    instructionText = stringResource(R.string.capturing_image_instruction)
                 }
 
                 is CameraUiState.ConfirmCapturedImage -> {
                     capturedImageForConfirmation = uiState.capturedImage
-                    instructionText = "¿Confirmar esta imagen?"
+                    instructionText = stringResource(R.string.confirm_image)
                 }
 
                 is CameraUiState.Completed -> {
-                    instructionText = "Completado."
+                    instructionText = stringResource(R.string.completed)
                     callbacks.onAddDetail(uiState.currentText, uiState.currentImage)
                 }
             }
@@ -126,104 +131,135 @@ fun CameraLensContent(
                     },
                     onImageCapture = callbacks.onCapturedImageProvided,
                     triggerImageCapture = triggerImageCapture,
-                    modifier = Modifier.size(412.dp, 648.dp).align(Alignment.Center),
+                    modifier = Modifier.size(412.dp, 648.dp).align(Alignment.Center).offset(y = (-55).dp),
                 )
             } else if (capturedImageForConfirmation != null) {
                 Image(
                     capturedImageForConfirmation.asImageBitmap(),
-                    contentDescription = "Confirmación de imagen capturada",
-                    modifier = Modifier.size(412.dp, 648.dp).align(Alignment.Center),
+                    stringResource(R.string.captured_image),
+                    modifier = Modifier.size(412.dp, 648.dp).align(Alignment.Center).offset(y = (-55).dp),
                 )
             }
 
-            // Processing Indicator
-            if (showProcessingIndicator &&
-                recognizedTextForConfirmation == null &&
-                capturedImageForConfirmation == null
-            ) {
-                CircularProgressIndicator(
-                    color = Color.White,
-                    modifier = Modifier.align(Alignment.Center),
-                )
+            CameraIndication(
+                instructionText = instructionText,
+                showProcessingIndicator = showProcessingIndicator,
+                showCameraPreview = showCameraPreview,
+                recognizedTextForConfirmation = recognizedTextForConfirmation,
+                capturedImageForConfirmation = capturedImageForConfirmation,
+            )
+
+            CameraControls(uiState, callbacks)
+        }
+    }
+}
+
+@Composable
+fun BoxScope.CameraIndication(
+    instructionText: String,
+    showProcessingIndicator: Boolean,
+    showCameraPreview: Boolean,
+    recognizedTextForConfirmation: String?,
+    capturedImageForConfirmation: Bitmap?,
+    modifier: Modifier = Modifier,
+) {
+    // Processing Indicator
+    if (showProcessingIndicator &&
+        recognizedTextForConfirmation == null &&
+        capturedImageForConfirmation == null
+    ) {
+        CircularProgressIndicator(
+            color = Color.White,
+            modifier = Modifier.align(Alignment.Center),
+        )
+    }
+
+    // Recognition/Capture Frame
+    if (showCameraPreview) {
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .size(265.dp, 385.dp)
+                .offset(y = (55).dp)
+                .border(2.dp, Color.LightGray, shape = RectangleShape),
+        )
+    }
+
+    // Instruction and Recognized Text Display
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .fillMaxWidth()
+            .align(Alignment.BottomCenter)
+            .padding(bottom = 100.dp), // Space for buttons
+    ) {
+        if (instructionText.isNotBlank()) {
+            Text(
+                instructionText,
+                color = Color.White,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 8.dp),
+            )
+        }
+        if (recognizedTextForConfirmation != null) {
+            Text(
+                recognizedTextForConfirmation,
+                color = Color.White,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 16.dp),
+            )
+        }
+    }
+}
+
+@Composable
+fun BoxScope.CameraControls(uiState: CameraUiState, callbacks: CameraCallbacks, modifier: Modifier = Modifier) {
+    // Buttons at the bottom
+    Box(
+        modifier = modifier
+            .align(Alignment.BottomCenter)
+            .padding(bottom = 30.dp),
+    ) {
+        when (uiState) {
+            is CameraUiState.ConfirmRecognizedText -> {
+                Row {
+                    Button(onClick = callbacks.onTextRecognitionConfirmed) {
+                        Text(stringResource(R.string.yes_confirm))
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    FilledTonalButton(onClick = callbacks.onTextRecognitionRetry) {
+                        Text(stringResource(R.string.no_retry))
+                    }
+                }
             }
 
-            // Recognition/Capture Frame
-            if (showCameraPreview) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .size(265.dp, 385.dp)
-                        .offset(y = (55).dp)
-                        .border(2.dp, Color.LightGray, shape = RectangleShape),
-                )
-            }
-
-            // Instruction and Recognized Text Display
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 100.dp), // Space for buttons
-            ) {
-                if (instructionText.isNotBlank()) {
-                    Text(
-                        instructionText,
-                        color = Color.White,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(bottom = 8.dp),
+            is CameraUiState.CapturingImage -> {
+                FilledIconButton(
+                    onClick = callbacks.onTakePictureRequest,
+                    modifier = Modifier.size(72.dp),
+                ) {
+                    Icon(
+                        Icons.Filled.CameraAlt,
+                        stringResource(R.string.take_picture),
                     )
                 }
-                if (recognizedTextForConfirmation != null) {
-                    Text(
-                        recognizedTextForConfirmation,
-                        color = Color.White,
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                    )
+            }
+
+            is CameraUiState.ConfirmCapturedImage -> {
+                Row {
+                    Button(onClick = callbacks.onCapturedImageConfirmation) {
+                        Text(stringResource(R.string.yes_confirm))
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    FilledTonalButton(onClick = callbacks.onCapturedImageRetry) {
+                        Text(stringResource(R.string.no_retry))
+                    }
                 }
             }
 
-            // Buttons at the bottom
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 30.dp),
-            ) {
-                when (uiState) {
-                    is CameraUiState.ConfirmRecognizedText -> {
-                        Row {
-                            Button(onClick = callbacks.onTextRecognitionConfirmed) { Text("Sí, continuar") }
-                            Spacer(Modifier.width(8.dp))
-                            FilledTonalButton(onClick = callbacks.onTextRecognitionRetry) { Text("Reintentar") }
-                        }
-                    }
-
-                    is CameraUiState.CapturingImage -> {
-                        FilledIconButton(
-                            onClick = callbacks.onTakePictureRequest, // This now signals ViewModel
-                            modifier = Modifier.size(72.dp), // Larger, circular button
-                        ) {
-                            Icon(
-                                Icons.Filled.CameraAlt,
-                                "Capturar Imagen",
-                            )
-                        }
-                    }
-
-                    is CameraUiState.ConfirmCapturedImage -> {
-                        Row {
-                            Button(onClick = callbacks.onCapturedImageConfirmation) { Text("Confirmar Imagen") }
-                            Spacer(Modifier.width(8.dp))
-                            FilledTonalButton(onClick = callbacks.onCapturedImageRetry) { Text("Reintentar Captura") }
-                        }
-                    }
-
-                    else -> {
-                        /* No controls for other states or handled by skip/back */
-                    }
-                }
+            else -> {
+                /* No controls for other states or handled by skip/back */
             }
         }
     }
