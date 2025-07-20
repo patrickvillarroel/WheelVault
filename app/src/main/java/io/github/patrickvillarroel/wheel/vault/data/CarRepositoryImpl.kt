@@ -10,7 +10,8 @@ data class CarRepositoryImpl(private val supabase: CarSupabaseDataSource) : Cars
 
     override suspend fun search(query: String, isFavorite: Boolean): List<CarItem> = supabase.search(query, isFavorite)
 
-    override suspend fun fetchAll(isFavorite: Boolean, limit: Int): List<CarItem> = supabase.fetchAll(isFavorite, limit)
+    override suspend fun fetchAll(isFavorite: Boolean, limit: Int, orderAsc: Boolean): List<CarItem> =
+        supabase.fetchAll(isFavorite, limit, orderAsc)
 
     override suspend fun fetch(id: UUID): CarItem? = supabase.fetch(id)
 

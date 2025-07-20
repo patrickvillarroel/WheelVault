@@ -12,7 +12,7 @@ interface CarsRepository {
     suspend fun exist(id: UUID): Boolean
     suspend fun search(query: String, isFavorite: Boolean = false): List<CarItem>
 
-    suspend fun fetchAll(isFavorite: Boolean = false, limit: Int = 10): List<CarItem>
+    suspend fun fetchAll(isFavorite: Boolean = false, limit: Int = 10, orderAsc: Boolean = true): List<CarItem>
     suspend fun fetch(id: UUID): CarItem?
     suspend fun fetchByModel(model: String, isFavorite: Boolean = false): List<CarItem>
     suspend fun fetchByYear(year: Int, isFavorite: Boolean = false): List<CarItem>

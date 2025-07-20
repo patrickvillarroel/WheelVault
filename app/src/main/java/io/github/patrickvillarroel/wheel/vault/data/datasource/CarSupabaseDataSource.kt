@@ -62,16 +62,21 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
         .decodeList<CarObj>()
         .map { it.toDomain(fetchAllImages(it.id!!).ifEmpty { setOf(CarItem.EmptyImage) }) }
 
-    override suspend fun fetchAll(isFavorite: Boolean, limit: Int): List<CarItem> = supabase.from(CarObj.TABLE).select {
-        filter {
-            eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
-            if (isFavorite) {
-                CarObj::isFavorite eq true
+    override suspend fun fetchAll(isFavorite: Boolean, limit: Int, orderAsc: Boolean): List<CarItem> =
+        supabase.from(CarObj.TABLE).select {
+            filter {
+                eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
+                if (isFavorite) {
+                    CarObj::isFavorite eq true
+                }
             }
-        }
-        limit(limit.toLong())
-        order("created_at", Order.DESCENDING)
-    }.decodeList<CarObj>().map { it.toDomain(fetchAllImages(it.id!!).ifEmpty { setOf(CarItem.EmptyImage) }) }
+            limit(limit.toLong())
+            if (orderAsc) {
+                order("created_at", Order.ASCENDING)
+            } else {
+                order("created_at", Order.DESCENDING)
+            }
+        }.decodeList<CarObj>().map { it.toDomain(fetchAllImages(it.id!!).ifEmpty { setOf(CarItem.EmptyImage) }) }
 
     override suspend fun fetch(id: UUID): CarItem? = supabase.from(CarObj.TABLE)
         .select {
@@ -103,7 +108,11 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
         .select {
             filter {
                 eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
-                eq(field, value)
+                if (value is String) {
+                    ilike(field, "%$value%")
+                } else {
+                    eq(field, value)
+                }
                 if (isFavorite) CarObj::isFavorite eq true
             }
             order("created_at", Order.DESCENDING)
