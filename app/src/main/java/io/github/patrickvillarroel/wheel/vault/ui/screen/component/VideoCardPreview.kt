@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -33,7 +34,7 @@ import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
-fun VideoCardPreview(thumbnail: Any, onPlayClick: () -> Unit, modifier: Modifier = Modifier) {
+fun VideoCardPreview(thumbnail: Any, name: String, onPlayClick: () -> Unit, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .height(150.dp)
@@ -45,15 +46,15 @@ fun VideoCardPreview(thumbnail: Any, onPlayClick: () -> Unit, modifier: Modifier
     ) {
         if (thumbnail is Painter) {
             Image(
-                painter = thumbnail,
-                contentDescription = "Video Thumbnail",
+                thumbnail,
+                stringResource(R.string.video_thumbnail_of, name),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
             )
         } else {
             AsyncImage(
                 thumbnail,
-                contentDescription = "Video Thumbnail",
+                stringResource(R.string.video_thumbnail_of, name),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
             )
@@ -67,8 +68,8 @@ fun VideoCardPreview(thumbnail: Any, onPlayClick: () -> Unit, modifier: Modifier
                 .background(Color.White.copy(alpha = 0.6f), shape = CircleShape),
         ) {
             Icon(
-                imageVector = Icons.Default.PlayArrow,
-                contentDescription = "Play",
+                Icons.Default.PlayArrow,
+                stringResource(R.string.play),
                 tint = Color.Black,
                 modifier = Modifier.size(32.dp),
             )
@@ -87,6 +88,7 @@ private fun CardVideoPreview() {
             items(5) {
                 VideoCardPreview(
                     thumbnail = painterResource(id = R.drawable.thumbnail_example),
+                    name = "Video example",
                     onPlayClick = { },
                 )
             }

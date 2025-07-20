@@ -21,8 +21,10 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import io.github.patrickvillarroel.wheel.vault.R
 
 @Composable
 fun ImageCarousel(images: List<Any>, modifier: Modifier = Modifier) {
@@ -38,8 +40,8 @@ fun ImageCarousel(images: List<Any>, modifier: Modifier = Modifier) {
     ) { page ->
         Card(shape = RoundedCornerShape(size = 15.dp), modifier = Modifier.fillMaxSize()) {
             AsyncImage(
-                model = images[page],
-                contentDescription = "Image $page",
+                images[page],
+                stringResource(R.string.image_of, page),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(8.dp),
@@ -71,7 +73,7 @@ fun HeroImageCarousel(images: Set<Any>, modifier: Modifier = Modifier) {
                 is Painter -> {
                     Image(
                         image,
-                        contentDescription = "Imagen $page",
+                        stringResource(R.string.image_of, page),
                         Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
                     )
@@ -80,7 +82,7 @@ fun HeroImageCarousel(images: Set<Any>, modifier: Modifier = Modifier) {
                 is Bitmap -> {
                     Image(
                         image.asImageBitmap(),
-                        contentDescription = "Imagen $page",
+                        stringResource(R.string.image_of, page),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
                     )
@@ -89,7 +91,7 @@ fun HeroImageCarousel(images: Set<Any>, modifier: Modifier = Modifier) {
                 is ImageVector -> {
                     Image(
                         image,
-                        contentDescription = "Imagen $page",
+                        stringResource(R.string.image_of, page),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
                     )
@@ -98,7 +100,7 @@ fun HeroImageCarousel(images: Set<Any>, modifier: Modifier = Modifier) {
                 else -> {
                     AsyncImage(
                         model = image,
-                        contentDescription = "Imagen $page",
+                        stringResource(R.string.image_of, page),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize(),
                     )

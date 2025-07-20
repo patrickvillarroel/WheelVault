@@ -22,7 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import io.github.patrickvillarroel.wheel.vault.R
 import kotlinx.coroutines.launch
 
 @Composable
@@ -75,8 +77,8 @@ fun FavoriteIcon(isFavorite: Boolean, onFavoriteToggle: (Boolean) -> Unit, modif
             ),
     ) {
         Icon(
-            imageVector = Icons.Default.Star,
-            contentDescription = "Favorito",
+            Icons.Default.Star,
+            stringResource(R.string.favorites),
             tint = starColor,
             modifier = Modifier.size(24.dp),
         )

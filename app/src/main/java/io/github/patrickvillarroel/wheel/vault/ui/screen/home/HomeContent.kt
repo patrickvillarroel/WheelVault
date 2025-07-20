@@ -147,7 +147,7 @@ fun HomeContent(
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             items(news, key = { it.id }) { video ->
-                                VideoCardPreview(video.thumbnail, onPlayClick = { info.onNewsClick(video) })
+                                VideoCardPreview(video.thumbnail, video.name, onPlayClick = { info.onNewsClick(video) })
                             }
                         }
                     }

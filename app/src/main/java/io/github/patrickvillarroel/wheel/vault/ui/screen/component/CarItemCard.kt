@@ -21,12 +21,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
@@ -80,19 +82,19 @@ fun CarItemCard(
                 HorizontalDivider(modifier = Modifier.height(4.dp), color = Color(0xFFE42E31))
 
                 Text(
-                    text = "Año: ${carItem.year}",
+                    text = stringResource(R.string.year_of, carItem.year),
                     color = Color.White,
                     fontSize = 13.sp,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = "Fabricante: ${carItem.manufacturer}",
+                    text = stringResource(R.string.manufacture_of, carItem.manufacturer),
                     color = Color.White,
                     fontSize = 13.sp,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = "Cantidad: ${carItem.quantity}",
+                    text = stringResource(R.string.quantity_of, carItem.quantity),
                     color = Color.White,
                     fontSize = 13.sp,
                     overflow = TextOverflow.Ellipsis,

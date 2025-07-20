@@ -25,8 +25,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
@@ -73,8 +75,8 @@ fun ModalAddImage(
                 .fillMaxWidth()
                 .padding(16.dp),
         ) {
-            Text("Seleccionar Imagen", style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(8.dp))
+            Text(stringResource(R.string.select_image), style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(8.dp))
             OutlinedButton(
                 onClick = {
                     try {
@@ -89,7 +91,7 @@ fun ModalAddImage(
                 enabled = isCameraPermission,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Desde Cámara")
+                Text(stringResource(R.string.from_camera))
             }
             Spacer(modifier = Modifier.height(8.dp))
             Button(
@@ -101,7 +103,7 @@ fun ModalAddImage(
                 },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Desde Galería")
+                Text(stringResource(R.string.from_gallery))
             }
         }
     }
