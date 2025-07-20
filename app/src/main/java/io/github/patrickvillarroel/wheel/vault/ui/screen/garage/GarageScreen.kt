@@ -1,15 +1,7 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.garage
 
 import androidx.compose.animation.AnimatedVisibilityScope
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.LoadingIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,8 +25,8 @@ fun GarageScreen(
     viewModel: GarageViewModel = koinViewModel(),
     carViewModel: CarViewModel = koinViewModel(),
 ) {
-    val carState by viewModel.carsState.collectAsStateWithLifecycle()
-    var uiState by rememberSaveable { mutableStateOf(GarageUiState.DEFAULT) }
+    val carState by viewModel.garageState.collectAsStateWithLifecycle()
+    var uiState by rememberSaveable { mutableStateOf(GarageTopBarState.DEFAULT) }
     var searchQuery by rememberSaveable { mutableStateOf(query.trim()) }
 
     LaunchedEffect(query, favorites) {
@@ -46,68 +38,52 @@ fun GarageScreen(
         }
     }
 
-    Crossfade(carState) { state ->
-        when (state) {
-            is GarageViewModel.CarsUiState.Success -> {
-                GarageContent(
-                    sharedTransitionScope = sharedTransitionScope,
-                    animatedVisibilityScope = animatedVisibilityScope,
-                    carResults = state.cars,
-                    uiState = uiState,
-                    searchQuery = searchQuery,
-                    callbacks = GarageCallbacks(
-                        onHomeClick = callbacks.onHomeClick,
-                        onSearchQueryChange = {
-                            searchQuery = it
-                        },
-                        onSearchClick = {
-                            viewModel.search(searchQuery)
-                        },
-                        onAddClick = callbacks.onAddClick,
-                        onCarClick = { callbacks.onCarClick(it.id) },
-                        onToggleFavorite = { car, isFavorite ->
-                            carViewModel.save(car.copy(isFavorite = isFavorite))
-                        },
-                        onRefresh = {
-                            viewModel.fetchAll(true)
-                        },
-                        onUiStateChange = { uiState = it },
-                        headersCallbacks = HeaderCallbacks(
-                            onProfileClick = callbacks.onProfileClick,
-                            onGarageClick = {
-                                viewModel.fetchAll(true)
-                            },
-                            onFavoritesClick = {
-                                viewModel.fetchFavorites()
-                            },
-                            onStatisticsClick = {},
-                        ),
-                        onFilterByBrand = {
-                            viewModel.filterByBrand(it)
-                        },
-                        onFilterByFavorite = {
-                            if (it) viewModel.fetchFavorites() else viewModel.fetchAll(true)
-                        },
-                        onSortByRecent = {
-                            viewModel.fetchAll(force = true, orderAsc = false)
-                        },
-                        onSortByLast = {
-                            viewModel.fetchAll(force = true, orderAsc = true)
-                        },
-                    ),
-                    modifier = modifier,
-                )
-            }
-
-            is GarageViewModel.CarsUiState.Loading -> Scaffold(Modifier.fillMaxSize()) {
-                LoadingIndicator(Modifier.padding(it).fillMaxSize())
-            }
-
-            is GarageViewModel.CarsUiState.Error -> Scaffold(Modifier.fillMaxSize()) {
-                BasicAlertDialog(callbacks.onHomeClick, modifier = Modifier.padding(it)) {
-                    Text(text = "Error", color = MaterialTheme.colorScheme.error)
-                }
-            }
-        }
-    }
+    GarageContent(
+        sharedTransitionScope = sharedTransitionScope,
+        animatedVisibilityScope = animatedVisibilityScope,
+        uiState = carState,
+        topBarState = uiState,
+        searchQuery = searchQuery,
+        callbacks = GarageCallbacks(
+            onHomeClick = callbacks.onHomeClick,
+            onSearchQueryChange = {
+                searchQuery = it
+            },
+            onSearchClick = {
+                viewModel.search(searchQuery)
+            },
+            onAddClick = callbacks.onAddClick,
+            onCarClick = { callbacks.onCarClick(it.id) },
+            onToggleFavorite = { car, isFavorite ->
+                carViewModel.save(car.copy(isFavorite = isFavorite))
+            },
+            onRefresh = {
+                viewModel.fetchAll(true)
+            },
+            onUiStateChange = { uiState = it },
+            headersCallbacks = HeaderCallbacks(
+                onProfileClick = callbacks.onProfileClick,
+                onGarageClick = {
+                    viewModel.fetchAll(true)
+                },
+                onFavoritesClick = {
+                    viewModel.fetchFavorites()
+                },
+                onStatisticsClick = {},
+            ),
+            onFilterByBrand = {
+                viewModel.filterByBrand(it)
+            },
+            onFilterByFavorite = {
+                if (it) viewModel.fetchFavorites() else viewModel.fetchAll(true)
+            },
+            onSortByRecent = {
+                viewModel.fetchAll(force = true, orderAsc = false)
+            },
+            onSortByLast = {
+                viewModel.fetchAll(force = true, orderAsc = true)
+            },
+        ),
+        modifier = modifier,
+    )
 }

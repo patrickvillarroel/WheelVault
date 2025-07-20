@@ -21,10 +21,10 @@ import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
 fun GarageTopBar(
-    uiState: GarageUiState,
+    uiState: GarageTopBarState,
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
-    onStateChange: (GarageUiState) -> Unit,
+    onStateChange: (GarageTopBarState) -> Unit,
     onSearch: () -> Unit,
     topBar: GarageCallbacks.FilterBar,
     headersCallbacks: HeaderCallbacks,
@@ -43,20 +43,20 @@ fun GarageTopBar(
             label = "Search Bar Transition",
         ) { state ->
             when (state) {
-                GarageUiState.DEFAULT -> DefaultFilterBar(
-                    onSearchClick = { onStateChange(GarageUiState.SEARCH) },
+                GarageTopBarState.DEFAULT -> DefaultFilterBar(
+                    onSearchClick = { onStateChange(GarageTopBarState.SEARCH) },
                     topBar,
                 )
 
-                GarageUiState.SEARCH -> {
-                    BackHandler { onStateChange(GarageUiState.DEFAULT) }
+                GarageTopBarState.SEARCH -> {
+                    BackHandler { onStateChange(GarageTopBarState.DEFAULT) }
                     SearchBarInput(
                         query = searchQuery,
                         onQueryChange = onSearchQueryChange,
                         onSearch = onSearch,
                         onClose = {
                             onSearchQueryChange("")
-                            onStateChange(GarageUiState.DEFAULT)
+                            onStateChange(GarageTopBarState.DEFAULT)
                         },
                     )
                 }
@@ -68,7 +68,7 @@ fun GarageTopBar(
 @Preview(showBackground = true)
 @Composable
 private fun TopBarPreview() {
-    var uiState by remember { mutableStateOf(GarageUiState.DEFAULT) }
+    var uiState by remember { mutableStateOf(GarageTopBarState.DEFAULT) }
     var searchQuery by remember { mutableStateOf("") }
 
     WheelVaultTheme {

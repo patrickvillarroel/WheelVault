@@ -18,8 +18,8 @@ data class GarageViewModel(
     private val carsRepository: CarsRepository,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : ViewModel() {
-    private val _carsState = MutableStateFlow<CarsUiState>(CarsUiState.Loading)
-    val carsState = _carsState.asStateFlow()
+    private val _garageState = MutableStateFlow<GarageUiState>(GarageUiState.Loading)
+    val garageState = _garageState.asStateFlow()
 
     init {
         fetchAll()
@@ -27,18 +27,18 @@ data class GarageViewModel(
 
     fun fetchAll(force: Boolean = false, orderAsc: Boolean = false) {
         val shouldFetch = force ||
-            carsState.value is CarsUiState.Error ||
-            carsState.value is CarsUiState.Loading
+            garageState.value is GarageUiState.Error ||
+            garageState.value is GarageUiState.Loading
 
         if (shouldFetch) {
-            _carsState.update { CarsUiState.Loading }
+            _garageState.update { GarageUiState.Loading }
             viewModelScope.launch(ioDispatcher) {
                 try {
                     val result = carsRepository.fetchAll(orderAsc = orderAsc)
-                    _carsState.update { CarsUiState.Success(result) }
+                    _garageState.update { GarageUiState.Success(result) }
                 } catch (e: Exception) {
                     Log.e("CarViewModel", "Failed to fetch cars", e)
-                    _carsState.update { CarsUiState.Error }
+                    _garageState.update { GarageUiState.Error }
                 }
             }
         }
@@ -48,10 +48,10 @@ data class GarageViewModel(
         viewModelScope.launch(ioDispatcher) {
             try {
                 val result = carsRepository.search(query, favoritesOnly)
-                _carsState.update { CarsUiState.Success(result) }
+                _garageState.update { GarageUiState.Success(result) }
             } catch (e: Exception) {
                 Log.e("CarViewModel", "Failed to search cars", e)
-                _carsState.update { CarsUiState.Error }
+                _garageState.update { GarageUiState.Error }
             }
         }
     }
@@ -59,12 +59,12 @@ data class GarageViewModel(
     fun fetchFavorites() {
         viewModelScope.launch(ioDispatcher) {
             try {
-                _carsState.update { CarsUiState.Loading }
+                _garageState.update { GarageUiState.Loading }
                 val result = carsRepository.fetchAll(true, 25)
-                _carsState.update { CarsUiState.Success(result) }
+                _garageState.update { GarageUiState.Success(result) }
             } catch (e: Exception) {
                 Log.e("CarViewModel", "Failed to get favorites", e)
-                _carsState.update { CarsUiState.Error }
+                _garageState.update { GarageUiState.Error }
             }
         }
     }
@@ -72,22 +72,22 @@ data class GarageViewModel(
     fun filterByBrand(brand: String) {
         viewModelScope.launch(ioDispatcher) {
             try {
-                _carsState.update { CarsUiState.Loading }
+                _garageState.update { GarageUiState.Loading }
                 val result = carsRepository.fetchByBrand(brand)
-                _carsState.update { CarsUiState.Success(result) }
+                _garageState.update { GarageUiState.Success(result) }
             } catch (e: Exception) {
                 Log.e("CarViewModel", "Failed to filter by brand", e)
-                _carsState.update { CarsUiState.Error }
+                _garageState.update { GarageUiState.Error }
             }
         }
     }
 
-    sealed interface CarsUiState {
-        data object Loading : CarsUiState
+    sealed interface GarageUiState {
+        data object Loading : GarageUiState
 
         @Immutable
-        data class Success(@Stable val cars: List<CarItem>) : CarsUiState
+        data class Success(@Stable val cars: List<CarItem>) : GarageUiState
 
-        data object Error : CarsUiState
+        data object Error : GarageUiState
     }
 }

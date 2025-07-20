@@ -10,8 +10,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -37,9 +39,9 @@ import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 fun GarageContent(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    uiState: GarageUiState,
+    uiState: GarageViewModel.GarageUiState,
+    topBarState: GarageTopBarState,
     searchQuery: String,
-    carResults: List<CarItem>,
     callbacks: GarageCallbacks,
     modifier: Modifier = Modifier,
 ) {
@@ -49,7 +51,7 @@ fun GarageContent(
         modifier = modifier.fillMaxSize(),
         topBar = {
             GarageTopBar(
-                uiState,
+                topBarState,
                 searchQuery = searchQuery,
                 onSearchQueryChange = callbacks.onSearchQueryChange,
                 onStateChange = callbacks.onUiStateChange,
@@ -65,35 +67,51 @@ fun GarageContent(
         },
     ) { paddingValues ->
         with(sharedTransitionScope) {
-            PullToRefreshBox(
-                isRefreshing,
-                onRefresh = {
-                    isRefreshing = true
-                    callbacks.onRefresh()
-                    isRefreshing = false
-                },
-                Modifier.fillMaxSize().padding(paddingValues),
-            ) {
-                LazyColumn(Modifier.fillMaxSize().padding(start = 15.dp, end = 15.dp)) {
-                    item {
-                        Text(
-                            stringResource(R.string.garage),
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(top = 15.dp, start = 15.dp, bottom = 5.dp),
-                        )
+            when (uiState) {
+                is GarageViewModel.GarageUiState.Success ->
+                    PullToRefreshBox(
+                        isRefreshing,
+                        onRefresh = {
+                            isRefreshing = true
+                            callbacks.onRefresh()
+                            isRefreshing = false
+                        },
+                        Modifier.fillMaxSize().padding(paddingValues),
+                    ) {
+                        val carResults = uiState.cars
+                        LazyColumn(Modifier.fillMaxSize().padding(start = 15.dp, end = 15.dp)) {
+                            item {
+                                Text(
+                                    stringResource(R.string.garage),
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    modifier = Modifier.padding(top = 15.dp, start = 15.dp, bottom = 5.dp),
+                                )
+                            }
+                            items(carResults, key = { it.id }) { item ->
+                                CarItemCard(
+                                    carItem = item,
+                                    onClick = { callbacks.onCarClick(item) },
+                                    onFavoriteToggle = { callbacks.onToggleFavorite(item, it) },
+                                    modifier = Modifier
+                                        .padding(3.dp)
+                                        .sharedBounds(
+                                            rememberSharedContentState("car-${item.id}"),
+                                            animatedVisibilityScope,
+                                        ),
+                                )
+                            }
+                        }
                     }
-                    items(carResults, key = { it.id }) { item ->
-                        CarItemCard(
-                            carItem = item,
-                            onClick = { callbacks.onCarClick(item) },
-                            onFavoriteToggle = { callbacks.onToggleFavorite(item, it) },
-                            modifier = Modifier
-                                .padding(3.dp)
-                                .sharedBounds(rememberSharedContentState("car-${item.id}"), animatedVisibilityScope),
-                        )
-                    }
+
+                GarageViewModel.GarageUiState.Error -> BasicAlertDialog(
+                    callbacks.filterBar.onHomeClick,
+                    modifier = Modifier.padding(paddingValues),
+                ) {
+                    Text(text = "Error", color = MaterialTheme.colorScheme.error)
                 }
+
+                GarageViewModel.GarageUiState.Loading -> LoadingIndicator(Modifier.padding(paddingValues).fillMaxSize())
             }
         }
     }
@@ -108,19 +126,21 @@ private fun GaragePreview() {
                 GarageContent(
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
-                    uiState = GarageUiState.DEFAULT,
+                    uiState = GarageViewModel.GarageUiState.Success(
+                        List(10) {
+                            CarItem(
+                                model = "Ford Mustang GTD",
+                                year = 2025,
+                                manufacturer = "HotWheels",
+                                quantity = 2,
+                                imageUrl =
+                                "https://tse1.mm.bing.net/th/id/OIP.zfsbW7lEIwYgeUt7Fd1knwHaHg?rs=1&pid=ImgDetMain&o=7&rm=3",
+                                isFavorite = true,
+                            )
+                        },
+                    ),
+                    topBarState = GarageTopBarState.DEFAULT,
                     searchQuery = "",
-                    carResults = List(10) {
-                        CarItem(
-                            model = "Ford Mustang GTD",
-                            year = 2025,
-                            manufacturer = "HotWheels",
-                            quantity = 2,
-                            imageUrl =
-                            "https://tse1.mm.bing.net/th/id/OIP.zfsbW7lEIwYgeUt7Fd1knwHaHg?rs=1&pid=ImgDetMain&o=7&rm=3",
-                            isFavorite = true,
-                        )
-                    },
                     callbacks = GarageCallbacks(
                         onHomeClick = {},
                         onSearchQueryChange = {},
