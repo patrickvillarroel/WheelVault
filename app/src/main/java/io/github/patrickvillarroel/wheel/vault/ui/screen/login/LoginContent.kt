@@ -49,7 +49,7 @@ fun LoginContent(
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Image(painterResource(R.drawable.helmet_icon), "Logo", Modifier.size(50.dp))
+            Image(painterResource(R.drawable.helmet_icon), stringResource(R.string.helmet), Modifier.size(50.dp))
             Spacer(Modifier.height(20.dp))
             Text(
                 stringResource(R.string.collectors_project_lines),
@@ -63,7 +63,12 @@ fun LoginContent(
                 Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935)),
             ) {
-                Text("Register", color = Color.White, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
+                Text(
+                    stringResource(R.string.register),
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
+                )
             }
 
             OutlinedButton(onClick = onLoginWithGoogleClick, Modifier.fillMaxWidth()) {
@@ -72,12 +77,20 @@ fun LoginContent(
 
             OutlinedButton(onLoginWithEmailClick, Modifier.fillMaxWidth()) {
                 Icon(Icons.Filled.Email, "Email")
-                Text("Continue with email", Modifier.weight(1f), textAlign = TextAlign.Center)
+                Text(
+                    stringResource(R.string.continue_with, stringResource(R.string.email)),
+                    Modifier.weight(1f),
+                    textAlign = TextAlign.Center,
+                )
             }
 
             OutlinedButton(onLoginWithEmailAndPasswordClick, Modifier.padding(bottom = 50.dp).fillMaxWidth()) {
-                Icon(Icons.Filled.Password, "Email and password")
-                Text("Continue with email and password", Modifier.weight(1f), textAlign = TextAlign.Center)
+                Icon(Icons.Filled.Password, stringResource(R.string.password))
+                Text(
+                    stringResource(R.string.continue_with_email_password),
+                    Modifier.weight(1f),
+                    textAlign = TextAlign.Center,
+                )
             }
         }
     }

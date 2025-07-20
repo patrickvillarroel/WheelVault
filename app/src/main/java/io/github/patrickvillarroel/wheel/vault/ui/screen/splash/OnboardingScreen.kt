@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
@@ -38,10 +39,14 @@ fun OnboardingScreen(
         R.drawable.onboarding_5,
     )
 
-    OnboardingContent(pages, onFinish = {
-        viewModel.updateOnboardingState()
-        onFinish()
-    }, modifier)
+    OnboardingContent(
+        pages = pages,
+        onFinish = {
+            viewModel.updateOnboardingState()
+            onFinish()
+        },
+        modifier = modifier,
+    )
 }
 
 @Composable
@@ -71,7 +76,7 @@ private fun OnboardingContent(pages: List<Int>, onFinish: () -> Unit, modifier: 
                 ) {
                     Image(
                         painter = painterResource(id = pages[page]),
-                        contentDescription = "Onboarding step ${page + 1}",
+                        contentDescription = stringResource(R.string.onboarding_step, page + 1),
                         contentScale = ContentScale.FillHeight,
                         modifier = Modifier.fillMaxHeight(),
                     )
@@ -80,7 +85,7 @@ private fun OnboardingContent(pages: List<Int>, onFinish: () -> Unit, modifier: 
 
             // Botón Omitir arriba
             TextButton(onClick = onFinish, Modifier.padding(top = 5.dp, end = 14.dp).align(Alignment.TopEnd)) {
-                Text("Omitir", color = Color.White)
+                Text(stringResource(R.string.skip), color = Color.White)
             }
 
             OnboardingControls(
@@ -117,7 +122,7 @@ private fun BoxScope.OnboardingControls(
     // Botón anterior
     if (currentPage > 0) {
         TextButton(onClick = onPreviousClick, Modifier.padding(24.dp).align(Alignment.BottomStart)) {
-            Text("Anterior", color = Color.White)
+            Text(stringResource(R.string.back_variant), color = Color.White)
         }
     }
 
@@ -128,7 +133,7 @@ private fun BoxScope.OnboardingControls(
         colors = ButtonDefaults.buttonColors(Color(0xFFE42E31)),
     ) {
         Text(
-            if (currentPage == lastIndex) "Empezar" else "Siguiente",
+            if (currentPage == lastIndex) stringResource(R.string.start) else stringResource(R.string.next),
             color = Color.White,
         )
     }

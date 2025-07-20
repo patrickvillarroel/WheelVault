@@ -17,12 +17,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.patrickvillarroel.wheel.vault.R
 import org.koin.compose.viewmodel.koinViewModel
 
+@Suppress("ktlint:compose:multiple-emitters-check")
 @Composable
 fun LoginWithEmailScreen(
     onLoginSuccess: () -> Unit,
@@ -58,7 +61,7 @@ fun LoginWithEmailScreen(
             LoadingIndicator(Modifier.fillMaxSize())
         }
 
-        is LoginUiState.Waiting -> {}
+        is LoginUiState.Waiting -> Unit
 
         is LoginUiState.Error -> {
             if (showDialog) {
@@ -69,16 +72,14 @@ fun LoginWithEmailScreen(
                         verticalArrangement = Arrangement.Center,
                     ) {
                         Image(
-                            painterResource(
-                                R.drawable.error,
-                            ),
-                            null,
+                            painterResource(R.drawable.error),
+                            stringResource(R.string.error),
                             Modifier.padding(16.dp).fillMaxWidth(0.8f),
                         )
                         Text(
-                            "Error $uiState",
+                            "$uiState",
                             color = MaterialTheme.colorScheme.error,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            textAlign = TextAlign.Center,
                         )
                     }
                 }

@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -63,7 +64,7 @@ fun ProfileContent(email: String, isEditable: Boolean, callbacks: ProfileCallbac
             ) {
                 Image(
                     painterResource(R.drawable.helmet_icon),
-                    contentDescription = "Helmet",
+                    stringResource(R.string.helmet),
                     modifier = Modifier
                         .size(150.dp)
                         .clip(CircleShape)
@@ -73,7 +74,7 @@ fun ProfileContent(email: String, isEditable: Boolean, callbacks: ProfileCallbac
                 )
                 Spacer(Modifier.width(30.dp))
                 Text(
-                    "Usuario",
+                    stringResource(R.string.user),
                     Modifier.align(Alignment.CenterVertically).offset(y = (-20).dp),
                     style = MaterialTheme.typography.titleLargeEmphasized,
                     fontWeight = FontWeight.Bold,
@@ -90,7 +91,7 @@ fun ProfileContent(email: String, isEditable: Boolean, callbacks: ProfileCallbac
                 shape = RoundedCornerShape(20.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDF2C2C)),
             ) {
-                Text("Cerrar Sesión", color = Color.White)
+                Text(stringResource(R.string.logout), color = Color.White)
             }
         }
     }

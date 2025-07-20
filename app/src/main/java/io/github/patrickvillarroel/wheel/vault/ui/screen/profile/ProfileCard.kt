@@ -28,11 +28,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
@@ -76,10 +78,10 @@ fun ProfileCard(
                 value = email,
                 onValueChange = onEmailChange,
                 readOnly = !isEditable,
-                label = { Text("Correo") },
+                label = { Text(stringResource(R.string.email)) },
                 trailingIcon = {
                     IconButton(onClick = onEditClick, enabled = isEditable) {
-                        Icon(imageVector = Icons.Default.Edit, contentDescription = "Editar correo")
+                        Icon(Icons.Default.Edit, stringResource(R.string.edit, stringResource(R.string.email)))
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -97,7 +99,7 @@ fun ProfileCard(
 
             Spacer(Modifier.height(16.dp))
 
-            Text("Cuentas vinculadas", color = Color.White, fontSize = 14.sp)
+            Text(stringResource(R.string.account_linked), color = Color.White, fontSize = 14.sp)
             Spacer(Modifier.height(8.dp))
 
             FlowRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {

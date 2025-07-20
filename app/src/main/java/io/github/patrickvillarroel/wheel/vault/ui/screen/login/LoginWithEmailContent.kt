@@ -53,11 +53,11 @@ fun LoginWithEmailContent(
     modifier: Modifier = Modifier,
 ) {
     val displayLabel = if (isRegister) {
-        "Registrate"
+        stringResource(R.string.register_action)
     } else if (isMagicLink) {
-        "Ingresar con Correo"
+        stringResource(R.string.login_with_email_action)
     } else {
-        "Iniciar Sesión"
+        stringResource(R.string.login)
     }
     var email by rememberSaveable(isRegister, isMagicLink) { mutableStateOf("") }
     var password by rememberSaveable(isRegister, isMagicLink) { mutableStateOf("") }
@@ -115,7 +115,7 @@ fun LoginWithEmailContent(
                                     focusedBorderColor = Color.Black,
                                     unfocusedBorderColor = Color.Black,
                                 ),
-                                label = { Text("Correo electrónico", color = Color.White) },
+                                label = { Text(stringResource(R.string.email), color = Color.White) },
                             )
 
                             if (!isMagicLink) {
@@ -126,7 +126,7 @@ fun LoginWithEmailContent(
                                         focusedBorderColor = Color.Black,
                                         unfocusedBorderColor = Color.Black,
                                     ),
-                                    label = { Text("Contraseña", color = Color.White) },
+                                    label = { Text(stringResource(R.string.password), color = Color.White) },
                                 )
                             }
 
@@ -139,7 +139,11 @@ fun LoginWithEmailContent(
                                 ),
                                 modifier = Modifier.align(Alignment.CenterHorizontally),
                             ) {
-                                Text("Ingresar", style = MaterialTheme.typography.labelLarge, color = Color.White)
+                                Text(
+                                    stringResource(R.string.login_action),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = Color.White,
+                                )
                             }
                         }
                     }
@@ -154,8 +158,8 @@ fun LoginWithEmailContent(
                         .offset(y = (-30).dp),
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.helmet_icon),
-                        contentDescription = "Helmet Icon",
+                        painterResource(id = R.drawable.helmet_icon),
+                        stringResource(R.string.helmet),
                         modifier = Modifier
                             .size(60.dp)
                             .weight(1f)
