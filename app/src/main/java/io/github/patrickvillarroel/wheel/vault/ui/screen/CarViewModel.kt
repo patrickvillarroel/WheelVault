@@ -74,7 +74,7 @@ data class CarViewModel(
             ?.firstOrNull { it.id == id }
 
         if (localMatch != null && !force) {
-            Log.i("CarViewModel", "Found car in local state")
+            Log.i("CarViewModel", "Found car in local state. $localMatch")
             _carDetailState.update { CarDetailUiState.Success(localMatch) }
             return
         }
@@ -86,7 +86,7 @@ data class CarViewModel(
                 Log.i("CarViewModel", "Going to find car by id $id")
                 val car = carsRepository.fetch(id)
                 if (car != null) {
-                    Log.i("CarViewModel", "Found car by id $id")
+                    Log.i("CarViewModel", "Found car by id $id. $car")
                     _carDetailState.update { CarDetailUiState.Success(car) }
                 } else {
                     Log.i("CarViewModel", "Car not found by id $id")

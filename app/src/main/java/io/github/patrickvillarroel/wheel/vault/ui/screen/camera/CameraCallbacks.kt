@@ -4,10 +4,19 @@ import android.graphics.Bitmap
 import androidx.camera.core.ImageProxy
 
 data class CameraCallbacks(
-    val reset: () -> Unit,
-    val onConfirm: () -> Unit,
     val onBack: () -> Unit,
-    val onSkipClick: () -> Unit,
-    val processImage: (ImageProxy) -> Unit,
-    val saveImage: (Bitmap) -> Unit,
+    val onSkip: () -> Unit,
+
+    // Text Recognition
+    val processImageForTextAnalysis: (ImageProxy) -> Unit,
+    val onTextRecognitionConfirmed: () -> Unit,
+    val onTextRecognitionRetry: () -> Unit,
+
+    // Image Capture
+    val onTakePictureRequest: () -> Unit,
+    val onCapturedImageProvided: (Bitmap) -> Unit,
+    val onCapturedImageConfirmation: () -> Unit,
+    val onCapturedImageRetry: () -> Unit,
+
+    val onAddDetail: (String?, Bitmap?) -> Unit,
 )

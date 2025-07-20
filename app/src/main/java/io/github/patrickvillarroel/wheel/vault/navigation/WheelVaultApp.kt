@@ -156,9 +156,8 @@ fun WheelVaultApp(
                 entry<NavigationKeys.AddCamera> { _ ->
                     CameraLensScreen(
                         onBack = { backStack.removeLastOrNull() },
-                        // TODO send more data like picture or save a partial in DB
-                        onAddDetail = {
-                            backStack.add(NavigationKeys.CarEdit(model = it))
+                        onAddDetail = { carModel, _ ->
+                            backStack.add(NavigationKeys.CarEdit(model = carModel, fromCamera = true))
                             backStack.remove(NavigationKeys.AddCamera)
                         },
                     )
@@ -182,7 +181,6 @@ fun WheelVaultApp(
                 }
 
                 entry<NavigationKeys.Garage> { (query, favorites) ->
-                    // TODO pass the state from others screens
                     GarageScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
@@ -216,6 +214,7 @@ fun WheelVaultApp(
                 entry<NavigationKeys.CarEdit> { edit ->
                     CarEditScreen(
                         partialCarItem = edit.toCarPartial(),
+                        fromCamera = edit.fromCamera,
                         headersBackCallbacks = HeaderBackCallbacks(
                             onBackClick = { backStack.removeLastOrNull() },
                             onProfileClick = { backStack.add(NavigationKeys.Profile) },

@@ -44,6 +44,7 @@ object NavigationKeys {
         val images: Set<String> = emptySet(),
         val isFavorite: Boolean = false,
         val id: Uuid? = null,
+        val fromCamera: Boolean = false,
     ) : NavKey
 
     @Serializable

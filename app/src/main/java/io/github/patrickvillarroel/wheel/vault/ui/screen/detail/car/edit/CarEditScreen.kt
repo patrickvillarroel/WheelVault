@@ -17,6 +17,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.CarViewModel
+import io.github.patrickvillarroel.wheel.vault.ui.screen.camera.CameraViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.ModalAddImage
 import org.koin.compose.viewmodel.koinViewModel
@@ -25,9 +26,11 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun CarEditScreen(
     partialCarItem: CarItem.Partial,
+    fromCamera: Boolean,
     headersBackCallbacks: HeaderBackCallbacks,
     modifier: Modifier = Modifier,
     carViewModel: CarViewModel = koinViewModel(),
+    cameraViewModel: CameraViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
@@ -40,6 +43,10 @@ fun CarEditScreen(
             ) {
                 // Recover the full state of the car because navigation don't preserve network images, only links (strings)
                 (detailState as CarViewModel.CarDetailUiState.Success).car.toPartial()
+            } else if (fromCamera) {
+                val capturedImage = cameraViewModel.getCapturedImage()
+                cameraViewModel.resetImage()
+                partialCarItem.copy(images = setOfNotNull(capturedImage) + partialCarItem.images)
             } else {
                 partialCarItem
             },
