@@ -114,7 +114,7 @@ fun CarEditContent(
 
             item {
                 RedOutlinedTextField(marca, {
-                    marca = it.trim()
+                    marca = it
                     car = car.copy(brand = it.takeIf(String::isNotBlank)?.trim())
                 }, "Marca")
             }
@@ -131,7 +131,7 @@ fun CarEditContent(
                     RedOutlinedTextField(
                         year,
                         {
-                            year = it.trim()
+                            year = it
                             car = car.copy(year = it.trim().takeIf(String::isNotBlank)?.toIntOrNull())
                         },
                         "Año",
@@ -154,13 +154,13 @@ fun CarEditContent(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     RedOutlinedTextField(manufacturer, {
-                        manufacturer = it.trim()
+                        manufacturer = it
                         car = car.copy(manufacturer = it.takeIf(String::isNotBlank)?.trim())
                     }, "Manufactura", Modifier.weight(1f))
                     RedOutlinedTextField(
                         cantidad,
                         {
-                            cantidad = it.trim()
+                            cantidad = it
                             car = car.copy(quantity = it.takeIf(String::isNotBlank)?.toIntOrNull() ?: 0)
                         },
                         "Cantidad",
@@ -174,7 +174,7 @@ fun CarEditContent(
                 RedOutlinedTextField(
                     categoria,
                     {
-                        categoria = it.trim()
+                        categoria = it
                         car = car.copy(category = it.takeIf(String::isNotBlank)?.trim())
                     },
                     "Categoría",
