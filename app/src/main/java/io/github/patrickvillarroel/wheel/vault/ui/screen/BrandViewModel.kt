@@ -98,7 +98,7 @@ data class BrandViewModel(
             try {
                 val brand = brandRepository.fetch(id)
                 if (brand != null) {
-                    val cars = carRepository.fetchByBrand(brand.name)
+                    val cars = carRepository.fetchByManufacturer(brand.name)
                     _brandDetailsState.update { BrandDetailsUiState.Success(brand, cars) }
                 } else {
                     _brandDetailsState.update { BrandDetailsUiState.NotFound }
