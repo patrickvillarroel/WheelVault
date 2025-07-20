@@ -152,7 +152,7 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
                 val realImages = car.images.filterIsInstance<ByteArray>().toSet()
                 if (realImages.isNotEmpty()) {
                     Log.i("Car Supabase", "Uploading images for car ${car.id}")
-                    uploadImages(car.id, realImages)
+                    uploadImages(carObject.id!!, realImages).ifEmpty { setOf(CarItem.EmptyImage) }
                 } else {
                     Log.i("Car Supabase", "No images to upload for car ${car.id} after filter is ByteArray")
                     setOf(CarItem.EmptyImage)
@@ -184,7 +184,7 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
                 val realImages = car.images.filterIsInstance<ByteArray>().toSet()
                 if (realImages.isNotEmpty()) {
                     Log.i("Car Supabase", "Uploading images for car ${car.id}")
-                    uploadImages(car.id, realImages)
+                    uploadImages(car.id, realImages).ifEmpty { setOf(CarItem.EmptyImage) }
                 } else {
                     Log.i("Car Supabase", "No images to upload for car ${car.id} after filter is ByteArray")
                     setOf(CarItem.EmptyImage)
@@ -227,7 +227,7 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
             }.toSet()
 
     private suspend fun uploadImages(
-        carId: UUID,
+        carId: Any,
         images: Set<ByteArray>,
         contentType: String = "png",
         userId: String = supabase.auth.currentUserOrNull()!!.id,
