@@ -130,6 +130,7 @@ fun CameraLensContent(
                         { it.close() }
                     },
                     onImageCapture = callbacks.onCapturedImageProvided,
+                    triggerImageAnalysis = uiState is CameraUiState.ProcessingText,
                     triggerImageCapture = triggerImageCapture,
                     modifier = Modifier.size(412.dp, 648.dp).align(Alignment.Center).offset(y = (-55).dp),
                 )
