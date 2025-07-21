@@ -53,39 +53,46 @@ class CameraViewModel(dispatcher: CoroutineDispatcher = Dispatchers.Default) : V
 
     @OptIn(ExperimentalGetImage::class)
     private fun processImageForTextInternal(imageProxy: ImageProxy) {
-        if (_uiState.value !is CameraUiState.ProcessingText) {
-            imageProxy.close()
-            return
-        }
-
-        val mediaImage = imageProxy.image ?: run {
-            imageProxy.close()
-            return
-        }
-
-        val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-
-        textRecognizer.process(image)
-            .addOnSuccessListener { visionText: Text ->
-                val filtered = visionText.textBlocks.flatMap { it.lines }
-                    .map { it.text.trim() }
-                    .filter { it.length in 4..30 && it.matches("^[A-Z0-9\\s'-]+$".toRegex()) }
-                    .joinToString(" ")
-
-                if (filtered.isNotBlank() && _uiState.value is CameraUiState.ProcessingText) {
-                    currentRecognizedText = filtered
-                    _uiState.value = CameraUiState.ConfirmRecognizedText(filtered)
-                }
-            }
-            .addOnFailureListener { e ->
-                Log.e("CameraViewModel", "Error al reconocer texto", e)
-                if (_uiState.value is CameraUiState.ProcessingText) {
-                    _uiState.value = CameraUiState.ProcessingText("Error al reconocer texto.") // Show error temporarily
-                }
-            }
-            .addOnCompleteListener {
+        try {
+            if (_uiState.value !is CameraUiState.ProcessingText) {
                 imageProxy.close()
+                return
             }
+
+            val mediaImage = imageProxy.image ?: run {
+                imageProxy.close()
+                return
+            }
+
+            val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+
+            textRecognizer.process(image)
+                .addOnSuccessListener { visionText: Text ->
+                    val filtered = visionText.textBlocks.flatMap { it.lines }
+                        .map { it.text.trim() }
+                        .filter { it.length in 4..30 && it.matches("^[A-Z0-9\\s'-]+$".toRegex()) }
+                        .joinToString(" ")
+
+                    if (filtered.isNotBlank() && _uiState.value is CameraUiState.ProcessingText) {
+                        currentRecognizedText = filtered
+                        _uiState.value = CameraUiState.ConfirmRecognizedText(filtered)
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.e("CameraViewModel", "Error al reconocer texto", e)
+                    if (_uiState.value is CameraUiState.ProcessingText) {
+                        _uiState.value = CameraUiState.ProcessingText("Error al reconocer texto.")
+                    }
+                }
+                .addOnCompleteListener {
+                    imageProxy.close()
+                }
+        } catch (e: Exception) {
+            Log.e("CameraViewModel", "Error al procesar imagen", e)
+            if (_uiState.value is CameraUiState.ProcessingText) {
+                _uiState.value = CameraUiState.ProcessingText("Error al procesar imagen.")
+            }
+        }
     }
 
     fun onPermissionGranted() {
@@ -99,7 +106,10 @@ class CameraViewModel(dispatcher: CoroutineDispatcher = Dispatchers.Default) : V
     }
 
     fun processImageForTextAnalysis(imageProxy: ImageProxy) {
-        if (_uiState.value is CameraUiState.ProcessingText && !imageProxyFlow.tryEmit(imageProxy)) {
+        if (_uiState.value is CameraUiState.ProcessingText) {
+            val emitted = imageProxyFlow.tryEmit(imageProxy)
+            if (!emitted) imageProxy.close()
+        } else {
             imageProxy.close()
         }
     }

@@ -3,16 +3,15 @@ package io.github.patrickvillarroel.wheel.vault.ui.screen.camera
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
-import androidx.camera.core.Preview
-import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -32,22 +31,24 @@ fun CameraPreview(
     onImageCaptureForAnalysis: (ImageProxy) -> Unit,
     onImageCapture: (Bitmap) -> Unit,
     triggerImageCapture: Boolean,
+    triggerImageAnalysis: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val onImageCaptureForAnalysisLatest by rememberUpdatedState(onImageCaptureForAnalysis)
     val onImageCaptureLatest by rememberUpdatedState(onImageCapture)
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
-    val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
     val cameraExecutor: ExecutorService = remember { Executors.newSingleThreadExecutor() }
-    val imageCapture = remember {
-        ImageCapture.Builder()
-            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-            .build()
+    val cameraController = remember {
+        LifecycleCameraController(context).apply {
+            bindToLifecycle(lifecycleOwner)
+            cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+        }
     }
 
     LaunchedEffect(triggerImageCapture) {
         if (triggerImageCapture) {
-            imageCapture.takePicture(
+            cameraController.takePicture(
                 ContextCompat.getMainExecutor(context),
                 object : ImageCapture.OnImageCapturedCallback() {
                     override fun onCaptureSuccess(output: ImageProxy) {
@@ -65,37 +66,23 @@ fun CameraPreview(
         }
     }
 
+    DisposableEffect(triggerImageAnalysis) {
+        cameraController.clearImageAnalysisAnalyzer()
+        if (triggerImageAnalysis) {
+            cameraController.setImageAnalysisAnalyzer(cameraExecutor, onImageCaptureForAnalysisLatest)
+        }
+        onDispose { cameraController.clearImageAnalysisAnalyzer() }
+    }
+
     AndroidView(
         factory = { _ ->
-            val previewView = PreviewView(context).apply {
+            PreviewView(context).apply {
                 scaleType = PreviewView.ScaleType.FILL_CENTER
+                controller = cameraController
             }
-            cameraProviderFuture.addListener({
-                val preview = Preview.Builder().build().apply {
-                    surfaceProvider = previewView.surfaceProvider
-                }
-
-                val imageAnalyzer = ImageAnalysis.Builder()
-                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                    .build()
-                    .also {
-                        it.setAnalyzer(cameraExecutor, onImageCaptureForAnalysis)
-                    }
-
-                cameraProviderFuture.get().unbindAll()
-                cameraProviderFuture.get().bindToLifecycle(
-                    lifecycleOwner,
-                    CameraSelector.DEFAULT_BACK_CAMERA,
-                    preview,
-                    imageAnalyzer,
-                    imageCapture,
-                )
-            }, ContextCompat.getMainExecutor(context))
-            previewView
         },
         modifier = modifier.fillMaxSize().padding(bottom = 100.dp),
         onRelease = {
-            cameraProviderFuture.get().unbindAll()
             cameraExecutor.shutdown()
             it.controller = null
             it.removeAllViews()
