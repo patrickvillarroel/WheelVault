@@ -72,7 +72,7 @@ ktor = "3.2.2"
 ktlint-core = "1.6.0"
 
 # https://github.com/mrmans0n/compose-rules/releases
-ktlint-compose-rules = "0.4.22"
+ktlint-compose-rules = "0.4.24"
 
 # https://github.com/jlleitschuh/ktlint-gradle/releases
 ktlint-plugin = "13.0.0"
@@ -81,7 +81,7 @@ ktlint-plugin = "13.0.0"
 compose-bom = "2025.06.01"
 
 # https://developer.android.com/jetpack/androidx/releases/compose-material3#compose_material3_version_14_2
-compose-material3-expressive = "1.4.0-alpha17"
+compose-material3-expressive = "1.4.0-alpha18"
 
 # https://junit.org/junit4/
 test-junit = "4.13.2"
@@ -95,6 +95,7 @@ supabase-kt = "3.2.1"
 [libraries]
 # kotlin
 kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlin-serialization" }
+kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services" }
 
 # ktor
 ktor-client-engine-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
