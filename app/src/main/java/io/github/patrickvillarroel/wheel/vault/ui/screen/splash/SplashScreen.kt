@@ -16,6 +16,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
@@ -28,6 +31,7 @@ import io.github.patrickvillarroel.wheel.vault.R
 fun SplashScreen(onVideoFinish: () -> Unit, modifier: Modifier = Modifier) {
     val onVideoFinishLatest by rememberUpdatedState(onVideoFinish)
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     val player = remember {
         ExoPlayer.Builder(context).build().apply {
@@ -39,7 +43,36 @@ fun SplashScreen(onVideoFinish: () -> Unit, modifier: Modifier = Modifier) {
             setMediaItem(mediaItem)
             repeatMode = Player.REPEAT_MODE_OFF
             playWhenReady = true
+            volume = 1f
             prepare()
+        }
+    }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_PAUSE -> {
+                    player.playWhenReady = false
+                    player.volume = 0f
+                }
+
+                Lifecycle.Event.ON_RESUME -> {
+                    player.playWhenReady = true
+                    player.volume = 1f
+                }
+
+                Lifecycle.Event.ON_STOP -> {
+                    player.playWhenReady = false
+                }
+
+                else -> Unit
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
 

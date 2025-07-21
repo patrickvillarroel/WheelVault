@@ -71,7 +71,12 @@ fun DefaultFilterBar(
         item {
             FilterChip(
                 selected = selectedFav,
-                onClick = { callbacks.onFilterByFavorite(true) },
+                onClick = {
+                    selectedFav = !selectedFav
+                    if (selectedFav) {
+                        callbacks.onFilterByFavorite(true)
+                    }
+                },
                 label = { Text("Favoritos") },
                 colors = FilterChipDefaults.filterChipColors(
                     containerColor = Color(0xFF1D1B20),
@@ -88,7 +93,12 @@ fun DefaultFilterBar(
         item {
             FilterChip(
                 selected = selectedRecientes,
-                onClick = { callbacks.onSortByRecent() },
+                onClick = {
+                    selectedRecientes = !selectedRecientes
+                    if (selectedRecientes) {
+                        callbacks.onSortByRecent()
+                    }
+                },
                 label = { Text(stringResource(R.string.recent)) },
                 colors = FilterChipDefaults.filterChipColors(
                     containerColor = Color(0xFF1D1B20),
@@ -105,7 +115,12 @@ fun DefaultFilterBar(
         item {
             FilterChip(
                 selected = selectedUltimos,
-                onClick = { callbacks.onSortByLast() },
+                onClick = {
+                    selectedUltimos = !selectedUltimos
+                    if (selectedUltimos) {
+                        callbacks.onSortByLast()
+                    }
+                },
                 label = { Text(stringResource(R.string.last)) },
                 colors = FilterChipDefaults.filterChipColors(
                     containerColor = Color(0xFF1D1B20),
@@ -123,7 +138,14 @@ fun DefaultFilterBar(
             val isSelected = selectedBrand == brand
             FilterChip(
                 selected = isSelected,
-                onClick = { callbacks.onFilterByBrand(brand) },
+                onClick = {
+                    if (isSelected) {
+                        selectedBrand = ""
+                    } else {
+                        callbacks.onFilterByBrand(brand)
+                        selectedBrand = brand
+                    }
+                },
                 label = { Text(brand) },
                 colors = FilterChipDefaults.filterChipColors(
                     containerColor = Color(0xFF1D1B20),

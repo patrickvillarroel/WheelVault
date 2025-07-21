@@ -86,7 +86,11 @@ data class GarageViewModel(
             try {
                 _garageState.update { GarageUiState.Loading }
                 val result = carsRepository.fetchByManufacturer(manufacturer)
-                _garageState.update { GarageUiState.Success(result) }
+                if (result.isEmpty()) {
+                    _garageState.update { GarageUiState.Empty }
+                } else {
+                    _garageState.update { GarageUiState.Success(result) }
+                }
             } catch (e: Exception) {
                 Log.e("CarViewModel", "Failed to filter by brand", e)
                 _garageState.update { GarageUiState.Error }
