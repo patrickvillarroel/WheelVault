@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class CameraViewModel(dispatcher: CoroutineDispatcher = Dispatchers.Default) : ViewModel() {
     private val textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
@@ -52,7 +53,7 @@ class CameraViewModel(dispatcher: CoroutineDispatcher = Dispatchers.Default) : V
     }
 
     @OptIn(ExperimentalGetImage::class)
-    private fun processImageForTextInternal(imageProxy: ImageProxy) {
+    private suspend fun processImageForTextInternal(imageProxy: ImageProxy) {
         try {
             if (_uiState.value !is CameraUiState.ProcessingText) {
                 imageProxy.close()
@@ -65,33 +66,24 @@ class CameraViewModel(dispatcher: CoroutineDispatcher = Dispatchers.Default) : V
             }
 
             val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+            val visionText: Text = textRecognizer.process(image).await()
 
-            textRecognizer.process(image)
-                .addOnSuccessListener { visionText: Text ->
-                    val filtered = visionText.textBlocks.flatMap { it.lines }
-                        .map { it.text.trim() }
-                        .filter { it.length in 4..30 && it.matches("^[A-Z0-9\\s'-]+$".toRegex()) }
-                        .joinToString(" ")
+            val filtered = visionText.textBlocks.flatMap { it.lines }
+                .map { it.text.trim() }
+                .filter { it.length in 4..30 && it.matches("^[A-Z0-9\\s'-]+$".toRegex()) }
+                .joinToString(" ")
 
-                    if (filtered.isNotBlank() && _uiState.value is CameraUiState.ProcessingText) {
-                        currentRecognizedText = filtered
-                        _uiState.value = CameraUiState.ConfirmRecognizedText(filtered)
-                    }
-                }
-                .addOnFailureListener { e ->
-                    Log.e("CameraViewModel", "Error al reconocer texto", e)
-                    if (_uiState.value is CameraUiState.ProcessingText) {
-                        _uiState.value = CameraUiState.ProcessingText("Error al reconocer texto.")
-                    }
-                }
-                .addOnCompleteListener {
-                    imageProxy.close()
-                }
+            if (filtered.isNotBlank() && _uiState.value is CameraUiState.ProcessingText) {
+                currentRecognizedText = filtered
+                _uiState.value = CameraUiState.ConfirmRecognizedText(filtered)
+            }
         } catch (e: Exception) {
             Log.e("CameraViewModel", "Error al procesar imagen", e)
             if (_uiState.value is CameraUiState.ProcessingText) {
                 _uiState.value = CameraUiState.ProcessingText("Error al procesar imagen.")
             }
+        } finally {
+            imageProxy.close()
         }
     }
 
