@@ -1,6 +1,7 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.login
 
 import android.content.Context
+import android.util.Log
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.ViewModel
@@ -41,15 +42,28 @@ data class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
                     this.password = password
                 }
                 _state.update { LoginUiState.Success }
-            } catch (_: AuthWeakPasswordException) {
+            } catch (e: AuthWeakPasswordException) {
+                Log.e("LoginViewModel", "AuthWeakPasswordException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.INVALID_CREDENTIALS, "Password is too weak") }
             } catch (e: AuthRestException) {
-                _state.update { LoginUiState.Error(LoginUiState.ErrorType.INVALID_CREDENTIALS, e.errorDescription) }
-            } catch (_: HttpRequestException) {
-                _state.update { LoginUiState.Error(LoginUiState.ErrorType.NETWORK, "Timeout") }
-            } catch (_: HttpRequestTimeoutException) {
+                Log.e("LoginViewModel", "AuthRestException: ${e.errorCode?.value ?: e.errorDescription}", e)
+                _state.update {
+                    LoginUiState.Error(
+                        LoginUiState.ErrorType.INVALID_CREDENTIALS,
+                        e.errorCode?.value ?: e.errorDescription,
+                    )
+                }
+            } catch (e: HttpRequestException) {
+                Log.e("LoginViewModel", "HttpRequestException", e)
+                _state.update { LoginUiState.Error(LoginUiState.ErrorType.NETWORK, "Network") }
+            } catch (e: HttpRequestTimeoutException) {
+                Log.e("LoginViewModel", "HttpRequestTimeoutException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.TIMEOUT, "Timeout") }
-            } catch (_: RestException) {
+            } catch (e: RestException) {
+                Log.e("LoginViewModel", "RestException", e)
+                _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
+            } catch (e: Exception) {
+                Log.e("LoginViewModel", "Unhandled Exception", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
             }
         }
@@ -66,19 +80,24 @@ data class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
                 }
                 _state.update { LoginUiState.Success }
             } catch (e: AuthRestException) {
+                Log.e("LoginViewModel", "AuthRestException: ${e.errorCode?.value ?: e.errorDescription}", e)
                 _state.update {
                     LoginUiState.Error(
                         LoginUiState.ErrorType.INVALID_CREDENTIALS,
                         e.errorCode?.value ?: e.errorDescription,
                     )
                 }
-            } catch (_: HttpRequestException) {
+            } catch (e: HttpRequestException) {
+                Log.e("LoginViewModel", "HttpRequestException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.NETWORK, "Network") }
-            } catch (_: HttpRequestTimeoutException) {
+            } catch (e: HttpRequestTimeoutException) {
+                Log.e("LoginViewModel", "HttpRequestTimeoutException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.TIMEOUT, "Timeout") }
-            } catch (_: RestException) {
+            } catch (e: RestException) {
+                Log.e("LoginViewModel", "RestException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                Log.e("LoginViewModel", "Unhandled Exception", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
             }
         }
@@ -118,13 +137,20 @@ data class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
                 }
 
                 _state.update { LoginUiState.Success }
-            } catch (_: HttpRequestException) {
+            } catch (e: androidx.credentials.exceptions.GetCredentialException) {
+                Log.e("LoginViewModel", "GetCredentialException", e)
+                _state.update { LoginUiState.Error(LoginUiState.ErrorType.INVALID_CREDENTIALS, "Problems with Google") }
+            } catch (e: HttpRequestException) {
+                Log.e("LoginViewModel", "HttpRequestException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.NETWORK, "Network") }
-            } catch (_: HttpRequestTimeoutException) {
+            } catch (e: HttpRequestTimeoutException) {
+                Log.e("LoginViewModel", "HttpRequestTimeoutException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.TIMEOUT, "Timeout") }
-            } catch (_: RestException) {
+            } catch (e: RestException) {
+                Log.e("LoginViewModel", "RestException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                Log.e("LoginViewModel", "Unhandled Exception", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
             }
         }
@@ -137,15 +163,23 @@ data class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
                 supabase.auth.signInWith(OTP, "https://wheel.supabase.com/magic-login-callback") {
                     this.email = email
                 }
-            } catch (_: HttpRequestException) {
+            } catch (e: HttpRequestException) {
+                Log.e("LoginViewModel", "HttpRequestException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.NETWORK, "Network") }
-            } catch (_: HttpRequestTimeoutException) {
+            } catch (e: HttpRequestTimeoutException) {
+                Log.e("LoginViewModel", "HttpRequestTimeoutException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.TIMEOUT, "Timeout") }
-            } catch (_: RestException) {
+            } catch (e: RestException) {
+                Log.e("LoginViewModel", "RestException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                Log.e("LoginViewModel", "Unhandled Exception", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
             }
         }
+    }
+
+    fun resetState() {
+        _state.value = LoginUiState.Waiting
     }
 }

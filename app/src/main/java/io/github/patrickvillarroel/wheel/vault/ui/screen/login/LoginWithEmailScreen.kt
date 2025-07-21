@@ -10,6 +10,7 @@ import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -37,6 +38,11 @@ fun LoginWithEmailScreen(
     val uiState by loginViewModel.state.collectAsStateWithLifecycle()
     var showDialog by rememberSaveable { mutableStateOf(true) }
 
+    LaunchedEffect(true) {
+        loginViewModel.resetState()
+        showDialog = true
+    }
+
     LoginWithEmailContent(
         onClick = { email, password ->
             if (isRegister) {
@@ -55,6 +61,7 @@ fun LoginWithEmailScreen(
     when (uiState) {
         is LoginUiState.Success -> {
             onLoginSuccess()
+            loginViewModel.resetState()
         }
 
         is LoginUiState.Loading -> {
@@ -65,9 +72,14 @@ fun LoginWithEmailScreen(
 
         is LoginUiState.Error -> {
             if (showDialog) {
-                Dialog(onDismissRequest = { showDialog = false }) {
+                Dialog(
+                    onDismissRequest = {
+                        showDialog = false
+                        loginViewModel.resetState()
+                    },
+                ) {
                     Column(
-                        Modifier.fillMaxSize(),
+                        Modifier.fillMaxSize(.5f),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center,
                     ) {

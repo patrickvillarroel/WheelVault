@@ -27,6 +27,15 @@ data class OnboardingViewModel(private val useCase: UpdateOnboardingStateUseCase
         }
     }
 
+    fun reloadOnboardingState() {
+        viewModelScope.launch {
+            _uiState.value = OnboardingUiState.Loading
+            _uiState.update {
+                if (useCase.getOnboardingState()) OnboardingUiState.Success else OnboardingUiState.Uncompleted
+            }
+        }
+    }
+
     sealed interface OnboardingUiState {
         data object Loading : OnboardingUiState
         data object Success : OnboardingUiState

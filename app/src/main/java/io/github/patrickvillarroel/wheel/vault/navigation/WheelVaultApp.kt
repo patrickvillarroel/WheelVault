@@ -66,16 +66,17 @@ fun WheelVaultApp(
                     backStack.lastOrNull() is NavigationKeys.Splash ||
                     backStack.lastOrNull() is NavigationKeys.Onboarding
                 ) {
-                    backStack.clear()
                     backStack.add(NavigationKeys.Home)
+                    backStack.removeAll { it !is NavigationKeys.Home }
                 }
             }
 
             SessionUiStatus.NotAuthenticated,
             SessionUiStatus.RefreshFailure,
             -> {
-                backStack.clear()
+                onboardingViewModel.reloadOnboardingState()
                 backStack.add(NavigationKeys.Login)
+                backStack.removeAll { it !is NavigationKeys.Login }
             }
 
             SessionUiStatus.Initializing -> Unit
@@ -95,7 +96,7 @@ fun WheelVaultApp(
                     popTransitionSpec = { ContentTransform(slideInVertically { it }, slideOutVertically { -it }) },
                 ) { _ ->
                     SplashScreen(onVideoFinish = {
-                        if (onboardingState !is OnboardingViewModel.OnboardingUiState.Success) {
+                        if (onboardingState is OnboardingViewModel.OnboardingUiState.Uncompleted) {
                             backStack.add(NavigationKeys.Onboarding)
                             return@SplashScreen
                         }
@@ -106,8 +107,8 @@ fun WheelVaultApp(
                 entry<NavigationKeys.Login> { _ ->
                     LoginScreen(
                         onLoginSuccess = {
+                            backStack.add(NavigationKeys.Home)
                             backStack.remove(NavigationKeys.Login)
-                            backStack.add(NavigationKeys.Onboarding)
                         },
                         onLoginWithEmail = {
                             backStack.add(NavigationKeys.LoginWithEmailAndPassword(isMagicLink = true))
@@ -121,19 +122,23 @@ fun WheelVaultApp(
                     )
                 }
 
-                entry<NavigationKeys.LoginWithEmailAndPassword> { (isRegister, isMagicLink) ->
+                entry<NavigationKeys.LoginWithEmailAndPassword> {
+                    val (isRegister, isMagicLink) = it
                     LoginWithEmailScreen(
                         isRegister = isRegister,
                         isMagicLink = isMagicLink,
                         onLoginSuccess = {
-                            backStack.remove(NavigationKeys.Login)
                             backStack.add(NavigationKeys.Home)
+                            backStack.remove(it)
                         },
                     )
                 }
 
                 entry<NavigationKeys.Onboarding> { _ ->
-                    OnboardingScreen(onFinish = { isSplashDone = true })
+                    OnboardingScreen(onFinish = {
+                        isSplashDone = true
+                        backStack.remove(NavigationKeys.Onboarding)
+                    })
                 }
 
                 entry<NavigationKeys.Home> { _ ->
