@@ -34,7 +34,7 @@ data class GarageViewModel(
             _garageState.update { GarageUiState.Loading }
             viewModelScope.launch(ioDispatcher) {
                 try {
-                    val result = carsRepository.fetchAll(orderAsc = orderAsc)
+                    val result = carsRepository.fetchAll(limit = 100, orderAsc = orderAsc)
                     if (result.isEmpty()) {
                         _garageState.update { GarageUiState.Empty }
                     } else {

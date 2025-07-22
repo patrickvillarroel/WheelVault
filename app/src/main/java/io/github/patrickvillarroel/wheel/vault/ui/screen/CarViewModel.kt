@@ -58,7 +58,7 @@ data class CarViewModel(
             _carsState.update { CarsUiState.Loading }
             viewModelScope.launch(ioDispatcher) {
                 try {
-                    val result = carsRepository.fetchAll()
+                    val result = carsRepository.fetchAll(orderAsc = false)
                     _carsState.update { CarsUiState.Success(result) }
                 } catch (e: Exception) {
                     Log.e("CarViewModel", "Failed to fetch cars", e)
