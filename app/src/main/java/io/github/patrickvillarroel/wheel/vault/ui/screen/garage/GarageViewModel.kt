@@ -51,6 +51,7 @@ data class GarageViewModel(
     fun search(query: String, favoritesOnly: Boolean = false) {
         viewModelScope.launch(ioDispatcher) {
             try {
+                _garageState.update { GarageUiState.Loading }
                 val result = carsRepository.search(query, favoritesOnly)
                 if (result.isEmpty()) {
                     _garageState.update { GarageUiState.Empty }
