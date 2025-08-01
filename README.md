@@ -18,7 +18,8 @@ This is an android app.
 ![home](https://github.com/patrickvillarroel/WheelVault/blob/main/docs/home.png?raw=true)
 * Brand Screen
 
-![brand](https://github.com/patrickvillarroel/WheelVault/blob/main/docs/brand.png?raw=true)
+![brand](https://github.com/patrickvillarroel/WheelVault/blob/main/docs/brand_1.jpg?raw=true)
+![brand with cars](https://github.com/patrickvillarroel/WheelVault/blob/main/docs/brand_2.jpg?raw=true)
 * Car Screen
 
 ![car](https://github.com/patrickvillarroel/WheelVault/blob/main/docs/car_detail.png?raw=true)
