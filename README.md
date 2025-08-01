@@ -9,9 +9,7 @@ This is an android app.
 
 ## Samples:
 
-* Demo video
-
-<video src="https://github.com/patrickvillarroel/WheelVault/blob/main/docs/demo.mp4?raw=true" autoplay loop muted playsinline width="600"></video>
+* [Demo video](https://github.com/patrickvillarroel/WheelVault/blob/main/docs/demo.mp4?raw=true)
 * Login Screen
 
 ![login](https://github.com/patrickvillarroel/WheelVault/blob/main/docs/login.png?raw=true)
