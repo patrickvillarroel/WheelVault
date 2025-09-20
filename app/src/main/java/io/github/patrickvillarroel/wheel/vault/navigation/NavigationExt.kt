@@ -10,6 +10,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import androidx.navigation3.ui.NavDisplay
+import androidx.navigationevent.NavigationEventSwipeEdge
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.toJavaUuid
@@ -73,7 +74,8 @@ fun NavigationKeys.CarEdit.toCarPartial(): CarItem.Partial {
 inline fun <reified T : NavKey> EntryProviderBuilder<*>.entry(
     noinline transitionSpec: (AnimatedContentTransitionScope<*>.() -> ContentTransform?)? = null,
     noinline popTransitionSpec: (AnimatedContentTransitionScope<*>.() -> ContentTransform?)? = null,
-    noinline predictivePopTransitionSpec: (AnimatedContentTransitionScope<*>.() -> ContentTransform?)? = null,
+    noinline predictivePopTransitionSpec:
+    (AnimatedContentTransitionScope<*>.(NavigationEventSwipeEdge) -> ContentTransform?)? = null,
     metadata: Map<String, Any> = emptyMap(),
     noinline content: @Composable AnimatedContentScope.(T) -> Unit,
 ) {
