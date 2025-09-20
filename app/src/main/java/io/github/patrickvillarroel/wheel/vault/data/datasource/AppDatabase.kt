@@ -7,7 +7,7 @@ import io.github.patrickvillarroel.wheel.vault.data.dao.CarDao
 import io.github.patrickvillarroel.wheel.vault.data.entity.BrandEntity
 import io.github.patrickvillarroel.wheel.vault.data.entity.CarEntity
 
-@Database(entities = [BrandEntity::class, CarEntity::class], version = 1)
+@Database(entities = [BrandEntity::class, CarEntity::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun brandDao(): BrandDao
     abstract fun carDao(): CarDao
