@@ -1,16 +1,16 @@
 [versions]
 # https://developer.android.com/build/releases/gradle-plugin
-android-agp = "8.11.0"
+android-agp = "8.13.0"
 
 # https://developer.android.com/tools/releases/platforms
 android-minSdk = "26"
 android-targetSdk = "36"
 
 # https://developer.android.com/jetpack/androidx/releases/activity
-androidx-activity-compose = "1.10.1"
+androidx-activity-compose = "1.11.0"
 
 # https://developer.android.com/jetpack/androidx/releases/camera
-androidx-camera = "1.4.2"
+androidx-camera = "1.5.0"
 
 # https://developer.android.com/jetpack/androidx/releases/credentials
 androidx-credentials = "1.5.0"
@@ -19,21 +19,21 @@ androidx-credentials = "1.5.0"
 androidx-datastore-preferences = "1.1.7"
 
 # https://developer.android.com/jetpack/androidx/releases/lifecycle
-androidx-lifecycle = "2.9.2"
-androidx-lifecycle-viewmodel-nav3 = "1.0.0-alpha03"
+androidx-lifecycle = "2.9.4"
+androidx-lifecycle-viewmodel-nav3 = "1.0.0-alpha04"
 
 # https://github.com/androidx/media/blob/release/RELEASENOTES.md
-androidx-media3 = "1.7.1"
+androidx-media3 = "1.8.0"
 
 # https://developer.android.com/jetpack/androidx/releases/navigation3
-androidx-navigation3 = "1.0.0-alpha05"
+androidx-navigation3 = "1.0.0-alpha09"
 
 # https://developer.android.com/jetpack/androidx/releases/test
-androidx-test-espresso-core = "3.6.1"
-androidx-test-junit = "1.2.1"
+#androidx-test-espresso-core = "3.7.0"
+#androidx-test-junit = "1.3.0"
 
 # https://github.com/coil-kt/coil/releases
-coil = "3.2.0"
+coil = "3.3.0"
 
 # https://github.com/uzzu/dotenv-gradle/tags
 dotenv-gradle = "4.0.0"
@@ -42,7 +42,7 @@ dotenv-gradle = "4.0.0"
 google-accompanist-permissions = "0.37.3"
 
 # https://mvnrepository.com/artifact/androidx.compose.ui/ui-text-google-fonts
-google-fonts-compose = "1.8.3"
+google-fonts-compose = "1.9.1"
 
 # https://developers.google.com/identity/android-credential-manager/releases
 google-identity-googleid = "1.1.1"
@@ -51,46 +51,46 @@ google-identity-googleid = "1.1.1"
 google-mlkit-text-recognition = "16.0.1"
 
 # https://github.com/JetBrains/kotlin/releases
-kotlin = "2.2.0"
+kotlin = "2.2.20"
 
 # https://github.com/google/ksp/releases
-kotlin-ksp = "2.2.0-2.0.2"
+kotlin-ksp = "2.2.20-2.0.3"
 
 # https://github.com/Kotlin/kotlinx.serialization/releases
 kotlin-serialization = "1.9.0"
 
 # https://github.com/InsertKoinIO/koin/releases
-koin-core = "4.1.0"
+koin-core = "4.1.1"
 
 # https://github.com/LemonAppDev/konsist/releases
-konsist = "0.17.3"
+#konsist = "0.17.3"
 
 # https://github.com/ktorio/ktor/releases
-ktor = "3.2.2"
+ktor = "3.3.0"
 
 # https://github.com/pinterest/ktlint/releases
-ktlint-core = "1.6.0"
+ktlint-core = "1.7.1"
 
 # https://github.com/mrmans0n/compose-rules/releases
-ktlint-compose-rules = "0.4.24"
+ktlint-compose-rules = "0.4.27"
 
 # https://github.com/jlleitschuh/ktlint-gradle/releases
-ktlint-plugin = "13.0.0"
+ktlint-plugin = "13.1.0"
 
 # https://developer.android.com/develop/ui/compose/bom/bom-mapping
-compose-bom = "2025.06.01"
+compose-bom = "2025.09.00"
 
 # https://developer.android.com/jetpack/androidx/releases/compose-material3#compose_material3_version_14_2
-compose-material3-expressive = "1.4.0-alpha18"
+compose-material3-expressive = "1.5.0-alpha04"
 
 # https://junit.org/junit4/
-test-junit = "4.13.2"
+#test-junit = "4.13.2"
 
 # https://developer.android.com/jetpack/androidx/releases/room
-androidx-room = "2.7.2"
+androidx-room = "2.8.0"
 
 # https://github.com/supabase-community/supabase-kt/releases
-supabase-kt = "3.2.1"
+supabase-kt = "3.2.3"
 
 [libraries]
 # kotlin
@@ -101,7 +101,7 @@ kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "ko
 ktor-client-engine-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
 
 # others
-konsist = { group = "com.lemonappdev", name = "konsist", version.ref = "konsist" }
+#konsist = { group = "com.lemonappdev", name = "konsist", version.ref = "konsist" }
 ktlint-compose = { group = "io.nlopez.compose.rules", name = "ktlint", version.ref = "ktlint-compose-rules" }
 
 # coil
@@ -158,8 +158,8 @@ supabase-compose-auth-ui = { group = "io.github.jan-tennert.supabase", name = "c
 supabase-compose-coil3 = { group = "io.github.jan-tennert.supabase", name = "coil3-integration" }
 
 # android specific
-junit = { group = "junit", name = "junit", version.ref = "test-junit" }
-androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-junit" }
+#junit = { group = "junit", name = "junit", version.ref = "test-junit" }
+#androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-junit" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidx-activity-compose" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 android-accompanist-permission = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "google-accompanist-permissions" }
