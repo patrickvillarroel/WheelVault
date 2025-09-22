@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -71,8 +72,10 @@ fun WheelVaultApp(
                     backStack.lastOrNull() is NavigationKeys.Splash ||
                     backStack.lastOrNull() is NavigationKeys.Onboarding
                 ) {
-                    backStack.add(NavigationKeys.Home)
-                    backStack.removeAll { it !is NavigationKeys.Home }
+                    Snapshot.withMutableSnapshot {
+                        if (!backStack.contains(NavigationKeys.Home)) backStack.add(NavigationKeys.Home)
+                        backStack.removeAll { it !is NavigationKeys.Home }
+                    }
                 }
             }
 
@@ -80,8 +83,10 @@ fun WheelVaultApp(
             SessionUiStatus.RefreshFailure,
             -> {
                 onboardingViewModel.reloadOnboardingState()
-                backStack.add(NavigationKeys.Login)
-                backStack.removeAll { it !is NavigationKeys.Login }
+                Snapshot.withMutableSnapshot {
+                    if (!backStack.contains(NavigationKeys.Login)) backStack.add(NavigationKeys.Login)
+                    backStack.removeAll { it !is NavigationKeys.Login }
+                }
             }
 
             SessionUiStatus.Initializing -> Unit
@@ -112,8 +117,10 @@ fun WheelVaultApp(
                 entry<NavigationKeys.Login> { _ ->
                     LoginScreen(
                         onLoginSuccess = {
-                            backStack.add(NavigationKeys.Home)
-                            backStack.remove(NavigationKeys.Login)
+                            Snapshot.withMutableSnapshot {
+                                backStack.add(NavigationKeys.Home)
+                                backStack.remove(NavigationKeys.Login)
+                            }
                         },
                         onLoginWithEmail = {
                             backStack.add(NavigationKeys.LoginWithEmailAndPassword(isMagicLink = true))
@@ -133,8 +140,10 @@ fun WheelVaultApp(
                         isRegister = isRegister,
                         isMagicLink = isMagicLink,
                         onLoginSuccess = {
-                            backStack.add(NavigationKeys.Home)
-                            backStack.remove(it)
+                            Snapshot.withMutableSnapshot {
+                                backStack.add(NavigationKeys.Home)
+                                backStack.remove(it)
+                            }
                         },
                     )
                 }
@@ -168,8 +177,10 @@ fun WheelVaultApp(
                     CameraLensScreen(
                         onBack = { backStack.removeLastOrNull() },
                         onAddDetail = { carModel, _ ->
-                            backStack.add(NavigationKeys.CarEdit(model = carModel, fromCamera = true))
-                            backStack.remove(NavigationKeys.AddCamera)
+                            Snapshot.withMutableSnapshot {
+                                backStack.add(NavigationKeys.CarEdit(model = carModel, fromCamera = true))
+                                backStack.remove(NavigationKeys.AddCamera)
+                            }
                         },
                     )
                 }

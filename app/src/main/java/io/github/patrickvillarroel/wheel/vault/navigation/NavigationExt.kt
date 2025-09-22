@@ -4,7 +4,9 @@ package io.github.patrickvillarroel.wheel.vault.navigation
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entry
@@ -32,7 +34,7 @@ fun CarItem.Partial.toCarEdit(): NavigationKeys.CarEdit {
         quantity = partial.quantity,
         manufacturer = partial.manufacturer,
         isFavorite = partial.isFavorite,
-        // TODO this convert is unsafe
+        // this convert is unsafe, but it's ok when links is used
         images = partial.images.map { it.toString() }.toSet(),
         description = partial.description,
         category = partial.category,
@@ -71,7 +73,8 @@ fun NavigationKeys.CarEdit.toCarPartial(): CarItem.Partial {
  * @param metadata provides information to the display
  * @param content content for this entry to be displayed when this entry is active with [AnimatedContentScope] of [LocalNavAnimatedContentScope].
  */
-inline fun <reified T : NavKey> EntryProviderBuilder<*>.entry(
+context(_: SharedTransitionScope)
+inline fun <reified T : NavKey> EntryProviderBuilder<NavKey>.entry(
     noinline transitionSpec: (AnimatedContentTransitionScope<*>.() -> ContentTransform?)? = null,
     noinline popTransitionSpec: (AnimatedContentTransitionScope<*>.() -> ContentTransform?)? = null,
     noinline predictivePopTransitionSpec:
@@ -97,11 +100,13 @@ inline fun <reified T : NavKey> EntryProviderBuilder<*>.entry(
 }
 
 /** Remove all element is not equal to [element] or add [element] if not exist */
-fun <T> MutableList<T>.removeAllOrAdd(element: T) {
-    val indexHome = this.lastIndexOf(element)
-    if (indexHome != -1) {
-        this.removeAll { it != element }
-    } else {
-        this.add(element)
+fun <T : NavKey> MutableList<T>.removeAllOrAdd(element: T) {
+    Snapshot.withMutableSnapshot {
+        val elementIndex = lastIndexOf(element)
+        if (elementIndex != -1) {
+            removeAll { it != element }
+        } else {
+            add(element)
+        }
     }
 }
