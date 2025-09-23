@@ -40,6 +40,7 @@
     <string name="edit_car">Editar Carrito</string>
     <string name="email">Correo electrónico</string>
     <string name="error_loading_of">Error al cargar %1$s</string>
+    <string name="exchange">Intercambios</string>
     <string name="image_of">Imagen %1$d</string>
     <string name="image_extras">Imágenes extras</string>
     <string name="info_of">Info %1$s</string>
