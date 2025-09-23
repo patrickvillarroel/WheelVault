@@ -5,9 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.ViewWeek
-import androidx.compose.material.icons.outlined.Calculate
 import androidx.compose.material.icons.outlined.DirectionsCar
 import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.PublishedWithChanges
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -58,6 +58,14 @@ fun MenuDropDown(menuDropdownCallbacks: HeaderMenuDropdownCallbacks, modifier: M
                 menuDropdownCallbacks.onFavoritesClick()
             },
         )
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.exchange)) },
+            leadingIcon = { Icon(Icons.Outlined.PublishedWithChanges, contentDescription = null) },
+            onClick = {
+                expandedMenu = false
+                menuDropdownCallbacks.onExchangesClick()
+            },
+        )
     }
 }
 
@@ -66,7 +74,7 @@ fun MenuDropDown(menuDropdownCallbacks: HeaderMenuDropdownCallbacks, modifier: M
 private fun HeaderBrushPreview() {
     WheelVaultTheme {
         Column {
-            MenuDropDown(HeaderMenuDropdownCallbacks(onGarageClick = {}, onFavoritesClick = {}, onStatisticsClick = {}))
+            MenuDropDown(HeaderMenuDropdownCallbacks.default)
         }
     }
 }
