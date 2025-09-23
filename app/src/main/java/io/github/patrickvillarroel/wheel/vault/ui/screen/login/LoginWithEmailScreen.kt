@@ -10,11 +10,13 @@ import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -38,9 +40,19 @@ fun LoginWithEmailScreen(
     val uiState by loginViewModel.state.collectAsStateWithLifecycle()
     var showDialog by rememberSaveable { mutableStateOf(true) }
 
-    LaunchedEffect(true) {
-        loginViewModel.resetState()
-        showDialog = true
+    LaunchedEffect(uiState) {
+        if (uiState is LoginUiState.Error) showDialog = true
+    }
+
+    DisposableEffect(true) {
+        Snapshot.withMutableSnapshot {
+            loginViewModel.resetState()
+            showDialog = true
+        }
+        onDispose {
+            loginViewModel.resetState()
+            showDialog = true
+        }
     }
 
     LoginWithEmailContent(
@@ -74,8 +86,10 @@ fun LoginWithEmailScreen(
             if (showDialog) {
                 Dialog(
                     onDismissRequest = {
-                        showDialog = false
-                        loginViewModel.resetState()
+                        Snapshot.withMutableSnapshot {
+                            showDialog = false
+                            loginViewModel.resetState()
+                        }
                     },
                 ) {
                     Column(
