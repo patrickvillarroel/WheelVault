@@ -14,9 +14,12 @@ data class OnboardingViewModel(private val useCase: UpdateOnboardingStateUseCase
 
     init {
         viewModelScope.launch {
-            _uiState.update {
-                if (useCase.getOnboardingState()) OnboardingUiState.Success else OnboardingUiState.Uncompleted
+            val newState = if (useCase.getOnboardingState()) {
+                OnboardingUiState.Success
+            } else {
+                OnboardingUiState.Uncompleted
             }
+            _uiState.update { newState }
         }
     }
 
@@ -29,10 +32,9 @@ data class OnboardingViewModel(private val useCase: UpdateOnboardingStateUseCase
 
     fun reloadOnboardingState() {
         viewModelScope.launch {
-            _uiState.value = OnboardingUiState.Loading
-            _uiState.update {
-                if (useCase.getOnboardingState()) OnboardingUiState.Success else OnboardingUiState.Uncompleted
-            }
+            _uiState.update { OnboardingUiState.Loading }
+            val newState = if (useCase.getOnboardingState()) OnboardingUiState.Success else OnboardingUiState.Uncompleted
+            _uiState.update { newState }
         }
     }
 
