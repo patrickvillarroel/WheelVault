@@ -93,13 +93,7 @@ private fun BrandHeaderPreview() {
     WheelVaultTheme {
         BrandHeader(
             R.drawable.hot_wheels_logo_black to "Hot Wheels Logo",
-            HeaderBackCallbacks(
-                onBackClick = {},
-                onProfileClick = {},
-                onGarageClick = {},
-                onFavoritesClick = {},
-                onStatisticsClick = {},
-            ),
+            HeaderBackCallbacks.default,
         )
     }
 }

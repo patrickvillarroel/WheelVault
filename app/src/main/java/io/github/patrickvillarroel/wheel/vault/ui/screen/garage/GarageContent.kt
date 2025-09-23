@@ -169,26 +169,7 @@ private fun GaragePreview() {
                     topBarState = GarageTopBarState.DEFAULT,
                     searchQuery = "",
                     manufacturerList = BrandViewModel.manufacturerList,
-                    callbacks = GarageCallbacks(
-                        onHomeClick = {},
-                        onSearchQueryChange = {},
-                        onAddClick = {},
-                        onCarClick = {},
-                        onRefresh = {},
-                        onUiStateChange = {},
-                        onSearchClick = {},
-                        headersCallbacks = HeaderCallbacks(
-                            onProfileClick = {},
-                            onGarageClick = {},
-                            onFavoritesClick = {},
-                            onStatisticsClick = {},
-                        ),
-                        onToggleFavorite = { _, _ -> },
-                        onFilterByBrand = {},
-                        onFilterByFavorite = {},
-                        onSortByRecent = {},
-                        onSortByLast = {},
-                    ),
+                    callbacks = GarageCallbacks.default,
                 )
             }
         }

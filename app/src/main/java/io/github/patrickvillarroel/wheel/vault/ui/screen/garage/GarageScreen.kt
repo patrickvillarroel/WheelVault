@@ -74,6 +74,7 @@ fun GarageScreen(
                     viewModel.fetchFavorites()
                 },
                 onStatisticsClick = {},
+                onExchangesClick = callbacks.onExchangesClick,
             ),
             onFilterByBrand = {
                 viewModel.filterByManufacturer(it)

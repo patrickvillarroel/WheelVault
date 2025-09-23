@@ -205,20 +205,7 @@ private fun CarDetailContentPreview() {
                 CarDetailContent(
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
-                    callbacks = CarDetailCallbacks(
-                        carDetail = carDetail,
-                        headersBackCallbacks = HeaderBackCallbacks(
-                            onBackClick = {},
-                            onProfileClick = {},
-                            onGarageClick = {},
-                            onFavoritesClick = {},
-                            onStatisticsClick = {},
-                        ),
-                        onEditClick = {},
-                        onDeleteClick = {},
-                        onFavoriteToggle = {},
-                        onRefresh = {},
-                    ),
+                    callbacks = CarDetailCallbacks.default(carDetail),
                 )
             }
         }

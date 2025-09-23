@@ -43,9 +43,7 @@ fun MenuButtonHeader(
 private fun HeaderBrushPreview() {
     WheelVaultTheme {
         Column {
-            MenuButtonHeader(
-                HeaderCallbacks(onProfileClick = {}, onGarageClick = {}, onFavoritesClick = {}, onStatisticsClick = {}),
-            )
+            MenuButtonHeader(HeaderCallbacks.default)
         }
     }
 }

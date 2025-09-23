@@ -59,13 +59,6 @@ fun MenuHeader(
 @Composable
 private fun HeaderBrushPreview() {
     WheelVaultTheme {
-        MenuHeader(
-            HeaderCallbacks(
-                onProfileClick = {},
-                onGarageClick = {},
-                onFavoritesClick = {},
-                onStatisticsClick = {},
-            ),
-        )
+        MenuHeader(HeaderCallbacks.default)
     }
 }

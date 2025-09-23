@@ -177,7 +177,7 @@ private fun HomeContentPreview() {
                 HomeContent(
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
-                    info = HomeCallbacks(
+                    info = HomeCallbacks.default(
                         brands = List(10) { UUID.randomUUID() to R.drawable.hot_wheels_logo_black },
                         news = List(10) {
                             VideoNews(
@@ -189,18 +189,6 @@ private fun HomeContentPreview() {
                             )
                         },
                         recentCars = List(10) { UUID.randomUUID() to R.drawable.batman_car },
-                        onAddClick = {},
-                        onSearchClick = {},
-                        onBrandClick = {},
-                        onNewsClick = {},
-                        onCarClick = {},
-                        onRefresh = {},
-                        headerCallbacks = HeaderCallbacks(
-                            onProfileClick = {},
-                            onGarageClick = {},
-                            onFavoritesClick = {},
-                            onStatisticsClick = {},
-                        ),
                     ),
                 )
             }
@@ -218,22 +206,10 @@ private fun HomeNoContentPreview() {
                 HomeContent(
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
-                    info = HomeCallbacks(
+                    info = HomeCallbacks.default(
                         brands = emptyList(),
                         news = emptyList(),
                         recentCars = emptyList(),
-                        onAddClick = {},
-                        onSearchClick = {},
-                        onBrandClick = {},
-                        onNewsClick = {},
-                        onCarClick = {},
-                        onRefresh = {},
-                        headerCallbacks = HeaderCallbacks(
-                            onProfileClick = {},
-                            onGarageClick = {},
-                            onFavoritesClick = {},
-                            onStatisticsClick = {},
-                        ),
                     ),
                 )
             }

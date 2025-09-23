@@ -319,13 +319,7 @@ private fun EditPreview() {
             isEditAction = true,
             onAddPictureClick = {},
             manufacturerList = BrandViewModel.manufacturerList,
-            headersBackCallbacks = HeaderBackCallbacks(
-                onBackClick = {},
-                onProfileClick = {},
-                onGarageClick = {},
-                onFavoritesClick = {},
-                onStatisticsClick = {},
-            ),
+            headersBackCallbacks = HeaderBackCallbacks.default,
         )
     }
 }

@@ -81,20 +81,9 @@ private fun TopBarPreview() {
             onSearchQueryChange = { searchQuery = it },
             onStateChange = { uiState = it },
             onSearch = {},
-            topBar = GarageCallbacks.FilterBar(
-                onHomeClick = {},
-                onFilterByBrand = {},
-                onFilterByFavorite = {},
-                onSortByRecent = {},
-                onSortByLast = {},
-            ),
+            topBar = GarageCallbacks.FilterBar.default,
             manufacturerList = BrandViewModel.manufacturerList,
-            headersCallbacks = HeaderCallbacks(
-                onProfileClick = {},
-                onGarageClick = {},
-                onFavoritesClick = {},
-                onStatisticsClick = {},
-            ),
+            headersCallbacks = HeaderCallbacks.default,
         )
     }
 }

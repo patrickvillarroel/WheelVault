@@ -108,13 +108,7 @@ private fun ProfileContentPreview() {
                 onEditClick = {},
                 onEmailChange = {},
                 linkedAccounts = mapOf(AuthProvider.Email to true, AuthProvider.Password to false),
-                backCallbacks = HeaderBackCallbacks(
-                    onBackClick = {},
-                    onProfileClick = {},
-                    onGarageClick = {},
-                    onFavoritesClick = {},
-                    onStatisticsClick = {},
-                ),
+                backCallbacks = HeaderBackCallbacks.default,
                 onLogout = {},
             ),
         )

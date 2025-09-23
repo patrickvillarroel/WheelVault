@@ -130,13 +130,7 @@ private fun BrandPreview() {
                         onAddClick = {},
                         onCarClick = {},
                         onFavoriteToggle = { _, _ -> },
-                        headerBackCallbacks = HeaderBackCallbacks(
-                            onBackClick = {},
-                            onProfileClick = {},
-                            onGarageClick = {},
-                            onFavoritesClick = {},
-                            onStatisticsClick = {},
-                        ),
+                        headerBackCallbacks = HeaderBackCallbacks.default,
                     ),
                 )
             }

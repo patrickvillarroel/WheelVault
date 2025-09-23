@@ -126,13 +126,6 @@ private fun TopHeaderWithBrush(modifier: Modifier = Modifier) {
 @Composable
 private fun HeaderPreview() {
     WheelVaultTheme {
-        HomeCarHeader(
-            HeaderCallbacks(
-                onProfileClick = {},
-                onGarageClick = {},
-                onFavoritesClick = {},
-                onStatisticsClick = {},
-            ),
-        )
+        HomeCarHeader(HeaderCallbacks.default)
     }
 }
