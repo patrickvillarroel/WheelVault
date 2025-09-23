@@ -26,12 +26,7 @@ class HomeCallbacks(
     val onCarClick: (UUID) -> Unit,
     val onRefresh: () -> Unit,
     headersCallbacks: HeaderCallbacks,
-) : HeaderCallbacks(
-    headersCallbacks.onProfileClick,
-    headersCallbacks.onGarageClick,
-    headersCallbacks.onFavoritesClick,
-    headersCallbacks.onStatisticsClick,
-) {
+) : HeaderCallbacks(headersCallbacks) {
     constructor(
         brands: List<Pair<UUID, Any>>,
         news: List<VideoNews>,
@@ -53,9 +48,25 @@ class HomeCallbacks(
         onRefresh,
         headerCallbacks,
     )
+
+    companion object {
+        fun default(brands: List<Pair<UUID, Any>>, news: List<VideoNews>, recentCars: List<Pair<UUID, Any>>) =
+            HomeCallbacks(
+                brands = brands,
+                news = news,
+                recentCars = recentCars,
+                onAddClick = {},
+                onSearchClick = {},
+                onBrandClick = {},
+                onNewsClick = {},
+                onCarClick = {},
+                onRefresh = {},
+                headerCallbacks = default,
+            )
+    }
 }
 
-data class HomeNavCallbacks(
+class HomeNavCallbacks(
     val onAddClick: () -> Unit,
     val onSearchClick: () -> Unit,
     val onBrandClick: (UUID) -> Unit,
@@ -64,6 +75,9 @@ data class HomeNavCallbacks(
     val onGarageClick: () -> Unit,
     val onFavoritesClick: () -> Unit,
     val onStatisticsClick: () -> Unit,
+    val onExchangesClick: () -> Unit,
 ) {
-    val headerCallbacks = HeaderCallbacks(onProfileClick, onGarageClick, onFavoritesClick, onStatisticsClick)
+    @JvmField
+    val headerCallbacks =
+        HeaderCallbacks(onProfileClick, onGarageClick, onFavoritesClick, onStatisticsClick, onExchangesClick)
 }

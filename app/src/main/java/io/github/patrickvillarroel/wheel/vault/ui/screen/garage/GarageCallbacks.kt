@@ -4,7 +4,7 @@ import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderCallbacks
 import java.util.UUID
 
-data class GarageCallbacks(
+class GarageCallbacks(
     val onSearchQueryChange: (String) -> Unit,
     val onAddClick: () -> Unit,
     val onCarClick: (CarItem) -> Unit,
@@ -41,18 +41,56 @@ data class GarageCallbacks(
         headersCallbacks,
     )
 
-    data class FilterBar(
+    companion object {
+        @JvmField
+        val default = GarageCallbacks(
+            onSearchQueryChange = {},
+            onAddClick = {},
+            onCarClick = {},
+            onToggleFavorite = { _, _ -> },
+            onRefresh = {},
+            onUiStateChange = {},
+            onSearchClick = {},
+            filterBar = FilterBar.default,
+            headersCallbacks = HeaderCallbacks.default,
+        )
+    }
+
+    class FilterBar(
         val onHomeClick: () -> Unit,
         val onFilterByBrand: (String) -> Unit,
         val onFilterByFavorite: (Boolean) -> Unit,
         val onSortByRecent: () -> Unit,
         val onSortByLast: () -> Unit,
-    )
+    ) {
+        companion object {
+            @JvmField
+            val default = FilterBar(
+                onHomeClick = {},
+                onFilterByBrand = {},
+                onFilterByFavorite = {},
+                onSortByRecent = {},
+                onSortByLast = {},
+            )
+        }
+    }
 
-    data class Partial(
+    class Partial(
         val onHomeClick: () -> Unit,
         val onAddClick: () -> Unit,
         val onCarClick: (UUID) -> Unit,
         val onProfileClick: () -> Unit,
-    )
+        val onExchangesClick: () -> Unit,
+    ) {
+        companion object {
+            @JvmField
+            val default = Partial(
+                onHomeClick = {},
+                onAddClick = {},
+                onCarClick = {},
+                onProfileClick = {},
+                onExchangesClick = {},
+            )
+        }
+    }
 }
