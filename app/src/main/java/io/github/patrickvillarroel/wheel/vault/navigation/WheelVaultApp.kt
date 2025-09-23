@@ -26,6 +26,7 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCal
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.brand.BrandDetailScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarDetailScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.edit.CarEditScreen
+import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.ExchangeScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.home.HomeNavCallbacks
@@ -154,6 +155,7 @@ fun WheelVaultApp(
                             onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
                             onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
                             onProfileClick = { backStack.add(NavigationKeys.Profile) },
+                            onExchangesClick = { backStack.add(NavigationKeys.Exchanges()) },
                         ),
                     )
                 }
@@ -179,6 +181,7 @@ fun WheelVaultApp(
                             onGarageClick = { backStack.add(NavigationKeys.Garage()) },
                             onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
                             onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
+                            onExchangesClick = { backStack.add(NavigationKeys.Exchanges()) },
                         ),
                         onAddClick = { backStack.add(NavigationKeys.AddCamera) },
                         onCarClick = { backStack.add(NavigationKeys.CarDetail(it.toKotlinUuid())) },
@@ -196,6 +199,7 @@ fun WheelVaultApp(
                             onCarClick = { backStack.add(NavigationKeys.CarDetail(it.toKotlinUuid())) },
                             onAddClick = { backStack.add(NavigationKeys.AddCamera) },
                             onProfileClick = { backStack.add(NavigationKeys.Profile) },
+                            onExchangesClick = { backStack.add(NavigationKeys.Exchanges()) },
                         ),
                     )
                 }
@@ -212,6 +216,7 @@ fun WheelVaultApp(
                             onGarageClick = { backStack.add(NavigationKeys.Garage()) },
                             onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
                             onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
+                            onExchangesClick = { backStack.add(NavigationKeys.Exchanges()) },
                         ),
                     )
                 }
@@ -226,6 +231,7 @@ fun WheelVaultApp(
                             onGarageClick = { backStack.add(NavigationKeys.Garage()) },
                             onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
                             onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
+                            onExchangesClick = { backStack.add(NavigationKeys.Exchanges()) },
                         ),
                     )
                 }
@@ -238,6 +244,20 @@ fun WheelVaultApp(
                             onGarageClick = { backStack.add(NavigationKeys.Garage()) },
                             onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
                             onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
+                            onExchangesClick = { backStack.add(NavigationKeys.Exchanges()) },
+                        ),
+                    )
+                }
+
+                entry<NavigationKeys.Exchanges> { (query) ->
+                    ExchangeScreen(
+                        query = query ?: "",
+                        callbacks = GarageCallbacks.Partial(
+                            onHomeClick = { backStack.removeAllOrAdd(NavigationKeys.Home) },
+                            onCarClick = { backStack.add(NavigationKeys.CarDetail(it.toKotlinUuid())) },
+                            onAddClick = { backStack.add(NavigationKeys.AddCamera) },
+                            onProfileClick = { backStack.add(NavigationKeys.Profile) },
+                            onExchangesClick = {},
                         ),
                     )
                 }

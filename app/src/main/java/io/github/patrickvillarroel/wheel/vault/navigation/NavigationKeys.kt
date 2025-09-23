@@ -31,6 +31,9 @@ object NavigationKeys {
     data class Garage(val query: String? = null, val favorites: Boolean = false, val statistics: Boolean = false) :
         NavKey
 
+    @Serializable
+    data class Exchanges(val query: String? = null) : NavKey
+
     @Stable
     @Serializable
     data class CarEdit(
