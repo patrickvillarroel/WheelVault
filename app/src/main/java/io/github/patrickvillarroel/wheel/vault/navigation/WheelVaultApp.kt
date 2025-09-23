@@ -44,7 +44,7 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.session.SessionViewMode
 import io.github.patrickvillarroel.wheel.vault.ui.screen.splash.OnboardingScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.splash.OnboardingViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.splash.SplashScreen
-import org.koin.compose.viewmodel.koinViewModel
+import org.koin.compose.viewmodel.koinActivityViewModel
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.toJavaUuid
 import kotlin.uuid.toKotlinUuid
@@ -52,8 +52,8 @@ import kotlin.uuid.toKotlinUuid
 @Composable
 fun WheelVaultApp(
     modifier: Modifier = Modifier,
-    sessionViewModel: SessionViewModel = koinViewModel(),
-    onboardingViewModel: OnboardingViewModel = koinViewModel(),
+    sessionViewModel: SessionViewModel = koinActivityViewModel(),
+    onboardingViewModel: OnboardingViewModel = koinActivityViewModel(),
 ) {
     val session by sessionViewModel.session.collectAsStateWithLifecycle(minActiveState = Lifecycle.State.CREATED)
     val onboardingState by onboardingViewModel.uiState.collectAsStateWithLifecycle(
@@ -82,8 +82,8 @@ fun WheelVaultApp(
             SessionUiStatus.NotAuthenticated,
             SessionUiStatus.RefreshFailure,
             -> {
-                onboardingViewModel.reloadOnboardingState()
                 Snapshot.withMutableSnapshot {
+                    onboardingViewModel.reloadOnboardingState()
                     if (!backStack.contains(NavigationKeys.Login)) backStack.add(NavigationKeys.Login)
                     backStack.removeAll { it !is NavigationKeys.Login }
                 }
@@ -131,6 +131,7 @@ fun WheelVaultApp(
                         onRegisterClick = {
                             backStack.add(NavigationKeys.LoginWithEmailAndPassword(isRegister = true))
                         },
+                        loginViewModel = koinActivityViewModel(),
                     )
                 }
 
@@ -145,6 +146,7 @@ fun WheelVaultApp(
                                 backStack.remove(it)
                             }
                         },
+                        loginViewModel = koinActivityViewModel(),
                     )
                 }
 
@@ -152,7 +154,7 @@ fun WheelVaultApp(
                     OnboardingScreen(onFinish = {
                         isSplashDone = true
                         backStack.remove(NavigationKeys.Onboarding)
-                    })
+                    }, viewModel = koinActivityViewModel())
                 }
 
                 entry<NavigationKeys.Home> { _ ->
@@ -261,6 +263,7 @@ fun WheelVaultApp(
                             onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
                             onExchangesClick = { backStack.add(NavigationKeys.Exchanges()) },
                         ),
+                        sessionViewModel = koinActivityViewModel(),
                     )
                 }
 
