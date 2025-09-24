@@ -1,4 +1,4 @@
-package io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges
+package io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.detail
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope

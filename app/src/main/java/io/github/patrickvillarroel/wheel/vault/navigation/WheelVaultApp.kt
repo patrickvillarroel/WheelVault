@@ -26,10 +26,10 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCal
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.brand.BrandDetailScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarDetailScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.edit.CarEditScreen
-import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.ExchangeCarDetailScreen
-import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.ExchangeCarOfferScreen
-import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.ExchangeCarSelectionScreen
-import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.ExchangeScreen
+import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.detail.ExchangeCarDetailScreen
+import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.garage.ExchangeScreen
+import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.offer.ExchangeCarOfferScreen
+import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.selection.ExchangeCarSelectionScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.home.HomeNavCallbacks

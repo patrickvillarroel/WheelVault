@@ -1,4 +1,4 @@
-package io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges
+package io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.selection
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.fillMaxSize

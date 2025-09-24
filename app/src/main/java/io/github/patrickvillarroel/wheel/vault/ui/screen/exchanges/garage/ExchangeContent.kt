@@ -1,4 +1,4 @@
-package io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges
+package io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.garage
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
@@ -34,6 +34,7 @@ import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.BrandViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.CarNameCard
+import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.ExchangeViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageTopBar
 import io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageTopBarState
