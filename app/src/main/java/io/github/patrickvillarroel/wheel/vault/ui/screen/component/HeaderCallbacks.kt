@@ -1,7 +1,10 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.component
 
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import io.github.patrickvillarroel.wheel.vault.util.CallbackInterceptor
 
+@Immutable
 open class HeaderMenuDropdownCallbacks(
     val onGarageClick: () -> Unit,
     val onFavoritesClick: () -> Unit,
@@ -25,6 +28,7 @@ open class HeaderMenuDropdownCallbacks(
     }
 }
 
+@Immutable
 open class HeaderCallbacks private constructor(
     val onProfileClick: () -> Unit,
     dropdownCallbacks: HeaderMenuDropdownCallbacks,
@@ -57,6 +61,7 @@ open class HeaderCallbacks private constructor(
     }
 }
 
+@Immutable
 open class HeaderBackCallbacks private constructor(val onBackClick: () -> Unit, headerCallbacks: HeaderCallbacks) :
     HeaderCallbacks(headerCallbacks) {
     constructor(
@@ -83,10 +88,11 @@ open class HeaderBackCallbacks private constructor(val onBackClick: () -> Unit, 
  * Special callback to intercept header callbacks.
  * Thinking to use in [io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.edit.CarEditContent] or testing.
  */
+@Immutable
 class InterceptedHeaderBackCallbacks(
     private val original: HeaderBackCallbacks,
     private val interceptor: CallbackInterceptor,
-    private val specificInterceptors: Map<String, CallbackInterceptor> = emptyMap(),
+    @Stable private val specificInterceptors: Map<String, CallbackInterceptor> = emptyMap(),
 ) : HeaderBackCallbacks(
     onBackClick = {
         val callback = original.onBackClick
