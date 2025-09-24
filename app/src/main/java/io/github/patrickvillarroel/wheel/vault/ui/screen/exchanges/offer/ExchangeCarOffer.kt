@@ -27,7 +27,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -43,7 +42,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BackTextButton
@@ -51,6 +49,7 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeroImageCaro
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuHeader
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarDetail
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarDetailCallbacks
+import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.component.ConfirmationDialog
 
 @Composable
 fun ExchangeCarOffer(
@@ -134,91 +133,13 @@ fun ExchangeCarOffer(
 
             if (showConfirmationDialog) {
                 ConfirmationDialog(
+                    message = stringResource(id = R.string.exchange_confirmation_message),
                     onDismissRequest = { showConfirmationDialog = false },
                     onConfirm = {
                         showConfirmationDialog = false
                         onExchangeClick(requisitoState)
                     },
                 )
-            }
-        }
-    }
-}
-
-@Composable
-private fun ConfirmationDialog(onDismissRequest: () -> Unit, onConfirm: () -> Unit) {
-    Dialog(onDismissRequest = onDismissRequest) {
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            color = Color(0xFF1C1C1E),
-        ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ) {
-                // Icono
-                Icon(
-                    imageVector = Icons.Default.CarCrash,
-                    contentDescription = null,
-                    tint = Color(0xFFE42E31),
-                    modifier = Modifier.size(48.dp),
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Titulo
-                Text(
-                    text = stringResource(id = R.string.warning),
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                    ),
-                    textAlign = TextAlign.Center,
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Mensaje
-                Text(
-                    text = stringResource(id = R.string.exchange_confirmation_message),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        color = Color.White.copy(alpha = 0.8f),
-                    ),
-                    textAlign = TextAlign.Center,
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // Botones
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                ) {
-                    Button(
-                        onClick = onDismissRequest,
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFE42E31),
-                            contentColor = Color.White,
-                        ),
-                    ) {
-                        Text(stringResource(id = R.string.cancel))
-                    }
-
-                    Button(
-                        onClick = onConfirm,
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF28282A),
-                            contentColor = Color.White,
-                        ),
-                    ) {
-                        Text(stringResource(id = R.string.confirm))
-                    }
-                }
             }
         }
     }
