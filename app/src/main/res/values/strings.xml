@@ -25,6 +25,7 @@
     <string name="close">Cerrar</string>
     <string name="collectors_project">Collector\'s Project</string>
     <string name="collectors_project_lines">Collector\'s\nProject</string>
+    <string name="confirm">Confirmar</string>
     <string name="confirm_text">¿Es Correcto?</string>
     <string name="confirm_image">¿Confirmar esta imagen?</string>
     <string name="continue_with">Continuar con %1$s</string>
@@ -42,6 +43,7 @@
     <string name="error_loading_of">Error al cargar %1$s</string>
     <string name="exchange">Intercambios</string>
     <string name="exchange_action">Intercambiar</string>
+    <string name="exchange_confirmation_message">¿Esta seguro que desea poner este carrito en proceso de intercambio? \nCuando la transacción haya terminado será avisado.</string>
     <string name="image_of">Imagen %1$d</string>
     <string name="image_extras">Imágenes extras</string>
     <string name="info_of">Info %1$s</string>
@@ -80,6 +82,7 @@
     <string name="share">Compartir</string>
     <string name="skip">Omitir</string>
     <string name="take_picture">Capturar Imagen</string>
+    <string name="offer_action">Ofrecer</string>
     <string name="onboarding_step">Onboarding step %1$d</string>
     <string name="open_settings">Abrir configuración</string>
     <string name="password">contraseña</string>
@@ -89,6 +92,9 @@
     <string name="quantity_of">Cantidad: %1$s</string>
     <string name="user">Usuario</string>
     <string name="video_thumbnail_of">Portada del video %1$s</string>
+    <string name="warning">Advertencia</string>
+    <string name="write_here">Escribe aquí…</string>
+    <string name="write_request_question">¿Deseas agregar algún requisito?</string>
     <string name="year">Año</string>
     <string name="year_of">Año: %1$s</string>
     <string name="yes_confirm">Sí, continuar</string>

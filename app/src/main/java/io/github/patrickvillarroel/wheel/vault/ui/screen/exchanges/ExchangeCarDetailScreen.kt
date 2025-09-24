@@ -23,6 +23,7 @@ fun ExchangeCarDetailScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
     carId: UUID,
+    onExchangeCarClick: () -> Unit,
     modifier: Modifier = Modifier,
     carViewModel: CarViewModel = koinViewModel(),
     exchangeViewModel: ExchangeViewModel = koinViewModel(),
@@ -48,7 +49,10 @@ fun ExchangeCarDetailScreen(
                     carDetail = state.car,
                     requestText = "Busco porsche rallyE color verde, si es STH mejor.",
                     callbacks = CarDetailCallbacks.default(state.car),
-                    onExchangeClick = { exchangeViewModel.exchangeCar(state.car) },
+                    onExchangeClick = {
+                        exchangeViewModel.exchangeCar(state.car)
+                        onExchangeCarClick()
+                    },
                     modifier = modifier,
                 )
             }
