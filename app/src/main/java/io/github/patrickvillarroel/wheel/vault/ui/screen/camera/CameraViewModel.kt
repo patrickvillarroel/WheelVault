@@ -11,6 +11,7 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import io.github.patrickvillarroel.wheel.vault.util.resizeBitmapMaxDimension
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
@@ -127,8 +128,8 @@ class CameraViewModel(dispatcher: CoroutineDispatcher = Dispatchers.Default) : V
     fun onCapturedImageProvided(bitmap: Bitmap) {
         _triggerImageCapture.value = false
         if (_uiState.value is CameraUiState.CapturingImage) {
-            currentCapturedImage = bitmap
-            _uiState.value = CameraUiState.ConfirmCapturedImage(currentRecognizedText, bitmap)
+            currentCapturedImage = resizeBitmapMaxDimension(bitmap, 1080f)
+            _uiState.value = CameraUiState.ConfirmCapturedImage(currentRecognizedText, currentCapturedImage!!)
         }
     }
 

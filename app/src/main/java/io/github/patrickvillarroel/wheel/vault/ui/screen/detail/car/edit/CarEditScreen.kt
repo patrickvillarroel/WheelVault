@@ -94,7 +94,7 @@ fun CarEditScreen(
             },
             onResultCamera = {
                 Log.i("CarEditScreen", "onResultCamera, current: $initial, new state with camera: $it")
-                initial = initial.copy(images = setOf(it) + initial.images)
+                initial = initial.copy(images = setOf(it.toCoilUri()) + initial.images)
             },
             isCameraPermission = permissionState.status.isGranted,
         )
