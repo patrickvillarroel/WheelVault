@@ -21,6 +21,10 @@ class ExchangeViewModel(garageViewModel: GarageViewModel) : ViewModel() {
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ExchangeUiState.Loading)
 
+    fun exchangeCar(carItem: CarItem) {
+        /* TODO */
+    }
+
     sealed interface ExchangeUiState {
         object Loading : ExchangeUiState
 
