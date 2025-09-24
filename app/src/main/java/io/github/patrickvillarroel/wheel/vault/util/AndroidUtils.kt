@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.net.Uri
 import android.util.Log
+import androidx.core.graphics.scale
 import java.io.ByteArrayOutputStream
 
 fun uriToByteArray(context: Context, uri: Uri): ByteArray? = try {
@@ -27,4 +28,14 @@ fun rotateBitmapIfNeeded(bitmap: Bitmap, rotationDegrees: Int): Bitmap = if (rot
     Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
 } else {
     bitmap
+}
+
+fun resizeBitmapMaxDimension(bitmap: Bitmap, maxDimension: Float): Bitmap {
+    val width = bitmap.width
+    val height = bitmap.height
+    val scale = if (width > height) maxDimension / width else maxDimension / height
+    if (scale >= 1f) return bitmap
+    val newWidth = (width * scale).toInt()
+    val newHeight = (height * scale).toInt()
+    return bitmap.scale(newWidth, newHeight)
 }
