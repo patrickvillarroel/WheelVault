@@ -16,8 +16,8 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun ExchangeCarSelectionScreen(
-    modifier: Modifier = Modifier,
     onCarClick: (CarItem) -> Unit,
+    modifier: Modifier = Modifier,
     carViewModel: CarViewModel = koinViewModel(),
 ) {
     // TODO connect exchange VM with cars available for exchange
