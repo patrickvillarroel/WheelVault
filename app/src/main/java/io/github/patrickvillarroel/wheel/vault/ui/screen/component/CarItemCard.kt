@@ -38,6 +38,7 @@ fun CarItemCard(
     onClick: () -> Unit,
     onFavoriteToggle: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    favoriteIcon: Boolean = true,
 ) {
     Card(
         modifier = modifier,
@@ -73,10 +74,12 @@ fun CarItemCard(
                         color = Color.White,
                         fontSize = 16.sp,
                     )
-                    FavoriteIcon(
-                        isFavorite = carItem.isFavorite,
-                        onFavoriteToggle = onFavoriteToggle,
-                    )
+                    if (favoriteIcon) {
+                        FavoriteIcon(
+                            isFavorite = carItem.isFavorite,
+                            onFavoriteToggle = onFavoriteToggle,
+                        )
+                    }
                 }
 
                 HorizontalDivider(modifier = Modifier.height(4.dp), color = Color(0xFFE42E31))

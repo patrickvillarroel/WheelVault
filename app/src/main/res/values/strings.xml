@@ -76,6 +76,7 @@
     <string name="search">Buscar</string>
     <string name="search_in_garage">Buscar en el garaje</string>
     <string name="select_image">Seleccionar Imagen</string>
+    <string name="select_car_to_exchange">Seleccione los carritos a intercambiar</string>
     <string name="share">Compartir</string>
     <string name="skip">Omitir</string>
     <string name="take_picture">Capturar Imagen</string>
