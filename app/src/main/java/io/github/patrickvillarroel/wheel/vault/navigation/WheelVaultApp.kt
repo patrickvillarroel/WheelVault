@@ -26,6 +26,7 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCal
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.brand.BrandDetailScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarDetailScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.edit.CarEditScreen
+import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.confirmation.ExchangeConfirmCarScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.detail.ExchangeCarDetailScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.garage.ExchangeScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.offer.ExchangeCarOfferScreen
@@ -285,7 +286,14 @@ fun WheelVaultApp(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
                         carId = id.toJavaUuid(),
+                        onExchangeTemporalClick = {
+                            backStack.add(NavigationKeys.ExchangeConfirmation(it.toKotlinUuid()))
+                        },
                     )
+                }
+
+                entry<NavigationKeys.ExchangeConfirmation> { (id) ->
+                    ExchangeConfirmCarScreen(id.toJavaUuid())
                 }
             },
         )
