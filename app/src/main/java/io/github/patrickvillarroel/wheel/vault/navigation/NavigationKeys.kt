@@ -37,6 +37,12 @@ object NavigationKeys {
     @Serializable
     data class ExchangeCarDetail(val id: Uuid) : NavKey
 
+    @Serializable
+    data object ExchangeCarSelection : NavKey
+
+    @Serializable
+    data class ExchangeCarOffer(val id: Uuid) : NavKey
+
     @Stable
     @Serializable
     data class CarEdit(

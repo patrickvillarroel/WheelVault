@@ -27,6 +27,8 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.brand.BrandDetai
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarDetailScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.edit.CarEditScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.ExchangeCarDetailScreen
+import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.ExchangeCarOfferScreen
+import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.ExchangeCarSelectionScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.ExchangeScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageScreen
@@ -265,6 +267,21 @@ fun WheelVaultApp(
 
                 entry<NavigationKeys.ExchangeCarDetail> { (id) ->
                     ExchangeCarDetailScreen(
+                        sharedTransitionScope = this@SharedTransitionLayout,
+                        animatedVisibilityScope = this,
+                        carId = id.toJavaUuid(),
+                        onExchangeCarClick = { backStack.add(NavigationKeys.ExchangeCarSelection) },
+                    )
+                }
+
+                entry<NavigationKeys.ExchangeCarSelection> { _ ->
+                    ExchangeCarSelectionScreen(
+                        onCarClick = { backStack.add(NavigationKeys.ExchangeCarOffer(it.id.toKotlinUuid())) },
+                    )
+                }
+
+                entry<NavigationKeys.ExchangeCarOffer> { (id) ->
+                    ExchangeCarOfferScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
                         carId = id.toJavaUuid(),
