@@ -24,6 +24,7 @@ fun ExchangeCarOfferScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
     carId: UUID,
+    onExchangeTemporalClick: (UUID) -> Unit,
     modifier: Modifier = Modifier,
     carViewModel: CarViewModel = koinViewModel(),
     exchangeViewModel: ExchangeViewModel = koinViewModel(),
@@ -49,7 +50,10 @@ fun ExchangeCarOfferScreen(
                     animatedVisibilityScope = animatedVisibilityScope,
                     carDetail = state.car,
                     callbacks = CarDetailCallbacks.default(state.car),
-                    onExchangeClick = { exchangeViewModel.exchangeCar(state.car) },
+                    onExchangeClick = {
+                        onExchangeTemporalClick(state.car.id)
+                        exchangeViewModel.exchangeCar(state.car)
+                    },
                     modifier = modifier,
                 )
             }
