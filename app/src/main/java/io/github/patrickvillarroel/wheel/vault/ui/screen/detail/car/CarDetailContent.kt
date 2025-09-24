@@ -39,10 +39,8 @@ import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BackTextButton
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.FavoriteIcon
-import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeroImageCarousel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuHeader
-import io.github.patrickvillarroel.wheel.vault.ui.screen.component.RaceDivider
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
@@ -100,50 +98,7 @@ fun CarDetailContent(
                         }
                     }
 
-                    item {
-                        Text(stringResource(R.string.brand), style = MaterialTheme.typography.labelLarge)
-                        Text(carDetail.brand, style = MaterialTheme.typography.bodyLarge)
-                        RaceDivider()
-                    }
-
-                    item {
-                        Text(stringResource(R.string.model), style = MaterialTheme.typography.labelLarge)
-                        Text(carDetail.model, style = MaterialTheme.typography.bodyLarge)
-                        RaceDivider()
-                    }
-
-                    item {
-                        Text(stringResource(R.string.year), style = MaterialTheme.typography.labelLarge)
-                        Text(carDetail.year.toString(), style = MaterialTheme.typography.bodyLarge)
-                        RaceDivider()
-                    }
-
-                    item {
-                        Text(stringResource(R.string.manufacture), style = MaterialTheme.typography.labelLarge)
-                        Text(carDetail.manufacturer, style = MaterialTheme.typography.bodyLarge)
-                        RaceDivider()
-                    }
-
-                    item {
-                        Text(stringResource(R.string.category), style = MaterialTheme.typography.labelLarge)
-                        Text(carDetail.category ?: "--", style = MaterialTheme.typography.bodyLarge)
-                        RaceDivider()
-                    }
-
-                    item {
-                        Text(stringResource(R.string.description), style = MaterialTheme.typography.labelLarge)
-                        Text(carDetail.description ?: "--", style = MaterialTheme.typography.bodyLarge)
-                        RaceDivider()
-                    }
-
-                    item {
-                        Text(
-                            stringResource(R.string.quantity_of, carDetail.quantity),
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Medium,
-                        )
-                        RaceDivider()
-                    }
+                    CarDetail(carDetail)
 
                     item {
                         Row(
