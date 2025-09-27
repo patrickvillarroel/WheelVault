@@ -9,7 +9,7 @@ import kotlin.uuid.Uuid
 
 /** Brand object of PostgresSQL from Supabase */
 @Serializable
-data class BrandObj(
+class BrandObj(
     val id: Uuid? = null,
     val name: String,
     val description: String,

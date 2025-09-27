@@ -14,7 +14,7 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
-data class GetVideosNewsUseCaseImpl(private val supabase: SupabaseClient, private val context: Context) :
+class GetVideosNewsUseCaseImpl(private val supabase: SupabaseClient, private val context: Context) :
     GetVideosNewsUseCase {
     override suspend fun getVideos(): List<VideoNews> = supabase.from(VideoObj.TABLE).select {
         order("created_at", Order.DESCENDING)

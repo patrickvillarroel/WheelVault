@@ -14,11 +14,9 @@ import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
 import java.util.UUID
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
-import kotlin.uuid.toJavaUuid
 import kotlin.uuid.toKotlinUuid
 
-data class BrandSupabaseDataSource(private val supabase: SupabaseClient, private val context: Context) :
-    BrandRepository {
+class BrandSupabaseDataSource(private val supabase: SupabaseClient, private val context: Context) : BrandRepository {
 
     override suspend fun search(query: String): List<Brand> = supabase.from(BrandObj.TABLE).select {
         filter {
@@ -51,9 +49,7 @@ data class BrandSupabaseDataSource(private val supabase: SupabaseClient, private
         fetchImage(it.id!!)
     }
 
-    private fun fetchImage(id: UUID, contentType: String = "png") = ImageRequest.Builder(context)
+    private fun fetchImage(id: Uuid, contentType: String = "png") = ImageRequest.Builder(context)
         .data(authenticatedStorageItem(BrandObj.BUCKET_IMAGES, "$id.$contentType"))
         .build()
-
-    private fun fetchImage(id: Uuid, contentType: String = "png") = fetchImage(id.toJavaUuid(), contentType)
 }

@@ -5,7 +5,7 @@ import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
 import java.util.UUID
 
-data class CarRepositoryImpl(private val supabase: CarSupabaseDataSource) : CarsRepository {
+class CarRepositoryImpl(private val supabase: CarSupabaseDataSource) : CarsRepository {
     override suspend fun exist(id: UUID): Boolean = supabase.exist(id)
 
     override suspend fun search(query: String, isFavorite: Boolean): List<CarItem> = supabase.search(query, isFavorite)

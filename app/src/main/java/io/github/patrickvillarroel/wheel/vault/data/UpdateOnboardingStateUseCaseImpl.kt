@@ -11,7 +11,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 
-data class UpdateOnboardingStateUseCaseImpl(private val dataStore: DataStore<Preferences>) :
+class UpdateOnboardingStateUseCaseImpl(private val dataStore: DataStore<Preferences>) :
     UpdateOnboardingStateUseCase {
 
     @OptIn(ExperimentalCoroutinesApi::class)
