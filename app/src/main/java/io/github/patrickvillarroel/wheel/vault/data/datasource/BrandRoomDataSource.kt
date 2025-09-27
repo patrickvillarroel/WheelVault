@@ -5,9 +5,9 @@ import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
 import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
 import java.util.UUID
 
-data class BrandRoomDataSource(private val dao: BrandDao) : BrandRepository {
+class BrandRoomDataSource(private val dao: BrandDao) : BrandRepository {
     override suspend fun search(query: String): List<Brand> {
-        dao.search(query)
+        TODO()
     }
 
     override suspend fun fetchAll(): List<Brand> {

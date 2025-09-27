@@ -2,12 +2,11 @@ package io.github.patrickvillarroel.wheel.vault.data.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.util.UUID
 
 @Entity(tableName = "brands")
-data class BrandEntity(
+class BrandEntity(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
     val name: String,
     val description: String,

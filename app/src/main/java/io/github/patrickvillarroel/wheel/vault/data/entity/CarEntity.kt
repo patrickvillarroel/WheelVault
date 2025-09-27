@@ -16,7 +16,7 @@ import java.util.UUID
         Index("id_remote", unique = true),
     ],
 )
-data class CarEntity(
+class CarEntity(
     @PrimaryKey(true)
     val id: Long? = null,
     val model: String,
@@ -32,7 +32,7 @@ data class CarEntity(
     val isFavorite: Boolean = false,
 
     @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP", index = true)
-    val createdAt: Long?,
+    val createdAt: Long? = null,
 
     @ColumnInfo(name = "user_id")
     val userId: String,

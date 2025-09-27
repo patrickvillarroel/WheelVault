@@ -5,7 +5,7 @@ import androidx.room.Fts4
 
 @Fts4(contentEntity = CarEntity::class)
 @Entity(tableName = "cars_fts")
-data class CarFtsEntity(
+class CarFtsEntity(
     val model: String,
     val brand: String,
     val manufacturer: String,

@@ -5,7 +5,7 @@ import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
 import java.util.UUID
 
-data class CarRoomDataSource(private val dao: CarDao) : CarsRepository {
+class CarRoomDataSource(private val dao: CarDao) : CarsRepository {
     override suspend fun exist(id: UUID): Boolean {
         TODO()
     }
