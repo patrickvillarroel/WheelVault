@@ -52,8 +52,8 @@ fun HomeScreen(
             },
             onCarClick = callbacks.onCarClick,
             onRefresh = {
-                brandViewModel.fetchAll()
-                carViewModel.fetchAll()
+                brandViewModel.fetchAll(true)
+                carViewModel.fetchAll(true)
                 homeViewModel.fetchNews()
             },
             headerCallbacks = callbacks.headerCallbacks,
