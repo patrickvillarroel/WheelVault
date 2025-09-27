@@ -7,7 +7,7 @@ import java.util.UUID
 
 data class BrandRoomDataSource(private val dao: BrandDao) : BrandRepository {
     override suspend fun search(query: String): List<Brand> {
-        TODO()
+        dao.search(query)
     }
 
     override suspend fun fetchAll(): List<Brand> {
@@ -23,6 +23,9 @@ data class BrandRoomDataSource(private val dao: BrandDao) : BrandRepository {
     }
 
     override suspend fun fetchByDescription(description: String): Brand? {
+        TODO()
+    }
+    suspend fun insert(brand: Brand): Brand {
         TODO()
     }
 }

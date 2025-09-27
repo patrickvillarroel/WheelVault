@@ -6,14 +6,11 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.util.UUID
 
-@Entity(indices = [Index("name", unique = true), Index("id_remote", unique = true)])
+@Entity(tableName = "brands")
 data class BrandEntity(
-    @PrimaryKey(true)
-    val id: Long? = null,
+    @PrimaryKey val id: String = UUID.randomUUID().toString(),
     val name: String,
     val description: String,
-    @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP", index = true)
-    val createdAt: Long? = null,
-    @ColumnInfo("id_remote")
-    val idRemote: String = UUID.randomUUID().toString(),
+    @ColumnInfo(name = "created_at")
+    val createdAt: Long = System.currentTimeMillis(),
 )
