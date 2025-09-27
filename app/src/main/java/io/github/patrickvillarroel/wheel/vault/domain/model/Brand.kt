@@ -8,4 +8,9 @@ data class Brand(
     val image: Any,
     val contentDescription: String?,
     val id: UUID = UUID.randomUUID(),
-)
+) {
+    companion object {
+        @JvmField
+        val DEFAULT_IMAGE = io.github.patrickvillarroel.wheel.vault.R.drawable.no_picture_available
+    }
+}
