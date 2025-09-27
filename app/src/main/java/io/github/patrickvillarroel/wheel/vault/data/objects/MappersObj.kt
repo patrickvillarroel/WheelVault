@@ -5,9 +5,6 @@ package io.github.patrickvillarroel.wheel.vault.data.objects
 import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.domain.model.VideoNews
-import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
-import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
-import io.github.patrickvillarroel.wheel.vault.domain.usecase.GetVideosNewsUseCase
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -16,7 +13,6 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.toJavaUuid
 import kotlin.uuid.toKotlinUuid
 
-context(_: BrandRepository)
 fun BrandObj.toDomain(image: Any) = Brand(
     name = this.name,
     description = this.description,
@@ -25,13 +21,11 @@ fun BrandObj.toDomain(image: Any) = Brand(
     id = this.id!!.toJavaUuid(),
 )
 
-context(_: BrandRepository)
-fun BrandObj.toDomain(image: (BrandObj) -> Any): Brand {
+inline fun BrandObj.toDomain(image: (BrandObj) -> Any): Brand {
     contract { callsInPlace(image, InvocationKind.EXACTLY_ONCE) }
     return this.toDomain(image(this))
 }
 
-context(_: CarsRepository)
 fun CarItem.toObject() = CarObj(
     id = this.id.toKotlinUuid(),
     model = this.model,
@@ -44,7 +38,6 @@ fun CarItem.toObject() = CarObj(
     isFavorite = this.isFavorite,
 )
 
-context(_: CarsRepository)
 fun CarObj.toDomain(images: Set<Any>) = CarItem(
     id = this.id!!.toJavaUuid(),
     model = this.model,
@@ -58,7 +51,6 @@ fun CarObj.toDomain(images: Set<Any>) = CarItem(
     images = images,
 )
 
-context(_: GetVideosNewsUseCase)
 fun VideoObj.toDomain(thumbnail: Any) = VideoNews(
     id = this.id.toJavaUuid(),
     name = this.name,

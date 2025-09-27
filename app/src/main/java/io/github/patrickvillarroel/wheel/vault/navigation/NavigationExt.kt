@@ -19,12 +19,10 @@ import kotlin.uuid.toJavaUuid
 import kotlin.uuid.toKotlinUuid
 
 /** Extension function to convert a [CarItem] to a [NavigationKeys.CarEdit], only callable in a [EntryProviderBuilder] */
-context(_: EntryProviderBuilder<NavKey>)
 fun CarItem.toCarEdit(): NavigationKeys.CarEdit = this.toPartial().toCarEdit()
 
 /** Extension function to convert a [CarItem.Partial] to a [NavigationKeys.CarEdit], only callable in a [EntryProviderBuilder] */
 @OptIn(ExperimentalUuidApi::class)
-context(_: EntryProviderBuilder<NavKey>)
 fun CarItem.Partial.toCarEdit(): NavigationKeys.CarEdit {
     val partial = this
     return NavigationKeys.CarEdit(
@@ -44,7 +42,6 @@ fun CarItem.Partial.toCarEdit(): NavigationKeys.CarEdit {
 
 /** Extension function to convert a [NavigationKeys.CarEdit] to [CarItem.Partial], especial only callable in a [EntryProviderBuilder] */
 @OptIn(ExperimentalUuidApi::class)
-context(_: EntryProviderBuilder<NavKey>)
 fun NavigationKeys.CarEdit.toCarPartial(): CarItem.Partial {
     val partial = this
     return CarItem.Partial(
@@ -73,7 +70,6 @@ fun NavigationKeys.CarEdit.toCarPartial(): CarItem.Partial {
  * @param metadata provides information to the display
  * @param content content for this entry to be displayed when this entry is active with [AnimatedContentScope] of [LocalNavAnimatedContentScope].
  */
-context(_: SharedTransitionScope)
 inline fun <reified T : NavKey> EntryProviderBuilder<NavKey>.entry(
     noinline transitionSpec: (AnimatedContentTransitionScope<*>.() -> ContentTransform?)? = null,
     noinline popTransitionSpec: (AnimatedContentTransitionScope<*>.() -> ContentTransform?)? = null,
