@@ -8,16 +8,20 @@ import coil3.request.ImageRequest
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.postgrest.query.filter.TextSearchType
 import io.github.jan.supabase.storage.authenticatedStorageItem
 import io.github.jan.supabase.storage.storage
+import io.github.patrickvillarroel.wheel.vault.data.objects.CarImagesObj
 import io.github.patrickvillarroel.wheel.vault.data.objects.CarObj
 import io.github.patrickvillarroel.wheel.vault.data.objects.toDomain
 import io.github.patrickvillarroel.wheel.vault.data.objects.toObject
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
+import io.ktor.http.ContentType
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -27,7 +31,7 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 import kotlin.uuid.toKotlinUuid
 
-data class CarSupabaseDataSource(private val supabase: SupabaseClient, private val context: Context) : CarsRepository {
+class CarSupabaseDataSource(private val supabase: SupabaseClient, private val context: Context) : CarsRepository {
     override suspend fun exist(id: UUID): Boolean {
         val count = supabase.from(CarObj.TABLE).select {
             filter {
@@ -193,7 +197,7 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
                 val realImages = car.images.filterIsInstance<ByteArray>().toSet()
                 if (realImages.isNotEmpty()) {
                     Log.i("Car Supabase", "Uploading images for car ${car.id}")
-                    uploadImages(car.id, realImages).ifEmpty { setOf(CarItem.EmptyImage) }
+                    uploadImages(car.id.toKotlinUuid(), realImages).ifEmpty { setOf(CarItem.EmptyImage) }
                 } else {
                     Log.i("Car Supabase", "No images to upload for car ${car.id} after filter is ByteArray")
                     setOf(CarItem.EmptyImage)
@@ -226,31 +230,37 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
         return true
     }
 
-    private suspend fun fetchAllImages(carId: Uuid, userId: String = supabase.auth.currentUserOrNull()!!.id) =
-        supabase.storage.from(CarObj.BUCKET_IMAGES)
-            .list("$userId/$carId")
-            .map { file ->
-                ImageRequest.Builder(context)
-                    .data(authenticatedStorageItem(CarObj.BUCKET_IMAGES, "$userId/$carId/${file.name}"))
-                    .build()
-            }.toSet()
+    private suspend fun fetchAllImages(carId: Uuid) = supabase.postgrest
+        .from(CarImagesObj.TABLE)
+        .select(Columns.list("storage_path")) {
+            filter {
+                CarImagesObj::carId eq carId
+            }
+        }.decodeList<Map<String, String>>()
+        .mapNotNull { image ->
+            val path = image.values
+            if (path.isEmpty()) return@mapNotNull null
+            ImageRequest.Builder(context)
+                .data(authenticatedStorageItem(CarObj.BUCKET_IMAGES, path.first()))
+                .build()
+        }.toSet()
 
     private suspend fun uploadImages(
-        carId: Any,
+        carId: Uuid,
         images: Set<ByteArray>,
-        contentType: String = "png",
         userId: String = supabase.auth.currentUserOrNull()!!.id,
     ): Set<String> = coroutineScope {
         val results: MutableSet<String> = ConcurrentSkipListSet()
 
         images.map { bytes ->
             async {
-                val imageId = UUID.randomUUID()
-                val path = "$userId/$carId/$imageId.$contentType"
+                val imageId = Uuid.random()
+                val path = "$userId/$carId/$imageId.webp"
 
                 try {
                     val bucketPath = supabase.storage.from(CarObj.BUCKET_IMAGES).upload(path, bytes) {
                         upsert = true
+                        contentType = ContentType.Image.WEBP
                     }.path
                     results.add(bucketPath)
                 } catch (e: Exception) {
@@ -258,6 +268,12 @@ data class CarSupabaseDataSource(private val supabase: SupabaseClient, private v
                 }
             }
         }.awaitAll()
+
+        supabase.postgrest
+            .from(CarImagesObj.TABLE)
+            .upsert(
+                results.map { CarImagesObj(carId, it, "image/webp", Uuid.parse(userId)) },
+            )
 
         results
     }
