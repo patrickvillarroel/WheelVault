@@ -65,7 +65,7 @@ data class BrandViewModel(
             viewModelScope.launch(ioDispatcher) {
                 Log.i("Brands", "Fetching all brands")
                 try {
-                    val result = brandRepository.fetchAll()
+                    val result = brandRepository.fetchAll(true)
                     _brandsState.update { BrandsUiState.Success(result) }
                 } catch (e: Exception) {
                     Log.e("Brands", "Error fetch all", e)
