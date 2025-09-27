@@ -1,12 +1,18 @@
 package io.github.patrickvillarroel.wheel.vault.data.entity
+
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+
 @Entity(tableName = "news")
-data class NewsEntity(
+class NewsEntity(
     @PrimaryKey
-    val id: String,
+    val id: Long? = null,
     val name: String,
     val description: String?,
     val link: String,
-    val created_at: Long = System.currentTimeMillis(),
+    @ColumnInfo(name = "created_at")
+    val createdAt: Long = System.currentTimeMillis(),
+    @ColumnInfo(name = "id_remote")
+    val idRemote: String,
 )
