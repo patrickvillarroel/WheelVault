@@ -22,4 +22,7 @@ interface BrandDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBrand(brand: BrandEntity): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAllBrands(brands: List<BrandEntity>)
 }
