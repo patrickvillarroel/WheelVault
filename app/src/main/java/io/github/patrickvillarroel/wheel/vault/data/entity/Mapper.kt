@@ -1,24 +1,26 @@
 package io.github.patrickvillarroel.wheel.vault.data.entity
-import io.github.patrickvillarroel.wheel.vault.domain.model.*
 
-fun BrandEntity.toDomain(): Brand = Brand(
-    id = this.id,
+import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
+import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
+import io.github.patrickvillarroel.wheel.vault.domain.model.VideoNews
+import java.util.UUID
+
+fun BrandEntity.toDomain(image: Any) = Brand(
+    id = UUID.fromString(this.id),
     name = this.name,
     description = this.description,
     image = image,
-    contentDescription = this.contentDescription,
+    contentDescription = "Cover image for ${this.name}",
 )
 
-fun Brand.toEntity(): BrandEntity = BrandEntity(
-    id = this.id,
+fun Brand.toEntity() = BrandEntity(
+    id = this.id.toString(),
     name = this.name,
     description = this.description,
-    image = image,
-    contentDescription = this.contentDescription,
 )
 
-fun CarEntity.toDomain(): CarItem = CarItem(
-    id = this.id,
+fun CarEntity.toDomain(images: Set<Any>) = CarItem(
+    id = UUID.fromString(idRemote),
     model = this.model,
     year = this.year,
     manufacturer = this.manufacturer,
@@ -30,32 +32,33 @@ fun CarEntity.toDomain(): CarItem = CarItem(
     category = this.category,
 )
 
-fun CarItem.toEntity(): CarEntity = CarEntity(
-    id = this.id,
+fun CarItem.toEntity(userId: String) = CarEntity(
+    id = null,
     model = this.model,
     year = this.year,
     manufacturer = this.manufacturer,
     brand = this.brand,
-    images = this.images,
+    idRemote = this.id.toString(),
     quantity = this.quantity,
     isFavorite = this.isFavorite,
     description = this.description,
     category = this.category,
+    userId = userId,
 )
 
 // VideoNews
-fun NewsEntity.toDomain(): VideoNews = VideoNews(
-    id = this.id,
+fun NewsEntity.toDomain(thumbnail: Any) = VideoNews(
+    id = UUID.fromString(idRemote),
     name = this.name,
     link = this.link,
-    thumbnail = this.thumbnail,
+    thumbnail = thumbnail,
     description = this.description,
 )
 
-fun VideoNews.toEntity(): NewsEntity = NewsEntity(
-    id = this.id,
+fun VideoNews.toEntity(idRemote: String) = NewsEntity(
+    id = null,
     name = this.name,
     link = this.link,
-    thumbnail = this.thumbnail,
     description = this.description,
+    idRemote = idRemote,
 )
