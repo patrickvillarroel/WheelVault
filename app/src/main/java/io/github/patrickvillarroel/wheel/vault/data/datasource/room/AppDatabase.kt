@@ -1,4 +1,4 @@
-package io.github.patrickvillarroel.wheel.vault.data.datasource
+package io.github.patrickvillarroel.wheel.vault.data.datasource.room
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

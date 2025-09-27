@@ -1,4 +1,4 @@
-package io.github.patrickvillarroel.wheel.vault.data.datasource
+package io.github.patrickvillarroel.wheel.vault.data.datasource.room
 
 import io.github.patrickvillarroel.wheel.vault.data.dao.BrandDao
 import io.github.patrickvillarroel.wheel.vault.domain.model.Brand

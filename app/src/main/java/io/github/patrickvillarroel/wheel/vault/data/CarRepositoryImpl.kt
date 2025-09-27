@@ -1,6 +1,6 @@
 package io.github.patrickvillarroel.wheel.vault.data
 
-import io.github.patrickvillarroel.wheel.vault.data.datasource.CarSupabaseDataSource
+import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.CarSupabaseDataSource
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
 import java.util.UUID

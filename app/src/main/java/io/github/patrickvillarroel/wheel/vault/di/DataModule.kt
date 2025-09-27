@@ -6,11 +6,11 @@ import io.github.patrickvillarroel.wheel.vault.data.CarRepositoryImpl
 import io.github.patrickvillarroel.wheel.vault.data.GetVideosNewsUseCaseImpl
 import io.github.patrickvillarroel.wheel.vault.data.UpdateOnboardingStateUseCaseImpl
 import io.github.patrickvillarroel.wheel.vault.data.UpdateOnboardingStateUseCaseImpl.Companion.dataStore
-import io.github.patrickvillarroel.wheel.vault.data.datasource.AppDatabase
-import io.github.patrickvillarroel.wheel.vault.data.datasource.BrandRoomDataSource
-import io.github.patrickvillarroel.wheel.vault.data.datasource.BrandSupabaseDataSource
-import io.github.patrickvillarroel.wheel.vault.data.datasource.CarRoomDataSource
-import io.github.patrickvillarroel.wheel.vault.data.datasource.CarSupabaseDataSource
+import io.github.patrickvillarroel.wheel.vault.data.datasource.room.AppDatabase
+import io.github.patrickvillarroel.wheel.vault.data.datasource.room.BrandRoomDataSource
+import io.github.patrickvillarroel.wheel.vault.data.datasource.room.CarRoomDataSource
+import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.BrandSupabaseDataSource
+import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.CarSupabaseDataSource
 import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
 import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
 import io.github.patrickvillarroel.wheel.vault.domain.usecase.GetVideosNewsUseCase

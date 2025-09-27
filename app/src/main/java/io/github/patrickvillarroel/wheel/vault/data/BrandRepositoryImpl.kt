@@ -1,6 +1,6 @@
 package io.github.patrickvillarroel.wheel.vault.data
 
-import io.github.patrickvillarroel.wheel.vault.data.datasource.BrandSupabaseDataSource
+import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.BrandSupabaseDataSource
 import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
 import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
 import java.util.UUID

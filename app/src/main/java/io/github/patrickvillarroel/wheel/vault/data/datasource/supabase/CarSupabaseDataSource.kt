@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalUuidApi::class)
 
-package io.github.patrickvillarroel.wheel.vault.data.datasource
+package io.github.patrickvillarroel.wheel.vault.data.datasource.supabase
 
 import android.content.Context
 import android.util.Log
