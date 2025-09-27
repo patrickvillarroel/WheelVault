@@ -11,7 +11,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.toCoilUri
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -87,14 +86,14 @@ fun CarEditScreen(
         ModalAddImage(
             onResultGallery = {
                 Log.i("CarEditScreen", "onResult, current: $initial, new state with image: $it")
-                initial = initial.copy(images = setOf(it.toCoilUri()) + initial.images)
+                initial = initial.copy(images = setOf(it) + initial.images)
             },
             onModalClose = {
                 openBottomSheet = false
             },
             onResultCamera = {
                 Log.i("CarEditScreen", "onResultCamera, current: $initial, new state with camera: $it")
-                initial = initial.copy(images = setOf(it.toCoilUri()) + initial.images)
+                initial = initial.copy(images = setOf(it) + initial.images)
             },
             isCameraPermission = permissionState.status.isGranted,
         )

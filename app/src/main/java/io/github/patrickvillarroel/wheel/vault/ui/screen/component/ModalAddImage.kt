@@ -5,7 +5,7 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
+import android.graphics.BitmapFactory.decodeStream
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
@@ -38,14 +38,12 @@ import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 import io.github.patrickvillarroel.wheel.vault.util.resizeBitmapMaxDimension
 import kotlinx.io.IOException
 import java.io.File
-import java.io.FileOutputStream
-import java.io.InputStream
 
 @Composable
 fun ModalAddImage(
-    onResultGallery: (Uri) -> Unit,
+    onResultGallery: (Bitmap) -> Unit,
     onModalClose: () -> Unit,
-    onResultCamera: (Uri) -> Unit,
+    onResultCamera: (Bitmap) -> Unit,
     isCameraPermission: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -57,7 +55,9 @@ fun ModalAddImage(
             Log.i("ModalAddImage", "photoPickerLauncher result $uri")
             if (uri != null) {
                 try {
-                    val resizedUri = saveResizedImageFromUri(context, uri, "gallery_")
+                    val inputStream = requireNotNull(context.contentResolver.openInputStream(uri))
+                    val originalBitmap = requireNotNull(inputStream.use { decodeStream(inputStream) })
+                    val resizedUri = resizeBitmapMaxDimension(originalBitmap)
                     onResultGallery(resizedUri)
                 } catch (e: Exception) {
                     Log.e("ModalAddImage", "Error procesando imagen de la galería", e)
@@ -75,20 +75,8 @@ fun ModalAddImage(
             try {
                 val originalBitmap = BitmapFactory.decodeFile(photoFile!!.absolutePath)
                 if (originalBitmap != null) {
-                    val resizedBitmap = resizeBitmapMaxDimension(originalBitmap, 1080f)
-                    originalBitmap.recycle()
-
-                    FileOutputStream(photoFile!!).use { out ->
-                        resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 85, out)
-                    }
-                    resizedBitmap.recycle()
-
-                    val photoUri = FileProvider.getUriForFile(
-                        context,
-                        "${context.packageName}.fileprovider",
-                        photoFile!!,
-                    )
-                    onResultCamera(photoUri)
+                    val resizedBitmap = resizeBitmapMaxDimension(originalBitmap)
+                    onResultCamera(resizedBitmap)
                 } else {
                     Toast.makeText(context, "No se pudo cargar la foto.", Toast.LENGTH_SHORT).show()
                 }
@@ -152,25 +140,6 @@ fun ModalAddImage(
             }
         }
     }
-}
-
-private fun saveResizedImageFromUri(context: android.content.Context, uri: Uri, prefix: String): Uri {
-    val inputStream: InputStream = context.contentResolver.openInputStream(uri)
-        ?: throw IOException("No se pudo abrir el inputStream")
-
-    val originalBitmap = BitmapFactory.decodeStream(inputStream)
-    inputStream.close()
-
-    if (originalBitmap == null) throw IOException("Bitmap nulo")
-
-    val resizedBitmap = resizeBitmapMaxDimension(originalBitmap, 1080f)
-
-    val resizedFile = File.createTempFile("${prefix}resized_", ".png", context.cacheDir)
-    FileOutputStream(resizedFile).use { out ->
-        resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 85, out)
-    }
-    resizedBitmap.recycle()
-    return FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", resizedFile)
 }
 
 @Preview

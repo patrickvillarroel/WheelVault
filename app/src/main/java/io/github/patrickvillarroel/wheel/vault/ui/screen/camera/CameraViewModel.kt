@@ -128,7 +128,7 @@ class CameraViewModel(dispatcher: CoroutineDispatcher = Dispatchers.Default) : V
     fun onCapturedImageProvided(bitmap: Bitmap) {
         _triggerImageCapture.value = false
         if (_uiState.value is CameraUiState.CapturingImage) {
-            currentCapturedImage = resizeBitmapMaxDimension(bitmap, 1080f)
+            currentCapturedImage = resizeBitmapMaxDimension(bitmap)
             _uiState.value = CameraUiState.ConfirmCapturedImage(currentRecognizedText, currentCapturedImage!!)
         }
     }
