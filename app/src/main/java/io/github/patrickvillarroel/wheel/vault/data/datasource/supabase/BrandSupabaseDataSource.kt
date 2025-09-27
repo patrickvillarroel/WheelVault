@@ -27,9 +27,10 @@ class BrandSupabaseDataSource(private val supabase: SupabaseClient, private val 
         }
     }.decodeList<BrandObj>().map { it.toDomain(fetchImage(it.id!!)) }
 
-    override suspend fun fetchAll(): List<Brand> = supabase.from(BrandObj.TABLE).select().decodeList<BrandObj>().map {
-        it.toDomain(fetchImage(it.id!!))
-    }
+    override suspend fun fetchAll(forceRefresh: Boolean): List<Brand> =
+        supabase.from(BrandObj.TABLE).select().decodeList<BrandObj>().map {
+            it.toDomain(fetchImage(it.id!!))
+        }
 
     override suspend fun fetch(id: UUID): Brand? = supabase.from(BrandObj.TABLE).select {
         filter { BrandObj::id eq id.toKotlinUuid() }
@@ -52,4 +53,7 @@ class BrandSupabaseDataSource(private val supabase: SupabaseClient, private val 
     private fun fetchImage(id: Uuid, contentType: String = "png") = ImageRequest.Builder(context)
         .data(authenticatedStorageItem(BrandObj.BUCKET_IMAGES, "$id.$contentType"))
         .build()
+
+    fun buildImageRequest(id: Uuid, contentType: String = "png") =
+        authenticatedStorageItem(BrandObj.BUCKET_IMAGES, "$id.$contentType")
 }
