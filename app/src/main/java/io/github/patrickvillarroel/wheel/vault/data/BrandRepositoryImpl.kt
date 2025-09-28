@@ -9,7 +9,7 @@ import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
 import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import java.util.UUID
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.toKotlinUuid
@@ -17,7 +17,7 @@ import kotlin.uuid.toKotlinUuid
 /**
  * Brands repository.
  *
- * This handle between data-sources, current only delegate to supabase.
+ * This handle requests between data-sources.
  */
 class BrandRepositoryImpl(
     private val supabase: BrandSupabaseDataSource,
@@ -30,7 +30,7 @@ class BrandRepositoryImpl(
         localFetch = { room.fetchAll(forceRefresh) },
         remoteFetch = { supabase.fetchAll(forceRefresh) },
         saveRemote = {
-            coroutineScope {
+            launch {
                 room.saveAll(
                     it,
                     it.map {

@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
 
-data class BrandViewModel(
+class BrandViewModel(
     private val brandRepository: BrandRepository,
     private val carRepository: CarsRepository,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
@@ -65,7 +65,7 @@ data class BrandViewModel(
             viewModelScope.launch(ioDispatcher) {
                 Log.i("Brands", "Fetching all brands")
                 try {
-                    val result = brandRepository.fetchAll(true)
+                    val result = brandRepository.fetchAll(force)
                     _brandsState.update { BrandsUiState.Success(result) }
                 } catch (e: Exception) {
                     Log.e("Brands", "Error fetch all", e)

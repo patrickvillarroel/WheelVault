@@ -2,6 +2,8 @@
 
 package io.github.patrickvillarroel.wheel.vault.data
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -34,7 +36,7 @@ object SyncMediator {
     suspend inline fun <T : Any> fetchList(
         localFetch: suspend () -> List<T>,
         remoteFetch: suspend () -> List<T>,
-        saveRemote: suspend (List<T>) -> Unit,
+        crossinline saveRemote: suspend CoroutineScope.(List<T>) -> Unit,
         forceRefresh: Boolean = false,
     ): List<T> {
         contract {
@@ -44,13 +46,17 @@ object SyncMediator {
         }
         return if (forceRefresh) {
             val remoteData = remoteFetch()
-            saveRemote(remoteData)
+            coroutineScope {
+                saveRemote(remoteData)
+            }
             remoteData
         } else {
             val localData = localFetch()
             localData.ifEmpty {
                 val remoteData = remoteFetch()
-                saveRemote(remoteData)
+                coroutineScope {
+                    saveRemote(remoteData)
+                }
                 remoteData
             }
         }
