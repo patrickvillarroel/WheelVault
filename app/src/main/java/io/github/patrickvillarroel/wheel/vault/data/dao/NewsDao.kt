@@ -20,6 +20,9 @@ interface NewsDao {
     @Query("SELECT * FROM news WHERE link = :link LIMIT 1")
     suspend fun fetchByLink(link: String): NewsEntity?
 
+    @Query("SELECT * FROM news WHERE name like '%' || :name || '%' LIMIT 1")
+    suspend fun fetchByName(name: String): NewsEntity?
+
     @Query("SELECT COUNT(*) FROM news")
     suspend fun count(): Int
 
@@ -28,4 +31,7 @@ interface NewsDao {
 
     @Query("DELETE FROM news WHERE id = :id")
     suspend fun deleteById(id: String)
+
+    @Query("DELETE FROM news WHERE id_remote = :id")
+    suspend fun deleteByIdRemote(id: String)
 }
