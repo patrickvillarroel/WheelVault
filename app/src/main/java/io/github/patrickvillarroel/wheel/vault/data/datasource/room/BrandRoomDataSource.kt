@@ -9,25 +9,30 @@ import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
 import java.util.UUID
 
 class BrandRoomDataSource(private val dao: BrandDao, private val imageRepository: ImageRepository) : BrandRepository {
-    override suspend fun search(query: String): List<Brand> {
-        TODO()
-    }
 
     override suspend fun fetchAll(forceRefresh: Boolean): List<Brand> = dao.fetchAll().map {
         it.toDomain(imageRepository.loadImage(it.id) ?: Brand.DEFAULT_IMAGE)
     }
 
-    override suspend fun fetch(id: UUID): Brand? {
-        TODO()
-    }
+    override suspend fun fetch(id: UUID): Brand? =
+        dao.fetchById(id.toString())?.let { entity ->
+            entity.toDomain(imageRepository.loadImage(entity.id) ?: Brand.DEFAULT_IMAGE)
+        }
 
-    override suspend fun fetchByName(name: String): Brand? {
-        TODO()
-    }
+    override suspend fun search(query: String): List<Brand> =
+        dao.search(query).map {
+            it.toDomain(imageRepository.loadImage(it.id) ?: Brand.DEFAULT_IMAGE)
+        }
 
-    override suspend fun fetchByDescription(description: String): Brand? {
-        TODO()
-    }
+    override suspend fun fetchByName(name: String): Brand? =
+        dao.fetchByName(name)?.let {
+            it.toDomain(imageRepository.loadImage(it.id) ?: Brand.DEFAULT_IMAGE)
+        }
+
+    override suspend fun fetchByDescription(description: String): Brand? =
+        dao.fetchByDescription(description)?.let {
+            it.toDomain(imageRepository.loadImage(it.id) ?: Brand.DEFAULT_IMAGE)
+        }
 
     suspend fun saveAll(brands: List<Brand>, images: List<ByteArray>) {
         dao.insertAllBrands(brands.map { it.toEntity() })

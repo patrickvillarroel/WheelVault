@@ -67,5 +67,5 @@ interface CarDao {
     suspend fun updateCar(car: CarEntity)
 
     @Delete
-    suspend fun deleteCar(car: CarEntity)
+    suspend fun deleteCar(car: CarEntity): Int
 }

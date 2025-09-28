@@ -8,6 +8,7 @@ import io.github.patrickvillarroel.wheel.vault.data.CarRepositoryImpl
 import io.github.patrickvillarroel.wheel.vault.data.GetVideosNewsUseCaseImpl
 import io.github.patrickvillarroel.wheel.vault.data.UpdateOnboardingStateUseCaseImpl
 import io.github.patrickvillarroel.wheel.vault.data.UpdateOnboardingStateUseCaseImpl.Companion.dataStore
+import io.github.patrickvillarroel.wheel.vault.data.dao.NewsDao
 import io.github.patrickvillarroel.wheel.vault.data.datasource.image.CacheImageDataSource
 import io.github.patrickvillarroel.wheel.vault.data.datasource.image.ImageDownloadHelper
 import io.github.patrickvillarroel.wheel.vault.data.datasource.image.ImageRepository
@@ -15,6 +16,7 @@ import io.github.patrickvillarroel.wheel.vault.data.datasource.image.MediaStoreI
 import io.github.patrickvillarroel.wheel.vault.data.datasource.room.AppDatabase
 import io.github.patrickvillarroel.wheel.vault.data.datasource.room.BrandRoomDataSource
 import io.github.patrickvillarroel.wheel.vault.data.datasource.room.CarRoomDataSource
+import io.github.patrickvillarroel.wheel.vault.data.datasource.room.NewsRoomDataSource
 import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.BrandSupabaseDataSource
 import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.CarSupabaseDataSource
 import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
@@ -63,8 +65,8 @@ val dataModule = module {
     single { androidContext().dataStore }
 
     single { BrandRoomDataSource(get<AppDatabase>().brandDao(), get()) }
-    single { CarRoomDataSource(get<AppDatabase>().carDao()) }
-
+    single { CarRoomDataSource(get<AppDatabase>().carDao(), get(), get()) }
+    single { NewsRoomDataSource(get<AppDatabase>().newsDao()) }
     single { BrandSupabaseDataSource(get(), get()) }
     single<BrandRepository> { BrandRepositoryImpl(get(), get(), get()) }
 

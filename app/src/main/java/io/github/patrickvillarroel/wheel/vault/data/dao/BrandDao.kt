@@ -11,6 +11,9 @@ interface BrandDao {
     @Query("SELECT * FROM brands WHERE name LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%'")
     suspend fun search(query: String): List<BrandEntity>
 
+    @Query("SELECT * FROM brands WHERE id = :id LIMIT 1")
+    suspend fun fetchById(id: String): BrandEntity?
+
     @Query("SELECT * FROM brands ORDER BY created_at DESC")
     suspend fun fetchAll(): List<BrandEntity>
 
