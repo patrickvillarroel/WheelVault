@@ -35,8 +35,9 @@ class CarEntity(
     val createdAt: Long? = null,
 
     @ColumnInfo(name = "user_id")
-    val userId: String,
+    val userId: String? = null,
 
+    // FIXME
     @ColumnInfo(name = "id_remote")
     val idRemote: String = UUID.randomUUID().toString(),
 )

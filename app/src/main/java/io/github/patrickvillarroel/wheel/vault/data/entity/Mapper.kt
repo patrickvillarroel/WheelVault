@@ -32,7 +32,7 @@ fun CarEntity.toDomain(images: Set<Any>) = CarItem(
     category = this.category,
 )
 
-fun CarItem.toEntity(userId: String) = CarEntity(
+fun CarItem.toEntity(userId: String?) = CarEntity(
     id = null,
     model = this.model,
     year = this.year,

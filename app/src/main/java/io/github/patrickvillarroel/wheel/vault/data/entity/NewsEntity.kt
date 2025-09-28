@@ -12,7 +12,7 @@ class NewsEntity(
     val description: String?,
     val link: String,
     @ColumnInfo(name = "created_at")
-    val createdAt: Long?=null,
+    val createdAt: Long? = null,
     @ColumnInfo(name = "id_remote")
     val idRemote: String,
 )
