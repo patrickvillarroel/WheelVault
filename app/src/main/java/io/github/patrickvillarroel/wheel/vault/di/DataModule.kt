@@ -8,7 +8,6 @@ import io.github.patrickvillarroel.wheel.vault.data.CarRepositoryImpl
 import io.github.patrickvillarroel.wheel.vault.data.GetVideosNewsUseCaseImpl
 import io.github.patrickvillarroel.wheel.vault.data.UpdateOnboardingStateUseCaseImpl
 import io.github.patrickvillarroel.wheel.vault.data.UpdateOnboardingStateUseCaseImpl.Companion.dataStore
-import io.github.patrickvillarroel.wheel.vault.data.dao.NewsDao
 import io.github.patrickvillarroel.wheel.vault.data.datasource.image.CacheImageDataSource
 import io.github.patrickvillarroel.wheel.vault.data.datasource.image.ImageDownloadHelper
 import io.github.patrickvillarroel.wheel.vault.data.datasource.image.ImageRepository
@@ -19,8 +18,10 @@ import io.github.patrickvillarroel.wheel.vault.data.datasource.room.CarRoomDataS
 import io.github.patrickvillarroel.wheel.vault.data.datasource.room.NewsRoomDataSource
 import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.BrandSupabaseDataSource
 import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.CarSupabaseDataSource
+import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.TradeSupabaseDataSource
 import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
 import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
+import io.github.patrickvillarroel.wheel.vault.domain.repository.TradeRepository
 import io.github.patrickvillarroel.wheel.vault.domain.usecase.GetVideosNewsUseCase
 import io.github.patrickvillarroel.wheel.vault.domain.usecase.UpdateOnboardingStateUseCase
 import io.ktor.client.HttpClient
@@ -72,6 +73,8 @@ val dataModule = module {
 
     single { CarSupabaseDataSource(get(), get()) }
     single<CarsRepository> { CarRepositoryImpl(get()) }
+
+    single<TradeRepository> { TradeSupabaseDataSource(get(), get()) }
 
     single<UpdateOnboardingStateUseCase> { UpdateOnboardingStateUseCaseImpl(get()) }
     single<GetVideosNewsUseCase> { GetVideosNewsUseCaseImpl(get(), get()) }
