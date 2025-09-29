@@ -233,6 +233,16 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
         return true
     }
 
+    suspend fun getCarsForTrade() = supabase.from(CarObj.TABLE)
+        .select {
+            filter {
+                eq("available_for_trade", true)
+            }
+            order("updated_at", Order.DESCENDING)
+        }.decodeList<CarObj>()
+        .map { it.toDomain(fetchAllImages(it.id!!).ifEmpty { setOf(CarItem.EmptyImage) }) }
+
+    // FIXME O(n+1)
     private suspend fun fetchAllImages(carId: Uuid) = supabase.postgrest
         .from(CarImagesObj.TABLE)
         .select(Columns.list("storage_path")) {
