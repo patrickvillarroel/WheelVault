@@ -15,6 +15,8 @@ import io.github.patrickvillarroel.wheel.vault.util.bitmapToByteArray
 import io.github.patrickvillarroel.wheel.vault.util.uriToByteArray
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -129,20 +131,33 @@ class CarViewModel(
                 }
                     .toSet()
                     .ifEmpty { setOfNotNull(CarItem.EmptyImage) }
-                val car = car.copy(images = pictures, imageUrl = pictures.first())
-                Log.i("Car VM", "Final car: $car")
-                val newCarState = if (carsRepository.exist(car.id)) {
+                val carToSave = car.copy(images = pictures, imageUrl = pictures.first())
+                Log.i("Car VM", "Final car: $carToSave")
+                val newCarState = if (carsRepository.exist(carToSave.id)) {
                     Log.i("Car VM", "The car exist")
-                    carsRepository.update(car)
+                    carsRepository.update(carToSave)
                 } else {
-                    carsRepository.insert(car)
+                    carsRepository.insert(carToSave)
                 }
                 Log.i("Car VM", "New car state: $newCarState")
-                findById(car.id, true)
-                fetchAll(true)
+                _carDetailState.update { CarDetailUiState.Success(newCarState) }
+
+                // Update the car in the main list as well
+                _carsState.update { currentState ->
+                    if (currentState is CarsUiState.Success) {
+                        val updatedCars = currentState.cars.map {
+                            if (it.id == newCarState.id) newCarState else it
+                        }
+                        CarsUiState.Success(updatedCars)
+                    } else {
+                        currentState
+                    }
+                }
             } catch (e: Exception) {
+                currentCoroutineContext().ensureActive()
                 Log.e("Car VM", "Failed to save car", e)
-                fetchAll(true)
+                // Potentially set an error state for carDetailState or carsState
+                _carDetailState.update { CarDetailUiState.Error } // Example error handling
             }
         }
     }
@@ -150,9 +165,74 @@ class CarViewModel(
     fun delete(car: CarItem) {
         viewModelScope.launch(ioDispatcher) {
             carsRepository.delete(car)
-            fetchAll(true)
+            // Update main list
+            _carsState.update { currentState ->
+                if (currentState is CarsUiState.Success) {
+                    CarsUiState.Success(currentState.cars.filterNot { it.id == car.id })
+                } else {
+                    currentState
+                }
+            }
+            // Update detail view if it was the deleted car
             if ((_carDetailState.value as? CarDetailUiState.Success)?.car?.id == car.id) {
                 _carDetailState.update { CarDetailUiState.Idle }
+            }
+        }
+    }
+
+    fun toggleCarTradeAvailability(carToUpdate: CarItem) {
+        viewModelScope.launch(ioDispatcher) {
+            val originalDetailState = _carDetailState.value
+            // Optimistically update the detail state if it's the current car
+            if (originalDetailState is CarDetailUiState.Success && originalDetailState.car.id == carToUpdate.id) {
+                _carDetailState.update {
+                    CarDetailUiState.Success(carToUpdate.copy(availableForTrade = !carToUpdate.availableForTrade))
+                }
+            }
+
+            try {
+                val updatedCar = carsRepository.setAvailableForTrade(carToUpdate.id, !carToUpdate.availableForTrade)
+                if (updatedCar != null) {
+                    _carDetailState.update { currentState ->
+                        if (currentState is CarDetailUiState.Success && currentState.car.id == updatedCar.id) {
+                            CarDetailUiState.Success(updatedCar)
+                        } else {
+                            currentState // No change if not the detailed car or not in success state
+                        }
+                    }
+                    _carsState.update { currentCarsState ->
+                        if (currentCarsState is CarsUiState.Success) {
+                            val updatedCars = currentCarsState.cars.map {
+                                if (it.id == updatedCar.id) updatedCar else it
+                            }
+                            CarsUiState.Success(updatedCars)
+                        } else {
+                            currentCarsState
+                        }
+                    }
+                } else {
+                    Log.e(
+                        "CarViewModel",
+                        "Failed to toggle trade availability, repository returned null for car ID: ${carToUpdate.id}",
+                    )
+                    // Revert optimistic update if necessary
+                    if (originalDetailState is CarDetailUiState.Success &&
+                        originalDetailState.car.id == carToUpdate.id
+                    ) {
+                        _carDetailState.update { originalDetailState }
+                    }
+                    // Optionally set a general error state for the detail view
+                    // _carDetailState.update { CarDetailUiState.Error }
+                }
+            } catch (e: Exception) {
+                currentCoroutineContext().ensureActive()
+                Log.e("CarViewModel", "Error toggling trade availability for car ID: ${carToUpdate.id}", e)
+                // Revert optimistic update
+                if (originalDetailState is CarDetailUiState.Success && originalDetailState.car.id == carToUpdate.id) {
+                    _carDetailState.update { originalDetailState }
+                }
+                // Optionally set a general error state for the detail view or a message to the user
+                // _carDetailState.update { CarDetailUiState.Error }
             }
         }
     }
