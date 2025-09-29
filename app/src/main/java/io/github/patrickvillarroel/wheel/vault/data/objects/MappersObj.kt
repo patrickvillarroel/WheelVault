@@ -33,6 +33,7 @@ fun CarItem.toObject() = CarObj(
     description = this.description,
     quantity = this.quantity,
     isFavorite = this.isFavorite,
+    availableForTrade = this.availableForTrade,
 )
 
 fun CarObj.toDomain(images: Set<Any>) = CarItem(
@@ -45,6 +46,7 @@ fun CarObj.toDomain(images: Set<Any>) = CarItem(
     description = this.description,
     quantity = this.quantity,
     isFavorite = this.isFavorite,
+    availableForTrade = this.availableForTrade,
     images = images,
 )
 

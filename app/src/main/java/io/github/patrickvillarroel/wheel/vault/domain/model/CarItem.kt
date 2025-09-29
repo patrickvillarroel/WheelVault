@@ -11,6 +11,7 @@ data class CarItem(
     val images: Set<Any> = setOfNotNull(EmptyImage),
     val quantity: Int = 0,
     val isFavorite: Boolean = false,
+    val availableForTrade: Boolean = false,
     val description: String? = null,
     val category: String? = null,
     val imageUrl: Any = images.first(),
@@ -22,6 +23,7 @@ data class CarItem(
         quantity: Int = 0,
         imageUrl: Any,
         isFavorite: Boolean = false,
+        availableForTrade: Boolean = false,
     ) : this(
         model = model,
         year = year,
@@ -30,6 +32,7 @@ data class CarItem(
         quantity = quantity,
         images = setOf(imageUrl),
         isFavorite = isFavorite,
+        availableForTrade = availableForTrade,
     )
 
     init {
@@ -53,6 +56,7 @@ data class CarItem(
         category = category,
         images = images,
         isFavorite = isFavorite,
+        availableForTrade = availableForTrade,
         id = id,
     )
 
@@ -66,6 +70,7 @@ data class CarItem(
         val category: String? = null,
         val images: Set<Any> = setOf(),
         val isFavorite: Boolean = false,
+        val availableForTrade: Boolean? = null,
         val id: Uuid? = null,
     ) {
         fun toCarItem(): CarItem? {
@@ -78,6 +83,7 @@ data class CarItem(
                 brand = brand ?: manufacturer ?: return null,
                 images = images.takeIf { it.isNotEmpty() } ?: setOfNotNull(EmptyImage),
                 isFavorite = isFavorite,
+                availableForTrade = availableForTrade ?: false,
                 description = this.description,
                 category = this.category,
             )
@@ -97,6 +103,7 @@ data class CarItem(
                 it == EmptyImage || it == io.github.patrickvillarroel.wheel.vault.R.drawable.car_add
             }.takeIf { it.isNotEmpty() }?.toSet() ?: emptySet(),
             isFavorite = isFavorite,
+            availableForTrade = availableForTrade,
             id = id,
         )
     }
