@@ -21,5 +21,5 @@ val presenterModule = module {
     viewModel { OnboardingViewModel(get()) }
     viewModel { HomeViewModel(get()) }
     viewModel { GarageViewModel(get()) }
-    viewModel { ExchangeViewModel(get()) }
+    viewModel { ExchangeViewModel(get(), get()) }
 }
