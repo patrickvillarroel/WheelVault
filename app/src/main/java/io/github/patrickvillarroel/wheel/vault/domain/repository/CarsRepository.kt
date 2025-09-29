@@ -33,4 +33,7 @@ interface CarsRepository {
     /** Only receive images as ByteArray. */
     suspend fun update(car: CarItem): CarItem
     suspend fun delete(car: CarItem): Boolean
+
+    /** Sets the availability of a car for trading. Returns the updated CarItem or null if not found/error. */
+    suspend fun setAvailableForTrade(carId: Uuid, isAvailable: Boolean): CarItem?
 }

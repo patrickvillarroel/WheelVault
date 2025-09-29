@@ -48,4 +48,6 @@ class CarRepositoryImpl(private val supabase: CarSupabaseDataSource) : CarsRepos
     override suspend fun update(car: CarItem): CarItem = supabase.update(car)
 
     override suspend fun delete(car: CarItem): Boolean = supabase.delete(car)
+    override suspend fun setAvailableForTrade(carId: Uuid, isAvailable: Boolean): CarItem? =
+        supabase.setAvailableForTrade(carId, isAvailable)
 }

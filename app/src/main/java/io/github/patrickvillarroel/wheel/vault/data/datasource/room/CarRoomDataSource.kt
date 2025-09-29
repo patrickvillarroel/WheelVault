@@ -109,4 +109,6 @@ class CarRoomDataSource(private val dao: CarDao, private val imageRepository: Im
     }
 
     override suspend fun delete(car: CarItem): Boolean = dao.deleteCar(car.toEntity(null)) > 0
+
+    override suspend fun setAvailableForTrade(carId: Uuid, isAvailable: Boolean): CarItem? = null
 }

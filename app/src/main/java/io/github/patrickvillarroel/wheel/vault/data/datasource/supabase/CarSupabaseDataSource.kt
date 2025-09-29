@@ -25,7 +25,6 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 class CarSupabaseDataSource(private val supabase: SupabaseClient, private val context: Context) : CarsRepository {
@@ -228,10 +227,27 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
         return true
     }
 
+    override suspend fun setAvailableForTrade(carId: Uuid, isAvailable: Boolean): CarItem? {
+        val updatedCarObj = supabase.from(CarObj.TABLE)
+            .update(mapOf("available_for_trade" to isAvailable)) {
+                filter {
+                    CarObj::id eq carId
+                    eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
+                }
+                select()
+            }
+            .decodeSingleOrNull<CarObj>()
+
+        return updatedCarObj?.toDomain(
+            fetchAllImages(updatedCarObj.id!!).ifEmpty { setOf(CarItem.EmptyImage) },
+        )
+    }
+
     suspend fun getCarsForTrade() = supabase.from(CarObj.TABLE)
         .select {
             filter {
                 eq("available_for_trade", true)
+                neq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
             }
             order("updated_at", Order.DESCENDING)
         }.decodeList<CarObj>()
