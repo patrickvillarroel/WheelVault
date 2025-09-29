@@ -104,4 +104,6 @@
     <string name="yes_exit">Sí, salir</string>
     <string name="yes_delete">Sí, eliminar</string>
     <string name="error">Error</string>
+    <string name="mark_for_trading">Marcar para Intercambio</string>
+    <string name="unmark_for_trading">Desmarcar para Intercambio</string>
 </resources>

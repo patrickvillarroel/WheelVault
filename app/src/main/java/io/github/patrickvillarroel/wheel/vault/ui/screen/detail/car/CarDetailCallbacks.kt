@@ -9,9 +9,18 @@ class CarDetailCallbacks(
     val onDeleteClick: () -> Unit,
     val onFavoriteToggle: (Boolean) -> Unit,
     val onRefresh: () -> Unit,
+    val onToggleTradeAvailabilityClick: () -> Unit,
     val headersBackCallbacks: HeaderBackCallbacks,
 ) {
     companion object {
-        fun default(carItem: CarItem) = CarDetailCallbacks(carItem, {}, {}, {}, {}, HeaderBackCallbacks.default)
+        fun default(carItem: CarItem) = CarDetailCallbacks(
+            carDetail = carItem,
+            onEditClick = {},
+            onDeleteClick = {},
+            onFavoriteToggle = {},
+            onRefresh = {},
+            onToggleTradeAvailabilityClick = {},
+            headersBackCallbacks = HeaderBackCallbacks.default,
+        )
     }
 }

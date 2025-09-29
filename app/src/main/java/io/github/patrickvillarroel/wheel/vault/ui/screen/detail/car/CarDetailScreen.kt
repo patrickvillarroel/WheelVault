@@ -64,6 +64,9 @@ fun CarDetailScreen(
                         onRefresh = {
                             carViewModel.findById(carDetail.id, true)
                         },
+                        onToggleTradeAvailabilityClick = {
+                            carViewModel.toggleCarTradeAvailability(carDetail)
+                        },
                     ),
                     modifier = modifier,
                 )

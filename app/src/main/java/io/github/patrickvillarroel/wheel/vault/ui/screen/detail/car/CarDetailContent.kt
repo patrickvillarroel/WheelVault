@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.Icon
@@ -118,6 +119,35 @@ fun CarDetailContent(
                             }
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 OutlinedIconButton(
+                                    onClick = { callbacks.onToggleTradeAvailabilityClick() },
+                                    modifier = Modifier.size(65.dp),
+                                ) {
+                                    Icon(
+                                        Icons.Filled.SwapHoriz,
+                                        contentDescription = if (carDetail.availableForTrade) {
+                                            stringResource(
+                                                R.string.unmark_for_trading,
+                                            )
+                                        } else {
+                                            stringResource(R.string.mark_for_trading)
+                                        },
+                                        modifier = Modifier.size(32.dp),
+                                        tint = if (carDetail.availableForTrade) MaterialTheme.colorScheme.primary else Color.Gray,
+                                    )
+                                }
+                                Text(
+                                    if (carDetail.availableForTrade) {
+                                        stringResource(
+                                            R.string.unmark_for_trading,
+                                        )
+                                    } else {
+                                        stringResource(R.string.mark_for_trading)
+                                    },
+                                    fontWeight = FontWeight.SemiBold,
+                                )
+                            }
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                OutlinedIconButton(
                                     onClick = callbacks.onDeleteClick,
                                     modifier = Modifier.size(65.dp),
                                 ) {
@@ -151,6 +181,7 @@ private fun CarDetailContentPreview() {
             category = "Sedan",
             quantity = 5,
             images = setOf("image1.jpg", "image2.jpg", "image3.jpg"),
+            availableForTrade = true,
         )
     }
 
