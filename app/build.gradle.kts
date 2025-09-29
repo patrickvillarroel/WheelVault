@@ -10,11 +10,14 @@ plugins {
 }
 
 group = "io.github.patrickvillarroel"
-version = "2.0.1"
+version = "2.0.2"
 
 kotlin {
     compilerOptions {
         optIn.addAll(
+            "kotlin.contracts.ExperimentalContracts",
+            "kotlin.time.ExperimentalTime",
+            "kotlin.uuid.ExperimentalUuidApi",
             "androidx.compose.material3.ExperimentalMaterial3Api",
             "androidx.compose.material3.ExperimentalMaterial3ExpressiveApi",
             "androidx.compose.animation.ExperimentalSharedTransitionApi",
@@ -31,7 +34,7 @@ android {
         applicationId = "$group.wheel.vault"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 4
+        versionCode = 5
         versionName = version.toString()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
