@@ -5,25 +5,17 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
-import io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageViewModel
+import io.github.patrickvillarroel.wheel.vault.domain.repository.TradeRepository
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.util.UUID
 
-/* Temporal TODO change datasource of data */
-class ExchangeViewModel(garageViewModel: GarageViewModel) : ViewModel() {
-    val exchangeState = garageViewModel.garageState.map {
-        when (it) {
-            GarageViewModel.GarageUiState.Empty -> ExchangeUiState.Success(emptyList())
-            GarageViewModel.GarageUiState.Error -> ExchangeUiState.Error
-            GarageViewModel.GarageUiState.Loading -> ExchangeUiState.Loading
-            is GarageViewModel.GarageUiState.Success -> ExchangeUiState.Success(it.cars)
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ExchangeUiState.Loading)
+class ExchangeViewModel(private val tradeRepository: TradeRepository) : ViewModel() {
+    private val _exchangeUiState = MutableStateFlow<ExchangeUiState>(ExchangeUiState.Loading)
+    val exchangeState = _exchangeUiState.asStateFlow()
+
     private val _exchangeConfirmState = MutableStateFlow<ExchangeConfirmUiState>(ExchangeConfirmUiState.Loading)
     val exchangeConfirmState = _exchangeConfirmState.asStateFlow()
 
@@ -32,12 +24,7 @@ class ExchangeViewModel(garageViewModel: GarageViewModel) : ViewModel() {
     }
 
     fun offersOf(carId: UUID) {
-        _exchangeConfirmState.update {
-            ExchangeConfirmUiState.WaitingConfirm(
-                (exchangeState.value as ExchangeUiState.Success).cars.first { it.id == carId },
-                (exchangeState.value as ExchangeUiState.Success).cars.random(),
-            )
-        }
+        /* TODO */
     }
 
     fun rejectExchange(offeredCar: CarItem, requestedCar: CarItem) {
