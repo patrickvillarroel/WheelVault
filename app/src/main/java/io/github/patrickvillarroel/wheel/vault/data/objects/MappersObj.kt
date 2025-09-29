@@ -1,18 +1,15 @@
-@file:OptIn(ExperimentalUuidApi::class, ExperimentalTime::class, ExperimentalContracts::class)
-
 package io.github.patrickvillarroel.wheel.vault.data.objects
 
 import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
+import io.github.patrickvillarroel.wheel.vault.domain.model.TradeProposal
 import io.github.patrickvillarroel.wheel.vault.domain.model.VideoNews
-import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import kotlin.time.ExperimentalTime
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.toJavaUuid
 import kotlin.uuid.toKotlinUuid
 
+// Brand
 fun BrandObj.toDomain(image: Any) = Brand(
     name = this.name,
     description = this.description,
@@ -25,6 +22,8 @@ inline fun BrandObj.toDomain(image: (BrandObj) -> Any): Brand {
     contract { callsInPlace(image, InvocationKind.EXACTLY_ONCE) }
     return this.toDomain(image(this))
 }
+
+// Car
 
 fun CarItem.toObject() = CarObj(
     id = this.id.toKotlinUuid(),
@@ -51,10 +50,51 @@ fun CarObj.toDomain(images: Set<Any>) = CarItem(
     images = images,
 )
 
+// Videos
 fun VideoObj.toDomain(thumbnail: Any) = VideoNews(
     id = this.id.toJavaUuid(),
     name = this.name,
     link = this.link,
     thumbnail = thumbnail,
     description = this.description,
+)
+
+// Trades
+fun TradeEventTypeObj.toDomain() = when (this) {
+    TradeEventTypeObj.PROPOSED -> TradeProposal.TradeEventType.PROPOSED
+    TradeEventTypeObj.ACCEPTED -> TradeProposal.TradeEventType.ACCEPTED
+    TradeEventTypeObj.REJECTED -> TradeProposal.TradeEventType.REJECTED
+    TradeEventTypeObj.CANCELLED -> TradeProposal.TradeEventType.CANCELLED
+    TradeEventTypeObj.EXPIRED -> TradeProposal.TradeEventType.EXPIRED
+    TradeEventTypeObj.COMPLETED -> TradeProposal.TradeEventType.COMPLETED
+}
+
+fun TradeProposalObj.toDomain() = TradeProposal(
+    id = this.id,
+    tradeGroupId = this.tradeGroupId,
+    requesterId = this.requesterId,
+    ownerId = this.ownerId,
+    offeredCarId = this.offeredCarId,
+    requestedCarId = this.requestedCarId,
+    eventType = this.eventType.toDomain(),
+    message = this.message,
+    expiresAt = this.expiresAt,
+    createdAt = this.createdAt,
+    createdBy = this.createdBy,
+)
+
+fun CurrentTradeStatusObj.toDomain() = TradeProposal.CurrentTradeStatus(
+    tradeGroupId = this.tradeGroupId,
+    currentStatus = this.currentStatus.toDomain(),
+    effectiveStatus = this.effectiveStatus,
+    requesterId = this.requesterId,
+    ownerId = this.ownerId,
+    offeredCarId = this.offeredCarId,
+    requestedCarId = this.requestedCarId,
+    initialMessage = this.initialMessage,
+    lastMessage = this.lastMessage,
+    proposedAt = this.proposedAt,
+    lastUpdated = this.lastUpdated,
+    isActive = this.isActive,
+    isSuccessful = this.isSuccessful,
 )
