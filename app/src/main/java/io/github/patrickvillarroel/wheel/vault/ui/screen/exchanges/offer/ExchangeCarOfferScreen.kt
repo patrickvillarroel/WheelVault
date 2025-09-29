@@ -17,14 +17,14 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarDetailCal
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarErrorScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.ExchangeViewModel
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.UUID
+import kotlin.uuid.Uuid
 
 @Composable
 fun ExchangeCarOfferScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    carId: UUID,
-    onExchangeTemporalClick: (UUID) -> Unit,
+    carId: Uuid,
+    onExchangeTemporalClick: (Uuid) -> Unit,
     modifier: Modifier = Modifier,
     carViewModel: CarViewModel = koinViewModel(),
     exchangeViewModel: ExchangeViewModel = koinViewModel(),

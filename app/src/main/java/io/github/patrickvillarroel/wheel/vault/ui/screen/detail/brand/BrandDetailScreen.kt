@@ -26,15 +26,15 @@ import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.ui.screen.BrandViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.UUID
+import kotlin.uuid.Uuid
 
 @Composable
 fun BrandDetailScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    brandId: UUID,
+    brandId: Uuid,
     onAddClick: () -> Unit,
-    onCarClick: (UUID) -> Unit,
+    onCarClick: (Uuid) -> Unit,
     headerBackCallbacks: HeaderBackCallbacks,
     modifier: Modifier = Modifier,
     brandViewModel: BrandViewModel = koinViewModel(),

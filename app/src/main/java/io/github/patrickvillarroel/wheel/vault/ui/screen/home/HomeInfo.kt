@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import io.github.patrickvillarroel.wheel.vault.domain.model.VideoNews
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderCallbacks
-import java.util.UUID
+import kotlin.uuid.Uuid
 
 /**
  * @param brands where the first element is the id and the second is the image
@@ -12,30 +12,30 @@ import java.util.UUID
  */
 @Immutable
 data class HomeInfo(
-    @Stable val brands: List<Pair<UUID, Any>>,
+    @Stable val brands: List<Pair<Uuid, Any>>,
     @Stable val news: List<VideoNews>,
-    @Stable val recentCars: List<Pair<UUID, Any>>,
+    @Stable val recentCars: List<Pair<Uuid, Any>>,
 )
 
 class HomeCallbacks(
     @Stable val homeInfo: HomeInfo,
     val onAddClick: () -> Unit,
     val onSearchClick: () -> Unit,
-    val onBrandClick: (UUID) -> Unit,
+    val onBrandClick: (Uuid) -> Unit,
     val onNewsClick: (VideoNews) -> Unit,
-    val onCarClick: (UUID) -> Unit,
+    val onCarClick: (Uuid) -> Unit,
     val onRefresh: () -> Unit,
     headersCallbacks: HeaderCallbacks,
 ) : HeaderCallbacks(headersCallbacks) {
     constructor(
-        brands: List<Pair<UUID, Any>>,
+        brands: List<Pair<Uuid, Any>>,
         news: List<VideoNews>,
-        recentCars: List<Pair<UUID, Any>>,
+        recentCars: List<Pair<Uuid, Any>>,
         onAddClick: () -> Unit,
         onSearchClick: () -> Unit,
-        onBrandClick: (UUID) -> Unit,
+        onBrandClick: (Uuid) -> Unit,
         onNewsClick: (VideoNews) -> Unit,
-        onCarClick: (UUID) -> Unit,
+        onCarClick: (Uuid) -> Unit,
         onRefresh: () -> Unit,
         headerCallbacks: HeaderCallbacks,
     ) : this(
@@ -50,7 +50,7 @@ class HomeCallbacks(
     )
 
     companion object {
-        fun default(brands: List<Pair<UUID, Any>>, news: List<VideoNews>, recentCars: List<Pair<UUID, Any>>) =
+        fun default(brands: List<Pair<Uuid, Any>>, news: List<VideoNews>, recentCars: List<Pair<Uuid, Any>>) =
             HomeCallbacks(
                 brands = brands,
                 news = news,
@@ -69,8 +69,8 @@ class HomeCallbacks(
 class HomeNavCallbacks(
     val onAddClick: () -> Unit,
     val onSearchClick: () -> Unit,
-    val onBrandClick: (UUID) -> Unit,
-    val onCarClick: (UUID) -> Unit,
+    val onBrandClick: (Uuid) -> Unit,
+    val onCarClick: (Uuid) -> Unit,
     val onProfileClick: () -> Unit,
     val onGarageClick: () -> Unit,
     val onFavoritesClick: () -> Unit,

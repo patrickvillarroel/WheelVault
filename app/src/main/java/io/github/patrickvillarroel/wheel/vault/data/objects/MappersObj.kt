@@ -6,8 +6,6 @@ import io.github.patrickvillarroel.wheel.vault.domain.model.TradeProposal
 import io.github.patrickvillarroel.wheel.vault.domain.model.VideoNews
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import kotlin.uuid.toJavaUuid
-import kotlin.uuid.toKotlinUuid
 
 // Brand
 fun BrandObj.toDomain(image: Any) = Brand(
@@ -15,7 +13,7 @@ fun BrandObj.toDomain(image: Any) = Brand(
     description = this.description,
     image = image,
     contentDescription = "Logo of $name", // TODO use i18n
-    id = this.id!!.toJavaUuid(),
+    id = this.id!!,
 )
 
 inline fun BrandObj.toDomain(image: (BrandObj) -> Any): Brand {
@@ -26,7 +24,7 @@ inline fun BrandObj.toDomain(image: (BrandObj) -> Any): Brand {
 // Car
 
 fun CarItem.toObject() = CarObj(
-    id = this.id.toKotlinUuid(),
+    id = this.id,
     model = this.model,
     year = this.year,
     brand = this.brand,
@@ -38,7 +36,7 @@ fun CarItem.toObject() = CarObj(
 )
 
 fun CarObj.toDomain(images: Set<Any>) = CarItem(
-    id = this.id!!.toJavaUuid(),
+    id = this.id!!,
     model = this.model,
     year = this.year,
     brand = this.brand,
@@ -52,7 +50,7 @@ fun CarObj.toDomain(images: Set<Any>) = CarItem(
 
 // Videos
 fun VideoObj.toDomain(thumbnail: Any) = VideoNews(
-    id = this.id.toJavaUuid(),
+    id = this.id,
     name = this.name,
     link = this.link,
     thumbnail = thumbnail,

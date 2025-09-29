@@ -6,10 +6,10 @@ import io.github.patrickvillarroel.wheel.vault.data.entity.toDomain
 import io.github.patrickvillarroel.wheel.vault.data.entity.toEntity
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
-import java.util.UUID
+import kotlin.uuid.Uuid
 
 class CarRoomDataSource(private val dao: CarDao, private val imageRepository: ImageRepository) : CarsRepository {
-    override suspend fun exist(id: UUID): Boolean = dao.exist(id.toString())
+    override suspend fun exist(id: Uuid): Boolean = dao.exist(id.toString())
 
     override suspend fun fetchAll(isFavorite: Boolean, limit: Int, orderAsc: Boolean): List<CarItem> {
         val cars = if (isFavorite) {
@@ -34,7 +34,7 @@ class CarRoomDataSource(private val dao: CarDao, private val imageRepository: Im
     }
 
     // TODO fix this method
-    override suspend fun fetch(id: UUID): CarItem? = dao.fetchById(id.toString())?.let { entity ->
+    override suspend fun fetch(id: Uuid): CarItem? = dao.fetchById(id.toString())?.let { entity ->
         entity.toDomain(setOf(imageRepository.loadImage(entity.idRemote) ?: CarItem.EmptyImage))
     }
 

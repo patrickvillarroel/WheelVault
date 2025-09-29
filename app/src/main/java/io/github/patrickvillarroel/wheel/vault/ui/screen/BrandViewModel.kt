@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.UUID
+import kotlin.uuid.Uuid
 
 class BrandViewModel(
     private val brandRepository: BrandRepository,
@@ -75,7 +75,7 @@ class BrandViewModel(
         }
     }
 
-    fun findById(id: UUID) {
+    fun findById(id: Uuid) {
         val localBrand = (brandsState.value as? BrandsUiState.Success)
             ?.brands
             ?.firstOrNull { it.id == id }

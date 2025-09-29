@@ -36,8 +36,8 @@ import androidx.core.content.FileProvider
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 import io.github.patrickvillarroel.wheel.vault.util.resizeBitmapMaxDimension
-import kotlinx.io.IOException
 import java.io.File
+import java.io.IOException
 
 @Composable
 fun ModalAddImage(

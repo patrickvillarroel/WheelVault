@@ -24,8 +24,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.security.MessageDigest
-import java.util.UUID
 import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 import io.github.jan.supabase.auth.providers.builtin.Email as ProviderEmail
 
 data class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
@@ -111,7 +111,7 @@ data class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
                 _state.update { LoginUiState.Loading }
                 val credentialManager = CredentialManager.create(context)
 
-                val rawNonce = UUID.randomUUID().toString()
+                val rawNonce = Uuid.random().toString()
                 val bytes = rawNonce.toByteArray()
                 val md: MessageDigest = MessageDigest.getInstance("SHA-256")
                 val digest: ByteArray = md.digest(bytes)

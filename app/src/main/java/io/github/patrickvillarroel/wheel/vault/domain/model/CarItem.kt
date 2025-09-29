@@ -1,13 +1,13 @@
 package io.github.patrickvillarroel.wheel.vault.domain.model
 
-import java.util.UUID
+import kotlin.uuid.Uuid
 
 data class CarItem(
-    val id: UUID = UUID.randomUUID(),
     val model: String,
     val year: Int,
     val manufacturer: String,
     val brand: String,
+    val id: Uuid = Uuid.random(),
     val images: Set<Any> = setOfNotNull(EmptyImage),
     val quantity: Int = 0,
     val isFavorite: Boolean = false,
@@ -66,11 +66,11 @@ data class CarItem(
         val category: String? = null,
         val images: Set<Any> = setOf(),
         val isFavorite: Boolean = false,
-        val id: UUID? = null,
+        val id: Uuid? = null,
     ) {
         fun toCarItem(): CarItem? {
             return CarItem(
-                id = this.id ?: UUID.randomUUID(),
+                id = this.id ?: Uuid.random(),
                 model = model ?: return null,
                 year = year ?: return null,
                 manufacturer = manufacturer ?: brand ?: return null,

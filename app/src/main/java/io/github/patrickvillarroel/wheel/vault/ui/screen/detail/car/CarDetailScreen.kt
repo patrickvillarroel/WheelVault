@@ -27,13 +27,13 @@ import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.CarViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.UUID
+import kotlin.uuid.Uuid
 
 @Composable
 fun CarDetailScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    carId: UUID,
+    carId: Uuid,
     onEditClick: (CarItem) -> Unit,
     headerBackCallbacks: HeaderBackCallbacks,
     modifier: Modifier = Modifier,

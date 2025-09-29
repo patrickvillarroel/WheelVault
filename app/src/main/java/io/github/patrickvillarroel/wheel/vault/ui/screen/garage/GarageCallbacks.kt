@@ -2,7 +2,7 @@ package io.github.patrickvillarroel.wheel.vault.ui.screen.garage
 
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderCallbacks
-import java.util.UUID
+import kotlin.uuid.Uuid
 
 class GarageCallbacks(
     val onSearchQueryChange: (String) -> Unit,
@@ -78,7 +78,7 @@ class GarageCallbacks(
     class Partial(
         val onHomeClick: () -> Unit,
         val onAddClick: () -> Unit,
-        val onCarClick: (UUID) -> Unit,
+        val onCarClick: (Uuid) -> Unit,
         val onProfileClick: () -> Unit,
         val onExchangesClick: () -> Unit,
     ) {

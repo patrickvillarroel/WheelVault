@@ -36,7 +36,7 @@ fun CarItem.Partial.toCarEdit(): NavigationKeys.CarEdit {
         images = partial.images.map { it.toString() }.toSet(),
         description = partial.description,
         category = partial.category,
-        id = partial.id?.toKotlinUuid(),
+        id = partial.id,
     )
 }
 
@@ -54,7 +54,7 @@ fun NavigationKeys.CarEdit.toCarPartial(): CarItem.Partial {
         images = partial.images,
         description = partial.description,
         category = partial.category,
-        id = partial.id?.toJavaUuid(),
+        id = partial.id,
     )
 }
 

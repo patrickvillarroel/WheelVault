@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalUuidApi::class)
-
 package io.github.patrickvillarroel.wheel.vault.data.datasource.supabase
 
 import android.content.Context
@@ -27,18 +25,15 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
-import java.util.UUID
-import java.util.concurrent.ConcurrentSkipListSet
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
-import kotlin.uuid.toKotlinUuid
 
 class CarSupabaseDataSource(private val supabase: SupabaseClient, private val context: Context) : CarsRepository {
-    override suspend fun exist(id: UUID): Boolean {
+    override suspend fun exist(id: Uuid): Boolean {
         val count = supabase.from(CarObj.TABLE).select {
             filter {
                 eq("user_id", supabase.auth.currentUserOrNull()!!.id)
-                CarObj::id eq id.toKotlinUuid()
+                CarObj::id eq id
             }
             count(Count.EXACT)
         }.countOrNull() ?: return false
@@ -84,15 +79,15 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
             }
         }.decodeList<CarObj>().map { it.toDomain(fetchAllImages(it.id!!).ifEmpty { setOf(CarItem.EmptyImage) }) }
 
-    override suspend fun fetch(id: UUID): CarItem? = supabase.from(CarObj.TABLE)
+    override suspend fun fetch(id: Uuid): CarItem? = supabase.from(CarObj.TABLE)
         .select {
             filter {
                 eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
-                CarObj::id eq id.toKotlinUuid()
+                CarObj::id eq id
             }
             order("created_at", Order.DESCENDING)
         }.decodeSingleOrNull<CarObj>()?.toDomain(
-            fetchAllImages(id.toKotlinUuid()).ifEmpty {
+            fetchAllImages(id).ifEmpty {
                 setOf(CarItem.EmptyImage)
             },
         )
@@ -184,7 +179,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
         val updated = supabase.from(CarObj.TABLE)
             .update(car.toObject()) {
                 filter {
-                    CarObj::id eq car.id.toKotlinUuid()
+                    CarObj::id eq car.id
                     eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
                 }
                 select()
@@ -200,7 +195,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
 
             if (realImages.isNotEmpty()) {
                 Log.i("Car Supabase", "Uploading images for car ${car.id}")
-                uploadImages(car.id.toKotlinUuid(), realImages).ifEmpty { setOf(CarItem.EmptyImage) }
+                uploadImages(car.id, realImages).ifEmpty { setOf(CarItem.EmptyImage) }
             } else {
                 Log.i("Car Supabase", "No images to upload for car ${car.id} after filter is ByteArray")
                 setOf(CarItem.EmptyImage)
@@ -216,7 +211,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
     override suspend fun delete(car: CarItem): Boolean {
         supabase.from(CarObj.TABLE).delete {
             filter {
-                CarObj::id eq car.id.toKotlinUuid()
+                CarObj::id eq car.id
                 eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
             }
         }
@@ -263,7 +258,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
         images: Set<ByteArray>,
         userId: String = supabase.auth.currentUserOrNull()!!.id,
     ) = coroutineScope {
-        val results: MutableSet<Pair<Uuid, String>> = ConcurrentSkipListSet()
+        val results: MutableSet<Pair<Uuid, String>> = java.util.concurrent.ConcurrentSkipListSet()
 
         images.map { bytes ->
             async {

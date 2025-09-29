@@ -3,17 +3,17 @@ package io.github.patrickvillarroel.wheel.vault.data
 import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.CarSupabaseDataSource
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
-import java.util.UUID
+import kotlin.uuid.Uuid
 
 class CarRepositoryImpl(private val supabase: CarSupabaseDataSource) : CarsRepository {
-    override suspend fun exist(id: UUID): Boolean = supabase.exist(id)
+    override suspend fun exist(id: Uuid): Boolean = supabase.exist(id)
 
     override suspend fun search(query: String, isFavorite: Boolean): List<CarItem> = supabase.search(query, isFavorite)
 
     override suspend fun fetchAll(isFavorite: Boolean, limit: Int, orderAsc: Boolean): List<CarItem> =
         supabase.fetchAll(isFavorite, limit, orderAsc)
 
-    override suspend fun fetch(id: UUID): CarItem? = supabase.fetch(id)
+    override suspend fun fetch(id: Uuid): CarItem? = supabase.fetch(id)
 
     override suspend fun fetchByModel(model: String, isFavorite: Boolean) = supabase.fetchByModel(model, isFavorite)
 

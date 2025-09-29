@@ -6,14 +6,14 @@ import io.github.patrickvillarroel.wheel.vault.data.entity.toDomain
 import io.github.patrickvillarroel.wheel.vault.data.entity.toEntity
 import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
 import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
-import java.util.UUID
+import kotlin.uuid.Uuid
 
 class BrandRoomDataSource(private val dao: BrandDao, private val imageRepository: ImageRepository) : BrandRepository {
     override suspend fun fetchAll(forceRefresh: Boolean): List<Brand> = dao.fetchAll().map {
         it.toDomain(imageRepository.loadImage(it.id) ?: Brand.DEFAULT_IMAGE)
     }
 
-    override suspend fun fetch(id: UUID): Brand? = dao.fetchById(id.toString())?.let { entity ->
+    override suspend fun fetch(id: Uuid): Brand? = dao.fetchById(id.toString())?.let { entity ->
         entity.toDomain(imageRepository.loadImage(entity.id) ?: Brand.DEFAULT_IMAGE)
     }
 

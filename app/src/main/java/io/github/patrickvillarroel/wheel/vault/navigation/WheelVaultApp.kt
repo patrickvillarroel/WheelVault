@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalUuidApi::class)
-
 package io.github.patrickvillarroel.wheel.vault.navigation
 
 import androidx.compose.animation.ContentTransform
@@ -45,9 +43,6 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.splash.OnboardingScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.splash.OnboardingViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.splash.SplashScreen
 import org.koin.compose.viewmodel.koinActivityViewModel
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.toJavaUuid
-import kotlin.uuid.toKotlinUuid
 
 @Composable
 fun WheelVaultApp(
@@ -73,7 +68,7 @@ fun WheelVaultApp(
                     backStack.lastOrNull() is NavigationKeys.Onboarding
                 ) {
                     Snapshot.withMutableSnapshot {
-                        if (!backStack.contains(NavigationKeys.Home)) backStack.add(NavigationKeys.Home)
+                        if (!backStack.contains(NavigationKeys.Home)) backStack += NavigationKeys.Home
                         backStack.removeAll { it !is NavigationKeys.Home }
                     }
                 }
@@ -84,7 +79,7 @@ fun WheelVaultApp(
             -> {
                 Snapshot.withMutableSnapshot {
                     onboardingViewModel.reloadOnboardingState()
-                    if (!backStack.contains(NavigationKeys.Login)) backStack.add(NavigationKeys.Login)
+                    if (!backStack.contains(NavigationKeys.Login)) backStack += NavigationKeys.Login
                     backStack.removeAll { it !is NavigationKeys.Login }
                 }
             }
@@ -107,7 +102,7 @@ fun WheelVaultApp(
                 ) { _ ->
                     SplashScreen(onVideoFinish = {
                         if (onboardingState is OnboardingViewModel.OnboardingUiState.Uncompleted) {
-                            backStack.add(NavigationKeys.Onboarding)
+                            backStack += NavigationKeys.Onboarding
                             return@SplashScreen
                         }
                         isSplashDone = true
@@ -118,18 +113,18 @@ fun WheelVaultApp(
                     LoginScreen(
                         onLoginSuccess = {
                             Snapshot.withMutableSnapshot {
-                                backStack.add(NavigationKeys.Home)
-                                backStack.remove(NavigationKeys.Login)
+                                backStack += NavigationKeys.Home
+                                backStack -= NavigationKeys.Login
                             }
                         },
                         onLoginWithEmail = {
-                            backStack.add(NavigationKeys.LoginWithEmailAndPassword(isMagicLink = true))
+                            backStack += NavigationKeys.LoginWithEmailAndPassword(isMagicLink = true)
                         },
                         onLoginWithEmailAndPasswordClick = {
-                            backStack.add(NavigationKeys.LoginWithEmailAndPassword(isRegister = false))
+                            backStack += NavigationKeys.LoginWithEmailAndPassword(isRegister = false)
                         },
                         onRegisterClick = {
-                            backStack.add(NavigationKeys.LoginWithEmailAndPassword(isRegister = true))
+                            backStack += NavigationKeys.LoginWithEmailAndPassword(isRegister = true)
                         },
                         loginViewModel = koinActivityViewModel(),
                     )
@@ -142,8 +137,8 @@ fun WheelVaultApp(
                         isMagicLink = isMagicLink,
                         onLoginSuccess = {
                             Snapshot.withMutableSnapshot {
-                                backStack.add(NavigationKeys.Home)
-                                backStack.remove(it)
+                                backStack += NavigationKeys.Home
+                                backStack -= it
                             }
                         },
                         loginViewModel = koinActivityViewModel(),
@@ -153,7 +148,7 @@ fun WheelVaultApp(
                 entry<NavigationKeys.Onboarding> { _ ->
                     OnboardingScreen(onFinish = {
                         isSplashDone = true
-                        backStack.remove(NavigationKeys.Onboarding)
+                        backStack -= NavigationKeys.Onboarding
                     }, viewModel = koinActivityViewModel())
                 }
 
@@ -162,15 +157,15 @@ fun WheelVaultApp(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
                         callbacks = HomeNavCallbacks(
-                            onAddClick = { backStack.add(NavigationKeys.AddCamera) },
-                            onSearchClick = { backStack.add(NavigationKeys.Garage("")) },
-                            onBrandClick = { backStack.add(NavigationKeys.BrandDetail(it.toKotlinUuid())) },
-                            onGarageClick = { backStack.add(NavigationKeys.Garage()) },
-                            onCarClick = { backStack.add(NavigationKeys.CarDetail(it.toKotlinUuid())) },
-                            onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
-                            onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
-                            onProfileClick = { backStack.add(NavigationKeys.Profile) },
-                            onExchangesClick = { backStack.add(NavigationKeys.Exchanges()) },
+                            onAddClick = { backStack += NavigationKeys.AddCamera },
+                            onSearchClick = { backStack += NavigationKeys.Garage("") },
+                            onBrandClick = { backStack += NavigationKeys.BrandDetail(it) },
+                            onGarageClick = { backStack += NavigationKeys.Garage() },
+                            onCarClick = { backStack += NavigationKeys.CarDetail(it) },
+                            onFavoritesClick = { backStack += NavigationKeys.Garage(favorites = true) },
+                            onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
+                            onProfileClick = { backStack += NavigationKeys.Profile },
+                            onExchangesClick = { backStack += NavigationKeys.Exchanges() },
                         ),
                     )
                 }
@@ -180,8 +175,8 @@ fun WheelVaultApp(
                         onBack = { backStack.removeLastOrNull() },
                         onAddDetail = { carModel, _ ->
                             Snapshot.withMutableSnapshot {
-                                backStack.add(NavigationKeys.CarEdit(model = carModel, fromCamera = true))
-                                backStack.remove(NavigationKeys.AddCamera)
+                                backStack += NavigationKeys.CarEdit(model = carModel, fromCamera = true)
+                                backStack -= NavigationKeys.AddCamera
                             }
                         },
                     )
@@ -191,17 +186,17 @@ fun WheelVaultApp(
                     BrandDetailScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
-                        brandId = id.toJavaUuid(),
+                        brandId = id,
                         headerBackCallbacks = HeaderBackCallbacks(
                             onBackClick = { backStack.removeLastOrNull() },
-                            onProfileClick = { backStack.add(NavigationKeys.Profile) },
-                            onGarageClick = { backStack.add(NavigationKeys.Garage()) },
-                            onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
-                            onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
-                            onExchangesClick = { backStack.add(NavigationKeys.Exchanges()) },
+                            onProfileClick = { backStack += NavigationKeys.Profile },
+                            onGarageClick = { backStack += NavigationKeys.Garage() },
+                            onFavoritesClick = { backStack += NavigationKeys.Garage(favorites = true) },
+                            onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
+                            onExchangesClick = { backStack += NavigationKeys.Exchanges() },
                         ),
-                        onAddClick = { backStack.add(NavigationKeys.AddCamera) },
-                        onCarClick = { backStack.add(NavigationKeys.CarDetail(it.toKotlinUuid())) },
+                        onAddClick = { backStack += NavigationKeys.AddCamera },
+                        onCarClick = { backStack += NavigationKeys.CarDetail(it) },
                     )
                 }
 
@@ -213,10 +208,10 @@ fun WheelVaultApp(
                         favorites = favorites,
                         callbacks = GarageCallbacks.Partial(
                             onHomeClick = { backStack.removeAllOrAdd(NavigationKeys.Home) },
-                            onCarClick = { backStack.add(NavigationKeys.CarDetail(it.toKotlinUuid())) },
-                            onAddClick = { backStack.add(NavigationKeys.AddCamera) },
-                            onProfileClick = { backStack.add(NavigationKeys.Profile) },
-                            onExchangesClick = { backStack.add(NavigationKeys.Exchanges()) },
+                            onCarClick = { backStack += NavigationKeys.CarDetail(it) },
+                            onAddClick = { backStack += NavigationKeys.AddCamera },
+                            onProfileClick = { backStack += NavigationKeys.Profile },
+                            onExchangesClick = { backStack += NavigationKeys.Exchanges() },
                         ),
                     )
                 }
@@ -225,15 +220,15 @@ fun WheelVaultApp(
                     CarDetailScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
-                        carId = id.toJavaUuid(),
-                        onEditClick = { backStack.add(it.toCarEdit()) },
+                        carId = id,
+                        onEditClick = { backStack += it.toCarEdit() },
                         headerBackCallbacks = HeaderBackCallbacks(
                             onBackClick = { backStack.removeLastOrNull() },
-                            onProfileClick = { backStack.add(NavigationKeys.Profile) },
-                            onGarageClick = { backStack.add(NavigationKeys.Garage()) },
-                            onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
-                            onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
-                            onExchangesClick = { backStack.add(NavigationKeys.Exchanges()) },
+                            onProfileClick = { backStack += NavigationKeys.Profile },
+                            onGarageClick = { backStack += NavigationKeys.Garage() },
+                            onFavoritesClick = { backStack += NavigationKeys.Garage(favorites = true) },
+                            onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
+                            onExchangesClick = { backStack += NavigationKeys.Exchanges() },
                         ),
                     )
                 }
@@ -244,11 +239,11 @@ fun WheelVaultApp(
                         fromCamera = edit.fromCamera,
                         headersBackCallbacks = HeaderBackCallbacks(
                             onBackClick = { backStack.removeLastOrNull() },
-                            onProfileClick = { backStack.add(NavigationKeys.Profile) },
-                            onGarageClick = { backStack.add(NavigationKeys.Garage()) },
-                            onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
-                            onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
-                            onExchangesClick = { backStack.add(NavigationKeys.Exchanges()) },
+                            onProfileClick = { backStack += NavigationKeys.Profile },
+                            onGarageClick = { backStack += NavigationKeys.Garage() },
+                            onFavoritesClick = { backStack += NavigationKeys.Garage(favorites = true) },
+                            onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
+                            onExchangesClick = { backStack += NavigationKeys.Exchanges() },
                         ),
                     )
                 }
@@ -258,10 +253,10 @@ fun WheelVaultApp(
                         backCallbacks = HeaderBackCallbacks(
                             onProfileClick = {},
                             onBackClick = { backStack.removeLastOrNull() },
-                            onGarageClick = { backStack.add(NavigationKeys.Garage()) },
-                            onFavoritesClick = { backStack.add(NavigationKeys.Garage(favorites = true)) },
-                            onStatisticsClick = { backStack.add(NavigationKeys.Garage(statistics = true)) },
-                            onExchangesClick = { backStack.add(NavigationKeys.Exchanges()) },
+                            onGarageClick = { backStack += NavigationKeys.Garage() },
+                            onFavoritesClick = { backStack += NavigationKeys.Garage(favorites = true) },
+                            onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
+                            onExchangesClick = { backStack += NavigationKeys.Exchanges() },
                         ),
                         sessionViewModel = koinActivityViewModel(),
                     )
@@ -272,9 +267,9 @@ fun WheelVaultApp(
                         query = query ?: "",
                         callbacks = GarageCallbacks.Partial(
                             onHomeClick = { backStack.removeAllOrAdd(NavigationKeys.Home) },
-                            onCarClick = { backStack.add(NavigationKeys.ExchangeCarDetail(it.toKotlinUuid())) },
-                            onAddClick = { backStack.add(NavigationKeys.AddCamera) },
-                            onProfileClick = { backStack.add(NavigationKeys.Profile) },
+                            onCarClick = { backStack += NavigationKeys.ExchangeCarDetail(it) },
+                            onAddClick = { backStack += NavigationKeys.AddCamera },
+                            onProfileClick = { backStack += NavigationKeys.Profile },
                             onExchangesClick = {},
                         ),
                     )
@@ -284,14 +279,14 @@ fun WheelVaultApp(
                     ExchangeCarDetailScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
-                        carId = id.toJavaUuid(),
-                        onExchangeCarClick = { backStack.add(NavigationKeys.ExchangeCarSelection) },
+                        carId = id,
+                        onExchangeCarClick = { backStack += NavigationKeys.ExchangeCarSelection },
                     )
                 }
 
                 entry<NavigationKeys.ExchangeCarSelection> { _ ->
                     ExchangeCarSelectionScreen(
-                        onCarClick = { backStack.add(NavigationKeys.ExchangeCarOffer(it.id.toKotlinUuid())) },
+                        onCarClick = { backStack += NavigationKeys.ExchangeCarOffer(it.id) },
                     )
                 }
 
@@ -299,15 +294,13 @@ fun WheelVaultApp(
                     ExchangeCarOfferScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
-                        carId = id.toJavaUuid(),
-                        onExchangeTemporalClick = {
-                            backStack.add(NavigationKeys.ExchangeConfirmation(it.toKotlinUuid()))
-                        },
+                        carId = id,
+                        onExchangeTemporalClick = { backStack += NavigationKeys.ExchangeConfirmation(it) },
                     )
                 }
 
                 entry<NavigationKeys.ExchangeConfirmation> { (id) ->
-                    ExchangeConfirmCarScreen(id.toJavaUuid())
+                    ExchangeConfirmCarScreen(id)
                 }
             },
         )

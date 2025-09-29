@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import java.util.UUID
+import kotlin.uuid.Uuid
 
 @Entity(
     tableName = "cars",
@@ -39,5 +39,5 @@ class CarEntity(
 
     // FIXME
     @ColumnInfo(name = "id_remote")
-    val idRemote: String = UUID.randomUUID().toString(),
+    val idRemote: String = Uuid.random().toString(),
 )

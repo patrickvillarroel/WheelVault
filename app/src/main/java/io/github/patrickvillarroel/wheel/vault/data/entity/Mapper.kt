@@ -3,10 +3,10 @@ package io.github.patrickvillarroel.wheel.vault.data.entity
 import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.domain.model.VideoNews
-import java.util.UUID
+import kotlin.uuid.Uuid
 
 fun BrandEntity.toDomain(image: Any) = Brand(
-    id = UUID.fromString(this.id),
+    id = Uuid.parse(this.id),
     name = this.name,
     description = this.description,
     image = image,
@@ -20,7 +20,7 @@ fun Brand.toEntity() = BrandEntity(
 )
 
 fun CarEntity.toDomain(images: Set<Any>) = CarItem(
-    id = UUID.fromString(idRemote),
+    id = Uuid.parse(idRemote),
     model = this.model,
     year = this.year,
     manufacturer = this.manufacturer,
@@ -48,7 +48,7 @@ fun CarItem.toEntity(userId: String?) = CarEntity(
 
 // VideoNews
 fun NewsEntity.toDomain(thumbnail: Any) = VideoNews(
-    id = UUID.fromString(idRemote),
+    id = Uuid.parse(idRemote),
     name = this.name,
     link = this.link,
     thumbnail = thumbnail,

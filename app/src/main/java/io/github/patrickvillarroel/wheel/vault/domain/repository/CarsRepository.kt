@@ -1,7 +1,7 @@
 package io.github.patrickvillarroel.wheel.vault.domain.repository
 
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
-import java.util.UUID
+import kotlin.uuid.Uuid
 
 /**
  * Repository for cars.
@@ -9,11 +9,11 @@ import java.util.UUID
  * @param isFavorite If true, only favorite cars will be returned.
  */
 interface CarsRepository {
-    suspend fun exist(id: UUID): Boolean
+    suspend fun exist(id: Uuid): Boolean
     suspend fun search(query: String, isFavorite: Boolean = false): List<CarItem>
 
     suspend fun fetchAll(isFavorite: Boolean = false, limit: Int = 10, orderAsc: Boolean = true): List<CarItem>
-    suspend fun fetch(id: UUID): CarItem?
+    suspend fun fetch(id: Uuid): CarItem?
     suspend fun fetchByModel(model: String, isFavorite: Boolean = false): List<CarItem>
     suspend fun fetchByYear(year: Int, isFavorite: Boolean = false): List<CarItem>
     suspend fun fetchByManufacturer(manufacturer: String, isFavorite: Boolean = false): List<CarItem>

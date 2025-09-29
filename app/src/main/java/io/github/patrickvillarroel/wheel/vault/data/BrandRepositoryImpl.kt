@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalUuidApi::class)
-
 package io.github.patrickvillarroel.wheel.vault.data
 
 import io.github.patrickvillarroel.wheel.vault.data.datasource.image.ImageDownloadHelper
@@ -10,9 +8,7 @@ import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
-import java.util.UUID
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.toKotlinUuid
+import kotlin.uuid.Uuid
 
 /**
  * Brands repository.
@@ -33,9 +29,9 @@ class BrandRepositoryImpl(
             launch {
                 room.saveAll(
                     it,
-                    it.map {
+                    it.map { brand ->
                         async {
-                            imageHelper.downloadImage(supabase.buildImageRequest(it.id.toKotlinUuid()))
+                            imageHelper.downloadImage(supabase.buildImageRequest(brand.id))
                         }
                     }
                         .awaitAll()
@@ -46,7 +42,7 @@ class BrandRepositoryImpl(
         forceRefresh = forceRefresh,
     )
 
-    override suspend fun fetch(id: UUID): Brand? = supabase.fetch(id)
+    override suspend fun fetch(id: Uuid): Brand? = supabase.fetch(id)
 
     override suspend fun fetchByName(name: String): Brand? = supabase.fetchByName(name)
 

@@ -15,11 +15,11 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarDetailCal
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarErrorScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.ExchangeViewModel
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.UUID
+import kotlin.uuid.Uuid
 
 @Composable
 fun ExchangeConfirmCarScreen(
-    requestCarId: UUID,
+    requestCarId: Uuid,
     modifier: Modifier = Modifier,
     exchangeViewModel: ExchangeViewModel = koinViewModel(),
 ) {

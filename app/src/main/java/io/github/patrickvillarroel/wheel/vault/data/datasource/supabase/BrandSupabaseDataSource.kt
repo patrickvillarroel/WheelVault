@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalUuidApi::class)
-
 package io.github.patrickvillarroel.wheel.vault.data.datasource.supabase
 
 import android.content.Context
@@ -11,10 +9,7 @@ import io.github.patrickvillarroel.wheel.vault.data.objects.BrandObj
 import io.github.patrickvillarroel.wheel.vault.data.objects.toDomain
 import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
 import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
-import java.util.UUID
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
-import kotlin.uuid.toKotlinUuid
 
 class BrandSupabaseDataSource(private val supabase: SupabaseClient, private val context: Context) : BrandRepository {
 
@@ -32,8 +27,8 @@ class BrandSupabaseDataSource(private val supabase: SupabaseClient, private val 
             it.toDomain(fetchImage(it.id!!))
         }
 
-    override suspend fun fetch(id: UUID): Brand? = supabase.from(BrandObj.TABLE).select {
-        filter { BrandObj::id eq id.toKotlinUuid() }
+    override suspend fun fetch(id: Uuid): Brand? = supabase.from(BrandObj.TABLE).select {
+        filter { BrandObj::id eq id }
     }.decodeSingleOrNull<BrandObj>()?.toDomain {
         fetchImage(it.id!!)
     }

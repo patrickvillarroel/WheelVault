@@ -37,11 +37,10 @@ import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.VideoNews
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BrandCard
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.CarCard
-import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.RaceDivider
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.VideoCardPreview
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
-import java.util.UUID
+import kotlin.uuid.Uuid
 
 @Composable
 fun HomeContent(
@@ -178,17 +177,17 @@ private fun HomeContentPreview() {
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
                     info = HomeCallbacks.default(
-                        brands = List(10) { UUID.randomUUID() to R.drawable.hot_wheels_logo_black },
+                        brands = List(10) { Uuid.random() to R.drawable.hot_wheels_logo_black },
                         news = List(10) {
                             VideoNews(
                                 thumbnail = R.drawable.thumbnail_example,
-                                id = UUID.randomUUID(),
+                                id = Uuid.random(),
                                 name = "Example",
                                 link = "Example",
                                 description = "A video of hot wheels events.",
                             )
                         },
-                        recentCars = List(10) { UUID.randomUUID() to R.drawable.batman_car },
+                        recentCars = List(10) { Uuid.random() to R.drawable.batman_car },
                     ),
                 )
             }

@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.UUID
+import kotlin.uuid.Uuid
 
 class ExchangeViewModel(private val tradeRepository: TradeRepository) : ViewModel() {
     private val _exchangeUiState = MutableStateFlow<ExchangeUiState>(ExchangeUiState.Loading)
@@ -23,7 +23,7 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository) : ViewMode
         /* TODO */
     }
 
-    fun offersOf(carId: UUID) {
+    fun offersOf(carId: Uuid) {
         /* TODO */
     }
 

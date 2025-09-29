@@ -22,9 +22,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.UUID
+import kotlin.uuid.Uuid
 
-data class CarViewModel(
+class CarViewModel(
     private val carsRepository: CarsRepository,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : ViewModel() {
@@ -68,7 +68,7 @@ data class CarViewModel(
         }
     }
 
-    fun findById(id: UUID, force: Boolean = false) {
+    fun findById(id: Uuid, force: Boolean = false) {
         val localMatch = (carsState.value as? CarsUiState.Success)
             ?.cars
             ?.firstOrNull { it.id == id }
