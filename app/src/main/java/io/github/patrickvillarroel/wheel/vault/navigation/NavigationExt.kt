@@ -4,25 +4,20 @@ package io.github.patrickvillarroel.wheel.vault.navigation
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.entry
+import androidx.navigation3.scene.Scene
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import androidx.navigation3.ui.NavDisplay
-import androidx.navigationevent.NavigationEventSwipeEdge
+import androidx.navigationevent.NavigationEvent
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.toJavaUuid
-import kotlin.uuid.toKotlinUuid
 
 /** Extension function to convert a [CarItem] to a [NavigationKeys.CarEdit], only callable in a [EntryProviderBuilder] */
 fun CarItem.toCarEdit(): NavigationKeys.CarEdit = this.toPartial().toCarEdit()
 
 /** Extension function to convert a [CarItem.Partial] to a [NavigationKeys.CarEdit], only callable in a [EntryProviderBuilder] */
-@OptIn(ExperimentalUuidApi::class)
 fun CarItem.Partial.toCarEdit(): NavigationKeys.CarEdit {
     val partial = this
     return NavigationKeys.CarEdit(
@@ -41,7 +36,6 @@ fun CarItem.Partial.toCarEdit(): NavigationKeys.CarEdit {
 }
 
 /** Extension function to convert a [NavigationKeys.CarEdit] to [CarItem.Partial], especial only callable in a [EntryProviderBuilder] */
-@OptIn(ExperimentalUuidApi::class)
 fun NavigationKeys.CarEdit.toCarPartial(): CarItem.Partial {
     val partial = this
     return CarItem.Partial(
@@ -70,11 +64,12 @@ fun NavigationKeys.CarEdit.toCarPartial(): CarItem.Partial {
  * @param metadata provides information to the display
  * @param content content for this entry to be displayed when this entry is active with [AnimatedContentScope] of [LocalNavAnimatedContentScope].
  */
-inline fun <reified T : NavKey> EntryProviderBuilder<NavKey>.entry(
+inline fun <reified T : NavKey> EntryProviderBuilder<NavKey>.route(
     noinline transitionSpec: (AnimatedContentTransitionScope<*>.() -> ContentTransform?)? = null,
     noinline popTransitionSpec: (AnimatedContentTransitionScope<*>.() -> ContentTransform?)? = null,
-    noinline predictivePopTransitionSpec:
-    (AnimatedContentTransitionScope<*>.(NavigationEventSwipeEdge) -> ContentTransform?)? = null,
+    noinline predictivePopTransitionSpec: (
+        AnimatedContentTransitionScope<Scene<*>>.(@NavigationEvent.SwipeEdge Int) -> ContentTransform?
+    )? = null,
     metadata: Map<String, Any> = emptyMap(),
     noinline content: @Composable AnimatedContentScope.(T) -> Unit,
 ) {

@@ -96,7 +96,7 @@ fun WheelVaultApp(
             transitionSpec = { ContentTransform(slideInHorizontally { it }, slideOutHorizontally()) },
             popTransitionSpec = { ContentTransform(slideInHorizontally(), slideOutHorizontally { it }) },
             entryProvider = entryProvider {
-                entry<NavigationKeys.Splash>(
+                route<NavigationKeys.Splash>(
                     transitionSpec = { ContentTransform(slideInVertically { -it }, slideOutVertically { it }) },
                     popTransitionSpec = { ContentTransform(slideInVertically { it }, slideOutVertically { -it }) },
                 ) { _ ->
@@ -109,7 +109,7 @@ fun WheelVaultApp(
                     })
                 }
 
-                entry<NavigationKeys.Login> { _ ->
+                route<NavigationKeys.Login> { _ ->
                     LoginScreen(
                         onLoginSuccess = {
                             Snapshot.withMutableSnapshot {
@@ -130,7 +130,7 @@ fun WheelVaultApp(
                     )
                 }
 
-                entry<NavigationKeys.LoginWithEmailAndPassword> {
+                route<NavigationKeys.LoginWithEmailAndPassword> {
                     val (isRegister, isMagicLink) = it
                     LoginWithEmailScreen(
                         isRegister = isRegister,
@@ -145,14 +145,14 @@ fun WheelVaultApp(
                     )
                 }
 
-                entry<NavigationKeys.Onboarding> { _ ->
+                route<NavigationKeys.Onboarding> { _ ->
                     OnboardingScreen(onFinish = {
                         isSplashDone = true
                         backStack -= NavigationKeys.Onboarding
                     }, viewModel = koinActivityViewModel())
                 }
 
-                entry<NavigationKeys.Home> { _ ->
+                route<NavigationKeys.Home> { _ ->
                     HomeScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
@@ -170,7 +170,7 @@ fun WheelVaultApp(
                     )
                 }
 
-                entry<NavigationKeys.AddCamera> { _ ->
+                route<NavigationKeys.AddCamera> { _ ->
                     CameraLensScreen(
                         onBack = { backStack.removeLastOrNull() },
                         onAddDetail = { carModel, _ ->
@@ -182,7 +182,7 @@ fun WheelVaultApp(
                     )
                 }
 
-                entry<NavigationKeys.BrandDetail> { (id) ->
+                route<NavigationKeys.BrandDetail> { (id) ->
                     BrandDetailScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
@@ -200,7 +200,7 @@ fun WheelVaultApp(
                     )
                 }
 
-                entry<NavigationKeys.Garage> { (query, favorites) ->
+                route<NavigationKeys.Garage> { (query, favorites) ->
                     GarageScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
@@ -216,7 +216,7 @@ fun WheelVaultApp(
                     )
                 }
 
-                entry<NavigationKeys.CarDetail> { (id) ->
+                route<NavigationKeys.CarDetail> { (id) ->
                     CarDetailScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
@@ -233,7 +233,7 @@ fun WheelVaultApp(
                     )
                 }
 
-                entry<NavigationKeys.CarEdit> { edit ->
+                route<NavigationKeys.CarEdit> { edit ->
                     CarEditScreen(
                         partialCarItem = edit.toCarPartial(),
                         fromCamera = edit.fromCamera,
@@ -248,7 +248,7 @@ fun WheelVaultApp(
                     )
                 }
 
-                entry<NavigationKeys.Profile> { _ ->
+                route<NavigationKeys.Profile> { _ ->
                     ProfileScreen(
                         backCallbacks = HeaderBackCallbacks(
                             onProfileClick = {},
@@ -262,7 +262,7 @@ fun WheelVaultApp(
                     )
                 }
 
-                entry<NavigationKeys.Exchanges> { (query) ->
+                route<NavigationKeys.Exchanges> { (query) ->
                     ExchangeScreen(
                         query = query ?: "",
                         callbacks = GarageCallbacks.Partial(
@@ -275,7 +275,7 @@ fun WheelVaultApp(
                     )
                 }
 
-                entry<NavigationKeys.ExchangeCarDetail> { (id) ->
+                route<NavigationKeys.ExchangeCarDetail> { (id) ->
                     ExchangeCarDetailScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
@@ -284,13 +284,13 @@ fun WheelVaultApp(
                     )
                 }
 
-                entry<NavigationKeys.ExchangeCarSelection> { _ ->
+                route<NavigationKeys.ExchangeCarSelection> { _ ->
                     ExchangeCarSelectionScreen(
                         onCarClick = { backStack += NavigationKeys.ExchangeCarOffer(it.id) },
                     )
                 }
 
-                entry<NavigationKeys.ExchangeCarOffer> { (id) ->
+                route<NavigationKeys.ExchangeCarOffer> { (id) ->
                     ExchangeCarOfferScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
@@ -299,7 +299,7 @@ fun WheelVaultApp(
                     )
                 }
 
-                entry<NavigationKeys.ExchangeConfirmation> { (id) ->
+                route<NavigationKeys.ExchangeConfirmation> { (id) ->
                     ExchangeConfirmCarScreen(id)
                 }
             },
