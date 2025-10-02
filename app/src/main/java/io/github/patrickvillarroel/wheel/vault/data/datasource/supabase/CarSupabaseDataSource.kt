@@ -25,6 +25,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
+import java.util.concurrent.ConcurrentSkipListSet
 import kotlin.uuid.Uuid
 
 class CarSupabaseDataSource(private val supabase: SupabaseClient, private val context: Context) : CarsRepository {
@@ -45,25 +46,35 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
         return count >= 1L
     }
 
-    override suspend fun search(query: String, isFavorite: Boolean): List<CarItem> = supabase
-        .from(CarObj.TABLE)
-        .select {
-            filter {
-                eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
-                textSearch(
-                    CarObj.FULL_TEXT_SEARCH_FIELD,
-                    query,
-                    textSearchType = TextSearchType.PLAINTO,
-                )
-                if (isFavorite) CarObj::isFavorite eq true
+    override suspend fun search(query: String, isFavorite: Boolean): List<CarItem> {
+        val cars = supabase
+            .from(CarObj.TABLE)
+            .select {
+                filter {
+                    eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
+                    textSearch(
+                        CarObj.FULL_TEXT_SEARCH_FIELD,
+                        query,
+                        textSearchType = TextSearchType.PLAINTO,
+                    )
+                    if (isFavorite) CarObj::isFavorite eq true
+                }
+                order("created_at", Order.DESCENDING)
             }
-            order("created_at", Order.DESCENDING)
-        }
-        .decodeList<CarObj>()
-        .map { it.toDomain(fetchAllImages(it.id!!).ifEmpty { setOf(CarItem.EmptyImage) }) }
+            .decodeList<CarObj>()
 
-    override suspend fun fetchAll(isFavorite: Boolean, limit: Int, orderAsc: Boolean): List<CarItem> =
-        supabase.from(CarObj.TABLE).select {
+        val imagesByCarId = fetchAllImages(cars.mapNotNull { it.id })
+            .groupBy { it.first }
+            .mapValues { (_, list) -> list.map { it.second }.toSet().ifEmpty { setOf(CarItem.EmptyImage) } }
+
+        return cars.map { car ->
+            val images = imagesByCarId[car.id] ?: setOf(CarItem.EmptyImage)
+            car.toDomain(images)
+        }
+    }
+
+    override suspend fun fetchAll(isFavorite: Boolean, limit: Int, orderAsc: Boolean): List<CarItem> {
+        val cars = supabase.from(CarObj.TABLE).select {
             filter {
                 eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
                 if (isFavorite) {
@@ -76,19 +87,21 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
             } else {
                 order("created_at", Order.DESCENDING)
             }
-        }.decodeList<CarObj>().map { it.toDomain(fetchAllImages(it.id!!).ifEmpty { setOf(CarItem.EmptyImage) }) }
+        }.decodeList<CarObj>()
+
+        val imagesCars = fetchAllImages(cars.mapNotNull { it.id })
+            .groupBy { it.first }
+            .mapValues { (_, list) -> list.map { it.second }.toSet().ifEmpty { setOf(CarItem.EmptyImage) } }
+
+        return cars.map { car -> car.toDomain(imagesCars[car.id] ?: setOf(CarItem.EmptyImage)) }
+    }
 
     override suspend fun fetch(id: Uuid): CarItem? = supabase.from(CarObj.TABLE)
         .select {
-            filter {
-                eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
-                CarObj::id eq id
-            }
+            filter { CarObj::id eq id }
             order("created_at", Order.DESCENDING)
         }.decodeSingleOrNull<CarObj>()?.toDomain(
-            fetchAllImages(id).ifEmpty {
-                setOf(CarItem.EmptyImage)
-            },
+            fetchAllImages(id).ifEmpty { setOf(CarItem.EmptyImage) },
         )
 
     override suspend fun fetchByModel(model: String, isFavorite: Boolean) = fetchByField("model", model, isFavorite)
@@ -103,22 +116,30 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
     override suspend fun fetchByCategory(category: String, isFavorite: Boolean) =
         fetchByField("category", category, isFavorite)
 
-    private suspend fun <T : Any> fetchByField(field: String, value: T, isFavorite: Boolean) = supabase
-        .from(CarObj.TABLE)
-        .select {
-            filter {
-                eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
-                if (value is String) {
-                    ilike(field, "%$value%")
-                } else {
-                    eq(field, value)
+    private suspend fun <T : Any> fetchByField(field: String, value: T, isFavorite: Boolean): List<CarItem> {
+        val cars =
+            supabase
+                .from(CarObj.TABLE)
+                .select {
+                    filter {
+                        eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
+                        if (value is String) {
+                            ilike(field, "%$value%")
+                        } else {
+                            eq(field, value)
+                        }
+                        if (isFavorite) CarObj::isFavorite eq true
+                    }
+                    order("created_at", Order.DESCENDING)
                 }
-                if (isFavorite) CarObj::isFavorite eq true
-            }
-            order("created_at", Order.DESCENDING)
-        }
-        .decodeList<CarObj>()
-        .map { it.toDomain(fetchAllImages(it.id!!).ifEmpty { setOf(CarItem.EmptyImage) }) }
+                .decodeList<CarObj>()
+
+        val carsImages = fetchAllImages(cars.mapNotNull { it.id })
+            .groupBy { it.first }
+            .mapValues { (_, list) -> list.map { it.second }.toSet().ifEmpty { setOf(CarItem.EmptyImage) } }
+
+        return cars.map { car -> car.toDomain(carsImages[car.id] ?: setOf(CarItem.EmptyImage)) }
+    }
 
     override suspend fun count(isFavorite: Boolean): Int = countByField(null, null, isFavorite)
 
@@ -243,15 +264,22 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
         )
     }
 
-    suspend fun getCarsForTrade() = supabase.from(CarObj.TABLE)
-        .select {
-            filter {
-                eq("available_for_trade", true)
-                neq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
-            }
-            order("updated_at", Order.DESCENDING)
-        }.decodeList<CarObj>()
-        .map { it.toDomain(fetchAllImages(it.id!!).ifEmpty { setOf(CarItem.EmptyImage) }) }
+    suspend fun getCarsForTrade(): List<CarItem> {
+        val cars = supabase.from(CarObj.TABLE)
+            .select {
+                filter {
+                    eq("available_for_trade", true)
+                    neq(CarObj.USER_ID_FIELD, Uuid.parse(supabase.auth.currentUserOrNull()?.id ?: return emptyList()))
+                }
+                order("updated_at", Order.DESCENDING)
+            }.decodeList<CarObj>()
+
+        val carsImages = fetchAllImages(cars.mapNotNull { it.id })
+            .groupBy { it.first }
+            .mapValues { (_, list) -> list.map { it.second }.toSet().ifEmpty { setOf(CarItem.EmptyImage) } }
+
+        return cars.map { car -> car.toDomain(carsImages[car.id] ?: setOf(CarItem.EmptyImage)) }
+    }
 
     // FIXME O(n+1)
     private suspend fun fetchAllImages(carId: Uuid) = supabase.postgrest
@@ -269,12 +297,29 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
                 .build()
         }.toSet()
 
+    private suspend fun fetchAllImages(carsId: List<Uuid>) = supabase.postgrest
+        .from(CarImagesObj.TABLE)
+        .select(Columns.list("car_id", "storage_path")) {
+            filter {
+                CarImagesObj::carId isIn carsId
+            }
+        }
+        .decodeList<Map<String, String>>()
+        .mapNotNull { image ->
+            val carId = image["car_id"]?.let { Uuid.parse(it) } ?: return@mapNotNull null
+            val path = image["storage_path"] ?: return@mapNotNull null
+
+            carId to ImageRequest.Builder(context)
+                .data(authenticatedStorageItem(CarObj.BUCKET_IMAGES, path))
+                .build()
+        }
+
     private suspend fun uploadImages(
         carId: Uuid,
         images: Set<ByteArray>,
         userId: String = supabase.auth.currentUserOrNull()!!.id,
     ) = coroutineScope {
-        val results: MutableSet<Pair<Uuid, String>> = java.util.concurrent.ConcurrentSkipListSet()
+        val results: MutableSet<Pair<Uuid, String>> = ConcurrentSkipListSet()
 
         images.map { bytes ->
             async {
