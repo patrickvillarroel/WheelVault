@@ -26,7 +26,7 @@ androidx-lifecycle-viewmodel-nav3 = "1.0.0-alpha04"
 androidx-media3 = "1.8.0"
 
 # https://developer.android.com/jetpack/androidx/releases/navigation3
-androidx-navigation3 = "1.0.0-alpha09"
+androidx-navigation3 = "1.0.0-alpha10"
 
 # https://developer.android.com/jetpack/androidx/releases/test
 #androidx-test-espresso-core = "3.7.0"
@@ -41,8 +41,8 @@ dotenv-gradle = "4.0.0"
 # https://google.github.io/accompanist/permissions/
 google-accompanist-permissions = "0.37.3"
 
-# https://mvnrepository.com/artifact/androidx.compose.ui/ui-text-google-fonts
-google-fonts-compose = "1.9.1"
+# https://developer.android.com/jetpack/androidx/releases/compose-ui
+google-fonts-compose = "1.9.2"
 
 # https://developers.google.com/identity/android-credential-manager/releases
 google-identity-googleid = "1.1.1"
@@ -78,7 +78,7 @@ ktlint-compose-rules = "0.4.27"
 ktlint-plugin = "13.1.0"
 
 # https://developer.android.com/develop/ui/compose/bom/bom-mapping
-compose-bom = "2025.09.00"
+compose-bom = "2025.09.01"
 
 # https://developer.android.com/jetpack/androidx/releases/compose-material3#compose_material3_version_14_2
 compose-material3-expressive = "1.5.0-alpha04"
@@ -87,10 +87,10 @@ compose-material3-expressive = "1.5.0-alpha04"
 #test-junit = "4.13.2"
 
 # https://developer.android.com/jetpack/androidx/releases/room
-androidx-room = "2.8.0"
+androidx-room = "2.8.1"
 
 # https://github.com/supabase-community/supabase-kt/releases
-supabase-kt = "3.2.3"
+supabase-kt = "3.2.4"
 
 [libraries]
 # kotlin
