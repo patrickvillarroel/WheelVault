@@ -61,7 +61,7 @@ fun rotateBitmapIfNeeded(bitmap: Bitmap, rotationDegrees: Int): Bitmap = if (rot
     bitmap
 }
 
-private const val MAX_DIMENSION = 1080
+private const val MAX_DIMENSION = 1080f
 
 /**
  * Redimensiona un Bitmap para que sus dimensiones no excedan un valor máximo.
@@ -75,7 +75,7 @@ fun resizeBitmapMaxDimension(bitmap: Bitmap): Bitmap {
     if (scale >= 1f) return bitmap
     val newWidth = (width * scale)
     val newHeight = (height * scale)
-    return bitmap.scale(newWidth, newHeight).also {
+    return bitmap.scale(newWidth.toInt(), newHeight.toInt()).also {
         if (bitmap != it) bitmap.recycle()
     }
 }
