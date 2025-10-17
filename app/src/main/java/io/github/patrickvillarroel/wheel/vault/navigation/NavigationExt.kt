@@ -1,4 +1,4 @@
-/** This file contain a extension only callable in [EntryProviderBuilder] to convert a domain model to navigation model */
+/** This file contain a extension only callable in [EntryProviderScope] to convert a domain model to navigation model */
 package io.github.patrickvillarroel.wheel.vault.navigation
 
 import androidx.compose.animation.AnimatedContentScope
@@ -6,7 +6,7 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.Scene
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
@@ -14,10 +14,10 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.navigationevent.NavigationEvent
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 
-/** Extension function to convert a [CarItem] to a [NavigationKeys.CarEdit], only callable in a [EntryProviderBuilder] */
+/** Extension function to convert a [CarItem] to a [NavigationKeys.CarEdit], only callable in a [EntryProviderScope] */
 fun CarItem.toCarEdit(): NavigationKeys.CarEdit = this.toPartial().toCarEdit()
 
-/** Extension function to convert a [CarItem.Partial] to a [NavigationKeys.CarEdit], only callable in a [EntryProviderBuilder] */
+/** Extension function to convert a [CarItem.Partial] to a [NavigationKeys.CarEdit], only callable in a [EntryProviderScope] */
 fun CarItem.Partial.toCarEdit(): NavigationKeys.CarEdit {
     val partial = this
     return NavigationKeys.CarEdit(
@@ -35,7 +35,7 @@ fun CarItem.Partial.toCarEdit(): NavigationKeys.CarEdit {
     )
 }
 
-/** Extension function to convert a [NavigationKeys.CarEdit] to [CarItem.Partial], especial only callable in a [EntryProviderBuilder] */
+/** Extension function to convert a [NavigationKeys.CarEdit] to [CarItem.Partial], especial only callable in a [EntryProviderScope] */
 fun NavigationKeys.CarEdit.toCarPartial(): CarItem.Partial {
     val partial = this
     return CarItem.Partial(
@@ -53,7 +53,7 @@ fun NavigationKeys.CarEdit.toCarPartial(): CarItem.Partial {
 }
 
 /**
- * Add entry provider to [EntryProviderBuilder].
+ * Add entry provider to [EntryProviderScope].
  *
  * @param T the type of the key for this NavEntry
  * @param transitionSpec the transition spec for this entry. See [NavDisplay.transitionSpec].
@@ -64,7 +64,7 @@ fun NavigationKeys.CarEdit.toCarPartial(): CarItem.Partial {
  * @param metadata provides information to the display
  * @param content content for this entry to be displayed when this entry is active with [AnimatedContentScope] of [LocalNavAnimatedContentScope].
  */
-inline fun <reified T : NavKey> EntryProviderBuilder<NavKey>.route(
+inline fun <reified T : NavKey> EntryProviderScope<NavKey>.route(
     noinline transitionSpec: (AnimatedContentTransitionScope<*>.() -> ContentTransform?)? = null,
     noinline popTransitionSpec: (AnimatedContentTransitionScope<*>.() -> ContentTransform?)? = null,
     noinline predictivePopTransitionSpec: (
