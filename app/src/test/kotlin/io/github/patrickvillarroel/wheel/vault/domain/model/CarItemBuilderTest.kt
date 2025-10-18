@@ -5,13 +5,13 @@ import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.string.shouldNotBeEmpty
-import kotlin.test.BeforeTest
-import kotlin.test.Test
+import org.junit.Before
+import org.junit.Test
 
 class CarItemBuilderTest {
     private lateinit var carItemPartial: CarItem.Partial
 
-    @BeforeTest
+    @Before
     fun setUp() {
         carItemPartial = CarItem.Partial(
             model = "Golf",
