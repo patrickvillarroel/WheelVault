@@ -47,6 +47,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
@@ -68,12 +69,14 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+        shaders = false
+        resValues = false
     }
 }
 
 composeCompiler {
     reportsDestination.set(layout.buildDirectory.dir("reports/compose_reports"))
-    metricsDestination.set(layout.buildDirectory.dir("reports/compose_reports"))
+    metricsDestination.set(layout.buildDirectory.dir("reports/compose_metrics"))
 }
 
 dependencies {
@@ -94,6 +97,8 @@ dependencies {
 
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+
     implementation(libs.androidx.activity.compose)
     implementation(libs.android.accompanist.permission)
     implementation(libs.androidx.ui.text.google.fonts)
@@ -125,9 +130,11 @@ dependencies {
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui.compose)
 
-    testImplementation(libs.kotlin.test)
+    testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.mockk.android)
+    testImplementation(libs.mockk.agent)
 
     debugImplementation(platform(libs.compose.bom))
     debugImplementation(libs.compose.ui.tooling)
