@@ -8,44 +8,59 @@ import kotlinx.serialization.Serializable
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-object NavigationKeys {
+/** All screens to navigate */
+@Serializable
+sealed interface NavigationKeys : NavKey {
+    /** Refers to [io.github.patrickvillarroel.wheel.vault.ui.screen.splash.SplashScreen] */
     @Serializable
-    data object Splash : NavKey
+    data object Splash : NavigationKeys
 
+    /** Refers to [io.github.patrickvillarroel.wheel.vault.ui.screen.splash.OnboardingScreen] */
     @Serializable
-    data object Onboarding : NavKey
+    data object Onboarding : NavigationKeys
 
+    /** Refers to [io.github.patrickvillarroel.wheel.vault.ui.screen.home.HomeScreen] */
     @Serializable
-    data object Home : NavKey
+    data object Home : NavigationKeys
 
+    /** Refers to [io.github.patrickvillarroel.wheel.vault.ui.screen.camera.CameraLensScreen] */
     @Serializable
-    data object AddCamera : NavKey
+    data object AddCamera : NavigationKeys
 
+    /** Refers to [io.github.patrickvillarroel.wheel.vault.ui.screen.detail.brand.BrandDetailScreen] */
     @Serializable
-    data class BrandDetail(val id: Uuid) : NavKey
+    data class BrandDetail(val id: Uuid) : NavigationKeys
 
+    /** Refers to [io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarDetailScreen] */
     @Serializable
-    data class CarDetail(val id: Uuid) : NavKey
+    data class CarDetail(val id: Uuid) : NavigationKeys
 
+    /** Refers to [io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageScreen] */
     @Serializable
     data class Garage(val query: String? = null, val favorites: Boolean = false, val statistics: Boolean = false) :
-        NavKey
+        NavigationKeys
 
+    /** Refers to [io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.garage.ExchangeScreen] */
     @Serializable
-    data class Exchanges(val query: String? = null) : NavKey
+    data class Exchanges(val query: String? = null) : NavigationKeys
 
+    /** Refers to [io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.detail.ExchangeCarDetailScreen] */
     @Serializable
-    data class ExchangeCarDetail(val id: Uuid) : NavKey
+    data class ExchangeCarDetail(val id: Uuid) : NavigationKeys
 
+    /** Refers to [io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.selection.ExchangeCarSelectionScreen] */
     @Serializable
-    data object ExchangeCarSelection : NavKey
+    data object ExchangeCarSelection : NavigationKeys
 
+    /** Refers to [io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.offer.ExchangeCarOfferScreen] */
     @Serializable
-    data class ExchangeCarOffer(val id: Uuid) : NavKey
+    data class ExchangeCarOffer(val id: Uuid) : NavigationKeys
 
+    /** Refers to [io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.confirmation.ExchangeConfirmCarScreen] */
     @Serializable
-    data class ExchangeConfirmation(val id: Uuid) : NavKey
+    data class ExchangeConfirmation(val id: Uuid) : NavigationKeys
 
+    /** Refers to [io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.edit.CarEditScreen] */
     @Stable
     @Serializable
     data class CarEdit(
@@ -60,14 +75,18 @@ object NavigationKeys {
         val isFavorite: Boolean = false,
         val id: Uuid? = null,
         val fromCamera: Boolean = false,
-    ) : NavKey
+    ) : NavigationKeys
 
+    /** Refers to [io.github.patrickvillarroel.wheel.vault.ui.screen.login.LoginScreen] */
     @Serializable
-    data object Login : NavKey
+    data object Login : NavigationKeys
 
+    /** Refers to [io.github.patrickvillarroel.wheel.vault.ui.screen.login.LoginWithEmailScreen] */
     @Serializable
-    data class LoginWithEmailAndPassword(val isRegister: Boolean = false, val isMagicLink: Boolean = false) : NavKey
+    data class LoginWithEmailAndPassword(val isRegister: Boolean = false, val isMagicLink: Boolean = false) :
+        NavigationKeys
 
+    /** Refers to [io.github.patrickvillarroel.wheel.vault.ui.screen.profile.ProfileScreen] */
     @Serializable
-    data object Profile : NavKey
+    data object Profile : NavigationKeys
 }
