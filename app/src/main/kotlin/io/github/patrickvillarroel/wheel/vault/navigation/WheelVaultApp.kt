@@ -357,10 +357,10 @@ fun WheelVaultApp(
 private val navigationLogger = Logger.withTag("WheelVault Nav3")
 
 /** Extension function to convert a [CarItem] to a [NavigationKeys.CarEdit] */
-private fun CarItem.toCarEdit(): NavigationKeys.CarEdit = this.toPartial().toCarEdit()
+private fun CarItem.toCarEdit(): NavigationKeys.CarEdit = this.toBuilder().toCarEdit()
 
-/** Extension function to convert a [CarItem.Partial] to a [NavigationKeys.CarEdit] */
-private fun CarItem.Partial.toCarEdit(): NavigationKeys.CarEdit {
+/** Extension function to convert a [CarItem.Builder] to a [NavigationKeys.CarEdit] */
+private fun CarItem.Builder.toCarEdit(): NavigationKeys.CarEdit {
     val partial = this
     return NavigationKeys.CarEdit(
         model = partial.model,
@@ -377,10 +377,10 @@ private fun CarItem.Partial.toCarEdit(): NavigationKeys.CarEdit {
     )
 }
 
-/** Extension function to convert a [NavigationKeys.CarEdit] to [CarItem.Partial] */
-private fun NavigationKeys.CarEdit.toCarPartial(): CarItem.Partial {
+/** Extension function to convert a [NavigationKeys.CarEdit] to [CarItem.Builder] */
+private fun NavigationKeys.CarEdit.toCarPartial(): CarItem.Builder {
     val partial = this
-    return CarItem.Partial(
+    return CarItem.Builder(
         model = partial.model,
         brand = partial.brand,
         year = partial.year,

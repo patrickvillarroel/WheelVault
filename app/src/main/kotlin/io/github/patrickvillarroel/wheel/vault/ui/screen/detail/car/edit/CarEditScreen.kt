@@ -25,7 +25,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun CarEditScreen(
-    partialCarItem: CarItem.Partial,
+    partialCarItem: CarItem.Builder,
     fromCamera: Boolean,
     headersBackCallbacks: HeaderBackCallbacks,
     modifier: Modifier = Modifier,
@@ -44,7 +44,7 @@ fun CarEditScreen(
                 (detailState as CarViewModel.CarDetailUiState.Success).car.id == partialCarItem.id
             ) {
                 // Recover the full state of the car because navigation don't preserve network images, only links (strings)
-                (detailState as CarViewModel.CarDetailUiState.Success).car.toPartial()
+                (detailState as CarViewModel.CarDetailUiState.Success).car.toBuilder()
             } else if (fromCamera) {
                 val capturedImage = cameraViewModel.getCapturedImage()
                 cameraViewModel.resetImage()

@@ -48,10 +48,10 @@ import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
 fun CarEditContent(
-    initial: CarItem.Partial,
+    initial: CarItem.Builder,
     isEditAction: Boolean,
-    onAddPictureClick: (CarItem.Partial) -> Unit,
-    onConfirmClick: (CarItem.Partial) -> Unit,
+    onAddPictureClick: (CarItem.Builder) -> Unit,
+    onConfirmClick: (CarItem.Builder) -> Unit,
     manufacturerList: List<String>,
     headersBackCallbacks: HeaderBackCallbacks,
     modifier: Modifier = Modifier,
@@ -296,7 +296,7 @@ fun CarEditContent(
 @Preview
 @Composable
 private fun EditPreview() {
-    val carDetailPartial = remember { CarItem.Partial() }
+    val carDetailPartial = remember { CarItem.Builder() }
 
     WheelVaultTheme {
         CarEditContent(

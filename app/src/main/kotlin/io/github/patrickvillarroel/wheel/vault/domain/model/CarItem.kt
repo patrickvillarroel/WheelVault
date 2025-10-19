@@ -46,7 +46,7 @@ data class CarItem(
         require(brand.isNotBlank()) { "Brand cannot be blank" }
     }
 
-    fun toPartial() = Partial(
+    fun toBuilder() = Builder(
         model = model,
         year = year,
         manufacturer = manufacturer,
@@ -60,7 +60,7 @@ data class CarItem(
         id = id,
     )
 
-    data class Partial(
+    data class Builder(
         val model: String? = null,
         val year: Int? = null,
         val manufacturer: String? = null,
@@ -73,7 +73,7 @@ data class CarItem(
         val availableForTrade: Boolean? = null,
         val id: Uuid? = null,
     ) {
-        fun toCarItem(): CarItem? {
+        fun build(): CarItem? {
             return CarItem(
                 id = this.id ?: Uuid.random(),
                 model = model ?: return null,
@@ -97,11 +97,7 @@ data class CarItem(
             brand = brand?.takeIf { it.isNotBlank() },
             description = description?.takeIf { it.isNotBlank() },
             category = category?.takeIf { it.isNotBlank() },
-            images =
-            images.filterNot {
-                // Use this filter to remove empty image and the default add thumbnail
-                it == EmptyImage || it == io.github.patrickvillarroel.wheel.vault.R.drawable.car_add
-            }.takeIf { it.isNotEmpty() }?.toSet() ?: emptySet(),
+            images = images.filterNot { it == EmptyImage }.takeIf { it.isNotEmpty() }?.toSet() ?: emptySet(),
             isFavorite = isFavorite,
             availableForTrade = availableForTrade,
             id = id,
