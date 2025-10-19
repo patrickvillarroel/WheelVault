@@ -1,6 +1,6 @@
 package io.github.patrickvillarroel.wheel.vault.domain.model
 
-import io.kotest.matchers.collections.shouldNotBeEmpty
+import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -9,11 +9,11 @@ import org.junit.Before
 import org.junit.Test
 
 class CarItemBuilderTest {
-    private lateinit var carItemPartial: CarItem.Partial
+    private lateinit var carItemPartial: CarItem.Builder
 
     @Before
     fun setUp() {
-        carItemPartial = CarItem.Partial(
+        carItemPartial = CarItem.Builder(
             model = "Golf",
             year = 2014,
             manufacturer = "Hot Wheels",
@@ -26,56 +26,38 @@ class CarItemBuilderTest {
         )
     }
 
-    /** Given all data to create a car, when [CarItem.Partial.toCarItem] is called, then a [CarItem] is returned */
+    /** Given all data to create a car, when [CarItem.Builder.build] is called, then a [CarItem] is returned */
     @Test
     fun testCompleteDataSuccess() {
-        val carItem = carItemPartial.toCarItem().shouldNotBeNull()
+        val carItem = carItemPartial.build().shouldNotBeNull()
 
         carItem.model.shouldNotBeEmpty()
         carItem.model.shouldBeEqual("Golf")
 
-        carItem.year shouldNotBeNull {
-            shouldNotBeNull()
-            shouldBeEqual(2014)
-        }
+        carItem.year.shouldBeEqual(2014)
 
         carItem.manufacturer.shouldNotBeEmpty()
         carItem.manufacturer.shouldBeEqual("Hot Wheels")
 
-        carItem.quantity shouldNotBeNull {
-            shouldNotBeNull()
-            shouldBeEqual(1)
-        }
+        carItem.quantity.shouldBeEqual(1)
 
         carItem.brand.shouldNotBeEmpty()
         carItem.brand.shouldBeEqual("Volkswagen")
 
-        carItem.isFavorite shouldNotBeNull {
-            shouldNotBeNull()
-            shouldBeEqual(true)
-        }
+        carItem.isFavorite.shouldNotBeNull().shouldBeEqual(true)
 
-        carItem.availableForTrade shouldNotBeNull {
-            shouldNotBeNull()
-            shouldBeEqual(false)
-        }
+        carItem.availableForTrade.shouldNotBeNull().shouldBeEqual(false)
 
-        carItem.description.shouldNotBeNull {
-            shouldNotBeNull()
-            shouldBeEqual("Nuevo")
-        }
+        carItem.description.shouldNotBeNull().shouldBeEqual("Nuevo")
 
-        carItem.category.shouldNotBeNull {
-            shouldNotBeNull()
-            shouldBeEqual("Europe Icons")
-        }
+        carItem.category.shouldNotBeNull().shouldBeEqual("Europe Icons")
 
-        carItem.images.shouldNotBeEmpty()
+        carItem.images.shouldContainExactly(CarItem.EmptyImage)
     }
 
     @Test
-    fun testIncompleteDataReturNull() {
-        carItemPartial = CarItem.Partial(
+    fun testIncompleteDataReturnNull() {
+        carItemPartial = CarItem.Builder(
             model = null,
             year = 2014,
             manufacturer = "Hot Wheels",
@@ -86,6 +68,47 @@ class CarItemBuilderTest {
             description = "xd",
             category = null,
         )
-        carItemPartial.toCarItem().shouldBeNull()
+        carItemPartial.build().shouldBeNull()
+    }
+
+    @Test
+    fun testUpdateCarItem() {
+        // Create a car item
+        val carItem = carItemPartial.build().shouldNotBeNull()
+        // assume is saved and going to edit again
+
+        // Convert to builder to update
+        var carItemBuilder = carItem.toBuilder()
+        // When going to update, the id is already set
+        carItemBuilder.id.shouldNotBeNull()
+
+        // New values
+        carItemBuilder = carItemBuilder.copy(
+            model = "Golf",
+            year = 2014,
+            manufacturer = "HotWheels",
+            quantity = 1,
+            brand = null,
+            images = setOf(),
+            isFavorite = false,
+            availableForTrade = false,
+            description = null,
+            category = null,
+        ).removeEmptyProperties()
+
+        // Convert back to car item and "save"
+        val updatedCarItem = carItemBuilder.build().shouldNotBeNull()
+
+        // Check values updated
+        updatedCarItem.model.shouldBeEqual("Golf")
+        updatedCarItem.year.shouldBeEqual(2014)
+        updatedCarItem.manufacturer.shouldBeEqual("HotWheels")
+        updatedCarItem.quantity.shouldBeEqual(1)
+        updatedCarItem.brand.shouldBeEqual("HotWheels")
+        updatedCarItem.images.shouldContainExactly(CarItem.EmptyImage)
+        updatedCarItem.isFavorite.shouldBeEqual(false)
+        updatedCarItem.availableForTrade.shouldBeEqual(false)
+        updatedCarItem.description.shouldBeNull()
+        updatedCarItem.category.shouldBeNull()
     }
 }
