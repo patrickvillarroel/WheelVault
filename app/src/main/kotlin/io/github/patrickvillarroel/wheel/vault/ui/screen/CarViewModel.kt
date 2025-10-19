@@ -172,18 +172,28 @@ class CarViewModel(
 
     fun delete(car: CarItem) {
         viewModelScope.launch(ioDispatcher) {
-            carsRepository.delete(car)
-            // Update main list
-            _carsState.update { currentState ->
-                if (currentState is CarsUiState.Success) {
-                    CarsUiState.Success(currentState.cars.filterNot { it.id == car.id })
-                } else {
-                    currentState
+            try {
+                if (!carsRepository.delete(car)) {
+                    logger.e("Failed to delete car")
+                    _carDetailState.update { CarDetailUiState.Error }
+                    return@launch
                 }
-            }
-            // Update detail view if it was the deleted car
-            if ((_carDetailState.value as? CarDetailUiState.Success)?.car?.id == car.id) {
-                _carDetailState.update { CarDetailUiState.Idle }
+                // Update main list
+                _carsState.update { currentState ->
+                    if (currentState is CarsUiState.Success) {
+                        CarsUiState.Success(currentState.cars.filterNot { it.id == car.id })
+                    } else {
+                        currentState
+                    }
+                }
+                // Update detail view if it was the deleted car
+                if ((_carDetailState.value as? CarDetailUiState.Success)?.car?.id == car.id) {
+                    _carDetailState.update { CarDetailUiState.Idle }
+                }
+            } catch (e: Exception) {
+                currentCoroutineContext().ensureActive()
+                logger.e("Failed to delete car", e)
+                _carDetailState.update { CarDetailUiState.Error }
             }
         }
     }
