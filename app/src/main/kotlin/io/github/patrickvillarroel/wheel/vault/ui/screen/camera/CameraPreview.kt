@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import io.github.patrickvillarroel.wheel.vault.util.rotateBitmapIfNeeded
+import io.github.patrickvillarroel.wheel.vault.util.rotateTo
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -53,7 +53,7 @@ fun CameraPreview(
                 object : ImageCapture.OnImageCapturedCallback() {
                     override fun onCaptureSuccess(output: ImageProxy) {
                         val rotation = output.imageInfo.rotationDegrees
-                        val bitmap = rotateBitmapIfNeeded(output.toBitmap(), rotation)
+                        val bitmap = output.toBitmap().rotateTo(rotation)
                         onImageCaptureLatest(bitmap)
                         output.close()
                     }

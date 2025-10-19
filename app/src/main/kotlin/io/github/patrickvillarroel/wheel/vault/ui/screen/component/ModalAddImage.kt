@@ -35,9 +35,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
-import io.github.patrickvillarroel.wheel.vault.util.resizeBitmapMaxDimension
+import io.github.patrickvillarroel.wheel.vault.util.resizeToMaxDimension
+import kotlinx.io.IOException
 import java.io.File
-import java.io.IOException
 
 @Composable
 fun ModalAddImage(
@@ -57,8 +57,7 @@ fun ModalAddImage(
                 try {
                     val inputStream = requireNotNull(context.contentResolver.openInputStream(uri))
                     val originalBitmap = requireNotNull(inputStream.use { decodeStream(inputStream) })
-                    val resizedUri = resizeBitmapMaxDimension(originalBitmap)
-                    onResultGallery(resizedUri)
+                    onResultGallery(originalBitmap.resizeToMaxDimension())
                 } catch (e: Exception) {
                     Log.e("ModalAddImage", "Error procesando imagen de la galería", e)
                     Toast.makeText(context, "No se pudo procesar la imagen", Toast.LENGTH_SHORT).show()
@@ -75,8 +74,7 @@ fun ModalAddImage(
             try {
                 val originalBitmap = BitmapFactory.decodeFile(photoFile!!.absolutePath)
                 if (originalBitmap != null) {
-                    val resizedBitmap = resizeBitmapMaxDimension(originalBitmap)
-                    onResultCamera(resizedBitmap)
+                    onResultCamera(originalBitmap.resizeToMaxDimension())
                 } else {
                     Toast.makeText(context, "No se pudo cargar la foto.", Toast.LENGTH_SHORT).show()
                 }
