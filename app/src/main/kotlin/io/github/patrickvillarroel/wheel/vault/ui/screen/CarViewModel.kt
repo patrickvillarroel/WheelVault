@@ -239,7 +239,7 @@ class CarViewModel(
                         _carDetailState.update { originalDetailState }
                     }
                     // Optionally set a general error state for the detail view
-                    // _carDetailState.update { CarDetailUiState.Error }
+                    _carDetailState.update { CarDetailUiState.Error }
                 }
             } catch (e: Exception) {
                 currentCoroutineContext().ensureActive()
@@ -249,7 +249,7 @@ class CarViewModel(
                     _carDetailState.update { originalDetailState }
                 }
                 // Optionally set a general error state for the detail view or a message to the user
-                // _carDetailState.update { CarDetailUiState.Error }
+                _carDetailState.update { CarDetailUiState.Error }
             }
         }
     }
