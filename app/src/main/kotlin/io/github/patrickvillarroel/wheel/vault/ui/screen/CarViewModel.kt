@@ -1,18 +1,15 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen
 
-import android.content.Context
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import coil3.Uri
+import co.touchlab.kermit.Logger
 import coil3.toAndroidUri
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
-import io.github.patrickvillarroel.wheel.vault.util.bitmapToByteArray
-import io.github.patrickvillarroel.wheel.vault.util.uriToByteArray
+import io.github.patrickvillarroel.wheel.vault.util.toByteArray
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
@@ -25,12 +22,14 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.uuid.Uuid
+import android.content.Context as AndroidContext
+import coil3.Uri as Coil3Uri
 
 class CarViewModel(
     private val carsRepository: CarsRepository,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : ViewModel() {
-
+    private val logger = Logger.withTag("Car VM")
     private val _carsState = MutableStateFlow<CarsUiState>(CarsUiState.Loading)
     val carsState = _carsState.asStateFlow()
 
@@ -63,7 +62,7 @@ class CarViewModel(
                     val result = carsRepository.fetchAll(orderAsc = false)
                     _carsState.update { CarsUiState.Success(result) }
                 } catch (e: Exception) {
-                    Log.e("CarViewModel", "Failed to fetch cars", e)
+                    logger.e(e) { "Failed to fetch cars" }
                     _carsState.update { CarsUiState.Error }
                 }
             }
@@ -76,7 +75,7 @@ class CarViewModel(
             ?.firstOrNull { it.id == id }
 
         if (localMatch != null && !force) {
-            Log.i("CarViewModel", "Found car in local state. $localMatch")
+            logger.i { "Found car in local state. $localMatch" }
             _carDetailState.update { CarDetailUiState.Success(localMatch) }
             return
         }
@@ -85,80 +84,89 @@ class CarViewModel(
 
         viewModelScope.launch(ioDispatcher) {
             try {
-                Log.i("CarViewModel", "Going to find car by id $id")
+                logger.i { "Going to find car by id $id" }
                 val car = carsRepository.fetch(id)
                 if (car != null) {
-                    Log.i("CarViewModel", "Found car by id $id. $car")
+                    logger.i { "Found car by id $id. $car" }
                     _carDetailState.update { CarDetailUiState.Success(car) }
                 } else {
-                    Log.i("CarViewModel", "Car not found by id $id")
+                    logger.i { "Car not found by id $id" }
                     _carDetailState.update { CarDetailUiState.NotFound }
                 }
             } catch (e: Exception) {
-                Log.e("CarViewModel", "Failed to find car by id", e)
+                logger.e(e) { "Failed to find car by id" }
                 _carDetailState.update { CarDetailUiState.Error }
             }
         }
     }
 
-    fun save(car: CarItem.Partial, context: Context? = null) {
-        viewModelScope.launch(ioDispatcher) {
-            Log.i("Car VM", "Going to save this car $car")
-            val built = car.toCarItem() ?: return@launch
-            Log.i("Car VM", "Convert as item: $built")
-            save(built, context)
+    fun save(car: CarItem.Builder, context: AndroidContext? = null) {
+        logger.v { "Going to save this car $car" }
+        _carDetailState.update { CarDetailUiState.Loading }
+        val built = car.build() ?: run {
+            logger.e("Failed to build car")
+            _carDetailState.update { CarDetailUiState.Error }
+            return
         }
+        logger.v { "Convert as item: $built" }
+        save(built, context)
     }
 
-    fun save(car: CarItem, context: Context? = null) {
-        viewModelScope.launch(ioDispatcher) {
-            Log.i("Car VM", "Going to save this car $car")
-            try {
-                val pictures = car.images.mapNotNull {
-                    when (it) {
-                        is Bitmap -> bitmapToByteArray(it)
+    fun save(car: CarItem, context: AndroidContext? = null) {
+        logger.i("Going to save this car $car")
+        _carDetailState.update { CarDetailUiState.Loading }
+        try {
+            val pictures = car.images.mapNotNull {
+                when (it) {
+                    is Bitmap -> it.toByteArray()
 
-                        is Uri -> {
-                            if (context == null) {
-                                Log.e("Car VM", "Context is null and image is a uri")
-                                return@mapNotNull null
-                            }
-                            uriToByteArray(context, it.toAndroidUri())
+                    is Coil3Uri -> {
+                        if (context == null) {
+                            logger.e("Context is null and image is a uri")
+                            return@mapNotNull null
                         }
-
-                        else -> null
+                        it.toAndroidUri().toByteArray(context)
                     }
-                }
-                    .toSet()
-                    .ifEmpty { setOfNotNull(CarItem.EmptyImage) }
-                val carToSave = car.copy(images = pictures, imageUrl = pictures.first())
-                Log.i("Car VM", "Final car: $carToSave")
-                val newCarState = if (carsRepository.exist(carToSave.id)) {
-                    Log.i("Car VM", "The car exist")
-                    carsRepository.update(carToSave)
-                } else {
-                    carsRepository.insert(carToSave)
-                }
-                Log.i("Car VM", "New car state: $newCarState")
-                _carDetailState.update { CarDetailUiState.Success(newCarState) }
 
-                // Update the car in the main list as well
-                _carsState.update { currentState ->
-                    if (currentState is CarsUiState.Success) {
-                        val updatedCars = currentState.cars.map {
-                            if (it.id == newCarState.id) newCarState else it
-                        }
-                        CarsUiState.Success(updatedCars)
-                    } else {
-                        currentState
-                    }
+                    else -> null
                 }
-            } catch (e: Exception) {
-                currentCoroutineContext().ensureActive()
-                Log.e("Car VM", "Failed to save car", e)
-                // Potentially set an error state for carDetailState or carsState
-                _carDetailState.update { CarDetailUiState.Error } // Example error handling
             }
+                .toSet()
+                .ifEmpty { setOfNotNull(CarItem.EmptyImage) }
+            val carToSave = car.copy(images = pictures, imageUrl = pictures.first())
+            logger.i("Final car: $carToSave")
+            viewModelScope.launch(ioDispatcher) {
+                try {
+                    val newCarState = if (carsRepository.exist(carToSave.id)) {
+                        logger.i("The car exist")
+                        carsRepository.update(carToSave)
+                    } else {
+                        carsRepository.insert(carToSave)
+                    }
+                    logger.i("New car state: $newCarState")
+                    _carDetailState.update { CarDetailUiState.Success(newCarState) }
+
+                    // Update the car in the main list as well
+                    _carsState.update { currentState ->
+                        if (currentState is CarsUiState.Success) {
+                            val updatedCars = currentState.cars.map {
+                                if (it.id == newCarState.id) newCarState else it
+                            }
+                            CarsUiState.Success(updatedCars)
+                        } else {
+                            currentState
+                        }
+                    }
+                } catch (e: Exception) {
+                    currentCoroutineContext().ensureActive()
+                    logger.e("Failed to save car", e)
+                    _carDetailState.update { CarDetailUiState.Error }
+                }
+            }
+        } catch (e: Exception) {
+            logger.e("Failed to save car", e)
+            // Potentially set an error state for carDetailState or carsState
+            _carDetailState.update { CarDetailUiState.Error } // Example error handling
         }
     }
 
@@ -181,15 +189,15 @@ class CarViewModel(
     }
 
     fun toggleCarTradeAvailability(carToUpdate: CarItem) {
-        viewModelScope.launch(ioDispatcher) {
-            val originalDetailState = _carDetailState.value
-            // Optimistically update the detail state if it's the current car
-            if (originalDetailState is CarDetailUiState.Success && originalDetailState.car.id == carToUpdate.id) {
-                _carDetailState.update {
-                    CarDetailUiState.Success(carToUpdate.copy(availableForTrade = !carToUpdate.availableForTrade))
-                }
+        val originalDetailState = _carDetailState.value
+        // Optimistically update the detail state if it's the current car
+        if (originalDetailState is CarDetailUiState.Success && originalDetailState.car.id == carToUpdate.id) {
+            _carDetailState.update {
+                CarDetailUiState.Success(carToUpdate.copy(availableForTrade = !carToUpdate.availableForTrade))
             }
+        }
 
+        viewModelScope.launch(ioDispatcher) {
             try {
                 val updatedCar = carsRepository.setAvailableForTrade(carToUpdate.id, !carToUpdate.availableForTrade)
                 if (updatedCar != null) {
@@ -211,8 +219,7 @@ class CarViewModel(
                         }
                     }
                 } else {
-                    Log.e(
-                        "CarViewModel",
+                    logger.e(
                         "Failed to toggle trade availability, repository returned null for car ID: ${carToUpdate.id}",
                     )
                     // Revert optimistic update if necessary
@@ -226,7 +233,7 @@ class CarViewModel(
                 }
             } catch (e: Exception) {
                 currentCoroutineContext().ensureActive()
-                Log.e("CarViewModel", "Error toggling trade availability for car ID: ${carToUpdate.id}", e)
+                logger.e("Error toggling trade availability for car ID: ${carToUpdate.id}", e)
                 // Revert optimistic update
                 if (originalDetailState is CarDetailUiState.Success && originalDetailState.car.id == carToUpdate.id) {
                     _carDetailState.update { originalDetailState }
