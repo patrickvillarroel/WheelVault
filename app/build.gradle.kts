@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -10,10 +11,12 @@ plugins {
 }
 
 group = "io.github.patrickvillarroel"
-version = "2.0.2"
+version = "2.0.3"
 
 kotlin {
     compilerOptions {
+        extraWarnings.set(true)
+        allWarningsAsErrors.set(false) // Until kotlin 2.3.0 fix value is never read
         optIn.addAll(
             "kotlin.contracts.ExperimentalContracts",
             "kotlin.time.ExperimentalTime",
@@ -23,6 +26,7 @@ kotlin {
             "androidx.compose.animation.ExperimentalSharedTransitionApi",
         )
         jvmTarget.set(JvmTarget.JVM_11)
+        jvmDefault.set(JvmDefaultMode.NO_COMPATIBILITY)
     }
 }
 
@@ -34,7 +38,7 @@ android {
         applicationId = "$group.wheel.vault"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 5
+        versionCode = 6
         versionName = version.toString()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
