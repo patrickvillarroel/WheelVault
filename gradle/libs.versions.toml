@@ -26,10 +26,10 @@ androidx-lifecycle-viewmodel-nav3 = "1.0.0-alpha04"
 androidx-media3 = "1.8.0"
 
 # https://developer.android.com/jetpack/androidx/releases/navigation3
-androidx-navigation3 = "1.0.0-alpha11"
+androidx-navigation3 = "1.0.0-beta01"
 
 # https://developer.android.com/jetpack/androidx/releases/test
-#androidx-test-espresso-core = "3.7.0"
+# androidx-test-espresso-core = "3.7.0"
 androidx-test-junit = "1.3.0"
 
 # https://github.com/coil-kt/coil/releases
@@ -42,7 +42,7 @@ dotenv-gradle = "4.0.0"
 google-accompanist-permissions = "0.37.3"
 
 # https://developer.android.com/jetpack/androidx/releases/compose-ui
-google-fonts-compose = "1.9.3"
+google-fonts-compose = "1.9.4"
 
 # https://developers.google.com/identity/android-credential-manager/releases
 google-identity-googleid = "1.1.1"
@@ -54,10 +54,10 @@ google-mlkit-text-recognition = "16.0.1"
 kotest = "6.0.4"
 
 # https://github.com/JetBrains/kotlin/releases
-kotlin = "2.2.20"
+kotlin = "2.2.21"
 
 # https://github.com/google/ksp/releases
-kotlin-ksp = "2.2.20-2.0.4"
+kotlin-ksp = "2.3.0"
 
 # https://github.com/Kotlin/kotlinx.serialization/releases
 kotlin-serialization = "1.9.0"
@@ -66,7 +66,7 @@ kotlin-serialization = "1.9.0"
 koin-core = "4.1.1"
 
 # https://github.com/LemonAppDev/konsist/releases
-#konsist = "0.17.3"
+# konsist = "0.17.3"
 
 # https://github.com/ktorio/ktor/releases
 ktor = "3.3.1"
@@ -81,16 +81,16 @@ ktlint-compose-rules = "0.4.27"
 ktlint-plugin = "13.1.0"
 
 # https://developer.android.com/develop/ui/compose/bom/bom-mapping
-compose-bom = "2025.10.00"
+compose-bom = "2025.10.01"
 
-# https://developer.android.com/jetpack/androidx/releases/compose-material3#compose_material3_version_14_2
-compose-material3-expressive = "1.5.0-alpha06"
+# https://developer.android.com/jetpack/androidx/releases/compose-material3#compose_material3_version_15_2
+compose-material3-expressive = "1.5.0-alpha07"
 
 # https://junit.org/junit4/
 test-junit = "4.13.2"
 
 # https://developer.android.com/jetpack/androidx/releases/room
-androidx-room = "2.8.2"
+androidx-room = "2.8.3"
 
 # https://github.com/supabase-community/supabase-kt/releases
 supabase-kt = "3.2.5"
