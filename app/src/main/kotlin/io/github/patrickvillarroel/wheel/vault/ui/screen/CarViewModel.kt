@@ -104,7 +104,10 @@ class CarViewModel(
         logger.v { "Going to save this car $car" }
         _carDetailState.update { CarDetailUiState.Loading }
         val built = car.build() ?: run {
-            logger.e("Failed to build car")
+            logger.e(
+                "Failed to build car - Builder data: model=${car.model}, " +
+                    "year=${car.year}, brand=${car.brand}, manufacturer=${car.manufacturer}",
+            )
             _carDetailState.update { CarDetailUiState.Error }
             return
         }
@@ -132,8 +135,13 @@ class CarViewModel(
                 }
             }
                 .toSet()
-                .ifEmpty { setOfNotNull(CarItem.EmptyImage) }
-            val carToSave = car.copy(images = pictures, imageUrl = pictures.first())
+
+            // If no real images, use empty set; the backend will handle the default image
+            val imagesToSave = pictures.ifEmpty { emptySet() }
+            val carToSave = car.copy(
+                images = imagesToSave.ifEmpty { setOfNotNull(CarItem.EmptyImage) },
+                imageUrl = imagesToSave.firstOrNull() ?: CarItem.EmptyImage,
+            )
             logger.i("Final car: $carToSave")
             viewModelScope.launch(ioDispatcher) {
                 try {
@@ -149,8 +157,15 @@ class CarViewModel(
                     // Update the car in the main list as well
                     _carsState.update { currentState ->
                         if (currentState is CarsUiState.Success) {
-                            val updatedCars = currentState.cars.map {
-                                if (it.id == newCarState.id) newCarState else it
+                            val carExists = currentState.cars.any { it.id == newCarState.id }
+                            val updatedCars = if (carExists) {
+                                // Update existing car
+                                currentState.cars.map {
+                                    if (it.id == newCarState.id) newCarState else it
+                                }
+                            } else {
+                                // Add new car to the beginning of the list
+                                listOf(newCarState) + currentState.cars
                             }
                             CarsUiState.Success(updatedCars)
                         } else {
@@ -159,12 +174,12 @@ class CarViewModel(
                     }
                 } catch (e: Exception) {
                     currentCoroutineContext().ensureActive()
-                    logger.e("Failed to save car", e)
+                    logger.e("Failed to save car in database", e)
                     _carDetailState.update { CarDetailUiState.Error }
                 }
             }
         } catch (e: Exception) {
-            logger.e("Failed to save car", e)
+            logger.e("Failed to save car (image processing)", e)
             // Potentially set an error state for carDetailState or carsState
             _carDetailState.update { CarDetailUiState.Error } // Example error handling
         }
