@@ -75,6 +75,15 @@ fun CarEditContent(
         mutableStateSetOf<Any>().also { it.addAll(initial.images + R.drawable.car_add) }
     }
     var showCancelDialog by rememberSaveable { mutableStateOf(false) }
+
+    // Validación de campos requeridos
+    val isFormValid = remember(modelo, year, marca, car.manufacturer) {
+        modelo.isNotBlank() &&
+            year.toIntOrNull() != null &&
+            year.toIntOrNull()!! > 0 &&
+            (marca.isNotBlank() || car.manufacturer?.isNotBlank() == true)
+    }
+
     val headerCallbacks = remember {
         InterceptedHeaderBackCallbacks(
             headersBackCallbacks,
@@ -133,7 +142,7 @@ fun CarEditContent(
                         car = car.copy(brand = it.takeIf(String::isNotBlank)?.trim())
                     },
                     isError = marca.isBlank() || car.manufacturer.isNullOrBlank(),
-                    label = stringResource(R.string.brand),
+                    label = stringResource(R.string.brand) + " *",
                 )
             }
 
@@ -159,7 +168,7 @@ fun CarEditContent(
                             car = car.copy(year = it.trim().takeIf(String::isNotBlank)?.toIntOrNull())
                         },
                         isError = year.isBlank() || year.toIntOrNull() == null,
-                        label = stringResource(R.string.year),
+                        label = stringResource(R.string.year) + " *",
                         modifier = Modifier.weight(1f),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     )
@@ -184,7 +193,7 @@ fun CarEditContent(
                 ) {
                     Box(modifier = Modifier.weight(1f)) {
                         val textFieldState = rememberTextFieldState(
-                            manufacturerList.firstOrNull { it == car.manufacturer } ?: manufacturerList[0],
+                            manufacturerList.firstOrNull { it == car.manufacturer } ?: "Otros",
                         )
 
                         ExposedDropdownMenuBox(
@@ -287,6 +296,7 @@ fun CarEditContent(
                     Button(
                         onClick = { onConfirmClick(car.removeEmptyProperties()) },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                        enabled = isFormValid,
                     ) {
                         Icon(Icons.Default.Check, null, tint = Color.White)
                     }
