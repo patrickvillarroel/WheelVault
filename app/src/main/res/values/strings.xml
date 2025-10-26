@@ -106,4 +106,6 @@
     <string name="error">Error</string>
     <string name="mark_for_trading">Marcar para Intercambio</string>
     <string name="unmark_for_trading">Desmarcar para Intercambio</string>
+    <string name="exchange_accepted_message">El intercambio ha sido aceptado exitosamente. El otro coleccionista será notificado.</string>
+    <string name="exchange_rejected_message">El intercambio ha sido rechazado. El otro coleccionista será notificado.</string>
 </resources>
