@@ -35,6 +35,7 @@ fun CarEditScreen(
 ) {
     val context = LocalContext.current
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
+    var shouldNavigateBack by rememberSaveable { mutableStateOf(false) }
     val permissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
     val detailState by carViewModel.carDetailState.collectAsStateWithLifecycle()
     val brandsNames by brandViewModel.brandsNames.collectAsStateWithLifecycle()
@@ -64,6 +65,16 @@ fun CarEditScreen(
         }
     }
 
+    // Navigate back when save is successful
+    DisposableEffect(detailState, shouldNavigateBack) {
+        if (shouldNavigateBack && detailState is CarViewModel.CarDetailUiState.Success) {
+            Log.i("CarEditScreen", "Save successful, navigating back")
+            headersBackCallbacks.onBackClick()
+            shouldNavigateBack = false
+        }
+        onDispose { }
+    }
+
     CarEditContent(
         initial = initial,
         onAddPictureClick = {
@@ -73,8 +84,9 @@ fun CarEditScreen(
             initial = it
         },
         onConfirmClick = {
+            Log.i("CarEditScreen", "Saving car: $it")
             carViewModel.save(it, context)
-            headersBackCallbacks.onBackClick()
+            shouldNavigateBack = true
         },
         isEditAction = partialCarItem.id != null,
         headersBackCallbacks = headersBackCallbacks,
