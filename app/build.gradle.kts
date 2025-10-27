@@ -13,6 +13,10 @@ plugins {
 group = "io.github.patrickvillarroel"
 version = "2.0.3"
 
+dependencyLocking {
+    lockAllConfigurations()
+}
+
 kotlin {
     compilerOptions {
         extraWarnings.set(true)
