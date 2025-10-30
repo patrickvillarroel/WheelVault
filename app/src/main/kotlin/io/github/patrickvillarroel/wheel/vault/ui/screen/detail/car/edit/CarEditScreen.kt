@@ -1,5 +1,6 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.edit
 
+import android.content.pm.PackageManager
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -10,10 +11,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.BrandViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.CarViewModel
@@ -22,7 +21,6 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCal
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.ModalAddImage
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun CarEditScreen(
     partialCarItem: CarItem.Builder,
@@ -34,23 +32,26 @@ fun CarEditScreen(
     cameraViewModel: CameraViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
+    val missingPermissions = rememberSaveable {
+        ContextCompat.checkSelfPermission(context, android.Manifest.permission.CAMERA) !=
+            PackageManager.PERMISSION_GRANTED
+    }
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
     var shouldNavigateBack by rememberSaveable { mutableStateOf(false) }
-    val permissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
     val detailState by carViewModel.carDetailState.collectAsStateWithLifecycle()
     val brandsNames by brandViewModel.brandsNames.collectAsStateWithLifecycle()
     var initial by remember(partialCarItem) {
+        val stateSnapshot = detailState
         mutableStateOf(
-            if (detailState is CarViewModel.CarDetailUiState.Success &&
-                (detailState as CarViewModel.CarDetailUiState.Success).car.id == partialCarItem.id
-            ) {
+            if (stateSnapshot is CarViewModel.CarDetailUiState.Success && stateSnapshot.car.id == partialCarItem.id) {
                 // Recover the full state of the car because navigation don't preserve network images, only links (strings)
-                (detailState as CarViewModel.CarDetailUiState.Success).car.toBuilder()
+                stateSnapshot.car.toBuilder()
             } else if (fromCamera) {
                 val capturedImage = cameraViewModel.getCapturedImage()
                 cameraViewModel.resetImage()
                 partialCarItem.copy(images = setOfNotNull(capturedImage) + partialCarItem.images)
             } else {
+                // WARNING: only have images of strings (links) because limitations of navigation serialization
                 partialCarItem
             },
         )
@@ -107,7 +108,7 @@ fun CarEditScreen(
                 Log.i("CarEditScreen", "onResultCamera, current: $initial, new state with camera: $it")
                 initial = initial.copy(images = setOf(it) + initial.images)
             },
-            isCameraPermission = permissionState.status.isGranted,
+            isCameraPermission = !missingPermissions,
         )
     }
 }
