@@ -16,8 +16,8 @@ class BrandSupabaseDataSource(private val supabase: SupabaseClient, private val 
     override suspend fun search(query: String): List<Brand> = supabase.from(BrandObj.TABLE).select {
         filter {
             or {
-                BrandObj::name ilike "%$query%"
-                BrandObj::description ilike "%$query%"
+                ilike("name", "%$query%")
+                ilike("description", "%$query%")
             }
         }
     }.decodeList<BrandObj>().map { it.toDomain(fetchImage(it.id!!)) }
@@ -28,19 +28,19 @@ class BrandSupabaseDataSource(private val supabase: SupabaseClient, private val 
         }
 
     override suspend fun fetch(id: Uuid): Brand? = supabase.from(BrandObj.TABLE).select {
-        filter { BrandObj::id eq id }
+        filter { eq("id", id) }
     }.decodeSingleOrNull<BrandObj>()?.toDomain {
         fetchImage(it.id!!)
     }
 
     override suspend fun fetchByName(name: String): Brand? = supabase.from(BrandObj.TABLE).select {
-        filter { BrandObj::name ilike "%$name%" }
+        filter { ilike("name", "%$name%") }
     }.decodeSingleOrNull<BrandObj>()?.toDomain {
         fetchImage(it.id!!)
     }
 
     override suspend fun fetchByDescription(description: String): Brand? = supabase.from(BrandObj.TABLE).select {
-        filter { BrandObj::description ilike "%$description%" }
+        filter { ilike("description", "%$description%") }
     }.decodeSingleOrNull<BrandObj>()?.toDomain {
         fetchImage(it.id!!)
     }

@@ -33,7 +33,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
         val count = supabase.from(CarObj.TABLE).select {
             filter {
                 eq("user_id", supabase.auth.currentUserOrNull()!!.id)
-                CarObj::id eq id
+                eq("id", id)
             }
             count(Count.EXACT)
         }.countOrNull() ?: return false
@@ -57,7 +57,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
                         query,
                         textSearchType = TextSearchType.PLAINTO,
                     )
-                    if (isFavorite) CarObj::isFavorite eq true
+                    if (isFavorite) eq("isFavorite", true)
                 }
                 order("created_at", Order.DESCENDING)
             }
@@ -77,9 +77,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
         val cars = supabase.from(CarObj.TABLE).select {
             filter {
                 eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
-                if (isFavorite) {
-                    CarObj::isFavorite eq true
-                }
+                if (isFavorite) eq("isFavorite", true)
             }
             limit(limit.toLong())
             if (orderAsc) {
@@ -98,7 +96,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
 
     override suspend fun fetch(id: Uuid): CarItem? = supabase.from(CarObj.TABLE)
         .select {
-            filter { CarObj::id eq id }
+            filter { eq("id", id) }
             order("created_at", Order.DESCENDING)
         }.decodeSingleOrNull<CarObj>()?.toDomain(
             fetchAllImages(id).ifEmpty { setOf(CarItem.EmptyImage) },
@@ -128,7 +126,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
                         } else {
                             eq(field, value)
                         }
-                        if (isFavorite) CarObj::isFavorite eq true
+                        if (isFavorite) eq("isFavorite", true)
                     }
                     order("created_at", Order.DESCENDING)
                 }
@@ -164,7 +162,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
             filter {
                 eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
                 if (field != null && value != null) eq(field, value)
-                if (isFavorite) CarObj::isFavorite eq true
+                if (isFavorite) eq("isFavorite", true)
             }
         }
         .countOrNull()?.toInt()
@@ -199,7 +197,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
         val updated = supabase.from(CarObj.TABLE)
             .update(car.toObject()) {
                 filter {
-                    CarObj::id eq car.id
+                    eq("id", car.id)
                     eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
                 }
                 select()
@@ -231,7 +229,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
     override suspend fun delete(car: CarItem): Boolean {
         supabase.from(CarObj.TABLE).delete {
             filter {
-                CarObj::id eq car.id
+                eq("id", car.id)
                 eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
             }
         }
@@ -252,7 +250,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
         val updatedCarObj = supabase.from(CarObj.TABLE)
             .update(mapOf("available_for_trade" to isAvailable)) {
                 filter {
-                    CarObj::id eq carId
+                    eq("id", carId)
                     eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
                 }
                 select()
@@ -285,9 +283,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
     private suspend fun fetchAllImages(carId: Uuid) = supabase.postgrest
         .from(CarImagesObj.TABLE)
         .select(Columns.list("storage_path")) {
-            filter {
-                CarImagesObj::carId eq carId
-            }
+            filter { eq("car_id", carId) }
         }.decodeList<Map<String, String>>()
         .mapNotNull { image ->
             val path = image.values
@@ -300,9 +296,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
     private suspend fun fetchAllImages(carsId: List<Uuid>) = supabase.postgrest
         .from(CarImagesObj.TABLE)
         .select(Columns.list("car_id", "storage_path")) {
-            filter {
-                CarImagesObj::carId isIn carsId
-            }
+            filter { isIn("car_id", carsId) }
         }
         .decodeList<Map<String, String>>()
         .mapNotNull { image ->
