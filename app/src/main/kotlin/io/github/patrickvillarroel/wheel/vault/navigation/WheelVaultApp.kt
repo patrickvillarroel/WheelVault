@@ -370,8 +370,8 @@ private fun CarItem.Builder.toCarEdit() = NavigationKeys.CarEdit(
     quantity = this.quantity,
     manufacturer = this.manufacturer,
     isFavorite = this.isFavorite,
-    // this convert is unsafe, but it's ok when links is used
-    images = this.images.map { it.toString() }.toSet(),
+    // Only navigate with links (strings)
+    images = this.images.filterIsInstance<String>().toSet(),
     description = this.description,
     category = this.category,
     id = this.id,
