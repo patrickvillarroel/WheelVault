@@ -50,6 +50,8 @@ android {
         buildConfigField("String", "SUPABASE_URL", "\"${env.SUPABASE_URL.value}\"")
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"${env.SUPABASE_ANON_KEY.value}\"")
         buildConfigField("String", "SUPABASE_WEB_KEY", "\"${env.SUPABASE_WEB_KEY.value}\"")
+        // flavor (variant) only this going to have trading enabled
+        buildConfigField("boolean", "ENABLE_TRADING", env.fetch("ENABLE_TRADING", "false"))
     }
 
     buildTypes {
