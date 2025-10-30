@@ -110,7 +110,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 
     implementation(libs.androidx.activity.compose)
-    implementation(libs.android.accompanist.permission)
     implementation(libs.androidx.ui.text.google.fonts)
 
     implementation(platform(libs.koin.bom))

@@ -38,9 +38,6 @@ coil = "3.3.0"
 # https://github.com/uzzu/dotenv-gradle/tags
 dotenv-gradle = "4.0.0"
 
-# https://google.github.io/accompanist/permissions/
-google-accompanist-permissions = "0.37.3"
-
 # https://developer.android.com/jetpack/androidx/releases/compose-ui
 google-fonts-compose = "1.9.4"
 
@@ -173,7 +170,6 @@ junit = { group = "junit", name = "junit", version.ref = "test-junit" }
 androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-junit" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidx-activity-compose" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
-android-accompanist-permission = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "google-accompanist-permissions" }
 androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "google-fonts-compose" }
 
 # mockk
