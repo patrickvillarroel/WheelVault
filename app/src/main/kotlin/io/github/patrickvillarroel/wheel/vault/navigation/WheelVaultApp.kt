@@ -8,34 +8,30 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSerializable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.runtime.serialization.NavBackStackSerializer
 import androidx.navigation3.scene.Scene
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigationevent.NavigationEvent
 import co.touchlab.kermit.Logger
+import io.github.patrickvillarroel.wheel.vault.BuildConfig
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.camera.CameraLensScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
@@ -72,7 +68,11 @@ fun WheelVaultApp(
     val onboardingState by onboardingViewModel.uiState.collectAsStateWithLifecycle(
         minActiveState = Lifecycle.State.CREATED,
     )
-    val backStack = rememberNavBackStack(NavigationKeys.Splash)
+    val backStack = rememberSerializable(
+        serializer = NavBackStackSerializer(elementSerializer = NavigationKeys.serializer()),
+    ) {
+        NavBackStack(NavigationKeys.Splash)
+    }
     var isSplashDone by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(session, isSplashDone) {
@@ -118,31 +118,8 @@ fun WheelVaultApp(
             transitionSpec = { ContentTransform(slideInHorizontally { it }, slideOutHorizontally()) },
             popTransitionSpec = { ContentTransform(slideInHorizontally(), slideOutHorizontally { it }) },
         ) { key ->
-            if (key !is NavigationKeys) {
-                navigationLogger.e { "Unexpected key type: $key" }
-                return@NavDisplay entry(key) {
-                    Scaffold(Modifier.fillMaxSize()) { paddingValues ->
-                        Column(
-                            Modifier.padding(paddingValues),
-                            horizontalAlignment = CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
-                        ) {
-                            Text("Unknown screen $key")
-                            TextButton(onClick = {
-                                Snapshot.withMutableSnapshot {
-                                    backStack.add(NavigationKeys.Home)
-                                    backStack.remove(key)
-                                }
-                            }) {
-                                Text("Go back")
-                            }
-                        }
-                    }
-                }
-            }
-
             when (key) {
-                is NavigationKeys.Splash -> entry(
+                is NavigationKeys.Splash -> route(
                     key,
                     transitionSpec = { ContentTransform(slideInVertically { -it }, slideOutVertically { it }) },
                     popTransitionSpec = { ContentTransform(slideInVertically { it }, slideOutVertically { -it }) },
@@ -156,7 +133,7 @@ fun WheelVaultApp(
                     })
                 }
 
-                is NavigationKeys.Login -> entry(key) {
+                is NavigationKeys.Login -> route(key) {
                     LoginScreen(
                         onLoginSuccess = {
                             Snapshot.withMutableSnapshot {
@@ -177,7 +154,7 @@ fun WheelVaultApp(
                     )
                 }
 
-                is NavigationKeys.LoginWithEmailAndPassword -> entry(key) {
+                is NavigationKeys.LoginWithEmailAndPassword -> route(key) {
                     val (isRegister, isMagicLink) = key
                     LoginWithEmailScreen(
                         isRegister = isRegister,
@@ -192,14 +169,14 @@ fun WheelVaultApp(
                     )
                 }
 
-                is NavigationKeys.Onboarding -> entry(key) {
+                is NavigationKeys.Onboarding -> route(key) {
                     OnboardingScreen(onFinish = {
                         isSplashDone = true
                         backStack -= NavigationKeys.Onboarding
                     }, viewModel = koinActivityViewModel())
                 }
 
-                is NavigationKeys.Home -> entry(key) {
+                is NavigationKeys.Home -> route(key) {
                     HomeScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
@@ -217,7 +194,7 @@ fun WheelVaultApp(
                     )
                 }
 
-                is NavigationKeys.AddCamera -> entry(key) {
+                is NavigationKeys.AddCamera -> route(key) {
                     CameraLensScreen(
                         onBack = { backStack.removeLastOrNull() },
                         onAddDetail = { carModel, _ ->
@@ -229,11 +206,11 @@ fun WheelVaultApp(
                     )
                 }
 
-                is NavigationKeys.BrandDetail -> route(key) { (id) ->
+                is NavigationKeys.BrandDetail -> route(key) {
                     BrandDetailScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
-                        brandId = id,
+                        brandId = key.id,
                         headerBackCallbacks = HeaderBackCallbacks(
                             onBackClick = { backStack.removeLastOrNull() },
                             onProfileClick = { backStack += NavigationKeys.Profile },
@@ -247,7 +224,8 @@ fun WheelVaultApp(
                     )
                 }
 
-                is NavigationKeys.Garage -> route(key) { (query, favorites) ->
+                is NavigationKeys.Garage -> route(key) {
+                    val (query, favorites) = key
                     GarageScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
@@ -263,11 +241,11 @@ fun WheelVaultApp(
                     )
                 }
 
-                is NavigationKeys.CarDetail -> route(key) { (id) ->
+                is NavigationKeys.CarDetail -> route(key) {
                     CarDetailScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
-                        carId = id,
+                        carId = key.id,
                         onEditClick = { backStack += it.toCarEdit() },
                         headerBackCallbacks = HeaderBackCallbacks(
                             onBackClick = { backStack.removeLastOrNull() },
@@ -280,10 +258,10 @@ fun WheelVaultApp(
                     )
                 }
 
-                is NavigationKeys.CarEdit -> route(key) { edit ->
+                is NavigationKeys.CarEdit -> route(key) {
                     CarEditScreen(
-                        partialCarItem = edit.toCarPartial(),
-                        fromCamera = edit.fromCamera,
+                        partialCarItem = key.toCarPartial(),
+                        fromCamera = key.fromCamera,
                         headersBackCallbacks = HeaderBackCallbacks(
                             onBackClick = { backStack.removeLastOrNull() },
                             onProfileClick = { backStack += NavigationKeys.Profile },
@@ -295,7 +273,7 @@ fun WheelVaultApp(
                     )
                 }
 
-                is NavigationKeys.Profile -> entry(key) {
+                is NavigationKeys.Profile -> route(key) {
                     ProfileScreen(
                         backCallbacks = HeaderBackCallbacks(
                             onProfileClick = {},
@@ -309,9 +287,14 @@ fun WheelVaultApp(
                     )
                 }
 
-                is NavigationKeys.Exchanges -> route(key) { (query) ->
+                is NavigationKeys.Exchanges -> route(key) {
+                    if (!BuildConfig.ENABLE_TRADING) {
+                        navigationLogger.e {
+                            "Exchanges not available and reached in navigation routes. Query='${key.query}'"
+                        }
+                    }
                     ExchangeScreen(
-                        query = query ?: "",
+                        query = key.query ?: "",
                         callbacks = GarageCallbacks.Partial(
                             onHomeClick = { backStack.removeAllOrAdd(NavigationKeys.Home) },
                             onCarClick = { backStack += NavigationKeys.ExchangeCarDetail(it) },
@@ -322,32 +305,52 @@ fun WheelVaultApp(
                     )
                 }
 
-                is NavigationKeys.ExchangeCarDetail -> route(key) { (id) ->
+                is NavigationKeys.ExchangeCarDetail -> route(key) {
+                    if (!BuildConfig.ENABLE_TRADING) {
+                        navigationLogger.e {
+                            "Exchanges not available and reached in navigation routes. CarId='${key.id}'"
+                        }
+                    }
                     ExchangeCarDetailScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
-                        carId = id,
+                        carId = key.id,
                         onExchangeCarClick = { backStack += NavigationKeys.ExchangeCarSelection },
                     )
                 }
 
-                is NavigationKeys.ExchangeCarSelection -> entry(key) {
+                is NavigationKeys.ExchangeCarSelection -> route(key) {
+                    if (!BuildConfig.ENABLE_TRADING) {
+                        navigationLogger.e {
+                            "Exchanges not available and reached in navigation routes for car selection."
+                        }
+                    }
                     ExchangeCarSelectionScreen(
                         onCarClick = { backStack += NavigationKeys.ExchangeCarOffer(it.id) },
                     )
                 }
 
-                is NavigationKeys.ExchangeCarOffer -> route(key) { (id) ->
+                is NavigationKeys.ExchangeCarOffer -> route(key) {
+                    if (!BuildConfig.ENABLE_TRADING) {
+                        navigationLogger.e {
+                            "Exchanges not available and reached in navigation routes. Offers of CarId='${key.id}'"
+                        }
+                    }
                     ExchangeCarOfferScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
-                        carId = id,
+                        carId = key.id,
                         onExchangeTemporalClick = { backStack += NavigationKeys.ExchangeConfirmation(it) },
                     )
                 }
 
-                is NavigationKeys.ExchangeConfirmation -> route(key) { (id) ->
-                    ExchangeConfirmCarScreen(id)
+                is NavigationKeys.ExchangeConfirmation -> route(key) {
+                    if (!BuildConfig.ENABLE_TRADING) {
+                        navigationLogger.e {
+                            "Exchanges not available and reached in navigation routes. Confirm of CarId='${key.id}'"
+                        }
+                    }
+                    ExchangeConfirmCarScreen(key.id)
                 }
             }
         }
@@ -357,82 +360,39 @@ fun WheelVaultApp(
 private val navigationLogger = Logger.withTag("WheelVault Nav3")
 
 /** Extension function to convert a [CarItem] to a [NavigationKeys.CarEdit] */
-private fun CarItem.toCarEdit(): NavigationKeys.CarEdit = this.toBuilder().toCarEdit()
+private fun CarItem.toCarEdit() = this.toBuilder().toCarEdit()
 
 /** Extension function to convert a [CarItem.Builder] to a [NavigationKeys.CarEdit] */
-private fun CarItem.Builder.toCarEdit(): NavigationKeys.CarEdit {
-    val partial = this
-    return NavigationKeys.CarEdit(
-        model = partial.model,
-        brand = partial.brand,
-        year = partial.year,
-        quantity = partial.quantity,
-        manufacturer = partial.manufacturer,
-        isFavorite = partial.isFavorite,
-        // this convert is unsafe, but it's ok when links is used
-        images = partial.images.map { it.toString() }.toSet(),
-        description = partial.description,
-        category = partial.category,
-        id = partial.id,
-    )
-}
+private fun CarItem.Builder.toCarEdit() = NavigationKeys.CarEdit(
+    model = this.model,
+    brand = this.brand,
+    year = this.year,
+    quantity = this.quantity,
+    manufacturer = this.manufacturer,
+    isFavorite = this.isFavorite,
+    // this convert is unsafe, but it's ok when links is used
+    images = this.images.map { it.toString() }.toSet(),
+    description = this.description,
+    category = this.category,
+    id = this.id,
+)
 
 /** Extension function to convert a [NavigationKeys.CarEdit] to [CarItem.Builder] */
-private fun NavigationKeys.CarEdit.toCarPartial(): CarItem.Builder {
-    val partial = this
-    return CarItem.Builder(
-        model = partial.model,
-        brand = partial.brand,
-        year = partial.year,
-        quantity = partial.quantity,
-        manufacturer = partial.manufacturer,
-        isFavorite = partial.isFavorite,
-        images = partial.images,
-        description = partial.description,
-        category = partial.category,
-        id = partial.id,
-    )
-}
-
-/**
- * Add entry to navigation, this not pass the key to the content.
- *
- * @param key the key for this NavEntry and the content.
- * @param T the type of the key for this NavEntry
- * @param transitionSpec the transition spec for this entry. See [NavDisplay.transitionSpec].
- * @param popTransitionSpec the transition spec when popping this entry from backstack.
- * See [NavDisplay.popTransitionSpec].
- * @param predictivePopTransitionSpec the transition spec when popping this entry from backstack using the predictive back gesture.
- * See [NavDisplay.predictivePopTransitionSpec].
- * @param metadata provides information to the display
- * @param content content for this entry to be displayed when this entry is active with [AnimatedContentScope] of [LocalNavAnimatedContentScope].
- */
-private inline fun <T : NavKey> entry(
-    key: T,
-    noinline transitionSpec: (AnimatedContentTransitionScope<*>.() -> ContentTransform?)? = null,
-    noinline popTransitionSpec: (AnimatedContentTransitionScope<*>.() -> ContentTransform?)? = null,
-    metadata: Map<String, Any> = emptyMap(),
-    noinline predictivePopTransitionSpec: (
-        AnimatedContentTransitionScope<Scene<*>>.(@NavigationEvent.SwipeEdge Int) -> ContentTransform?
-    )? = null,
-    crossinline content: @Composable AnimatedContentScope.() -> Unit,
-): NavEntry<NavKey> = NavEntry(
-    key = key,
-    metadata = buildMap {
-        putAll(metadata)
-        transitionSpec?.let { putAll(NavDisplay.transitionSpec(transitionSpec)) }
-        popTransitionSpec?.let { putAll(NavDisplay.popTransitionSpec(popTransitionSpec)) }
-        predictivePopTransitionSpec?.let { putAll(NavDisplay.predictivePopTransitionSpec(predictivePopTransitionSpec)) }
-    },
-    content = { _ ->
-        with(LocalNavAnimatedContentScope.current) {
-            content()
-        }
-    },
+private fun NavigationKeys.CarEdit.toCarPartial() = CarItem.Builder(
+    model = this.model,
+    brand = this.brand,
+    year = this.year,
+    quantity = this.quantity,
+    manufacturer = this.manufacturer,
+    isFavorite = this.isFavorite,
+    images = this.images,
+    description = this.description,
+    category = this.category,
+    id = this.id,
 )
 
 /**
- * Add a route with data to navigation, this pass the key to the content.
+ * Add entry to navigation, this not pass the key to the content.
  *
  * @param key the key for this NavEntry and the content.
  * @param T the type of the key for this NavEntry
@@ -448,24 +408,22 @@ private inline fun <T : NavKey> route(
     key: T,
     noinline transitionSpec: (AnimatedContentTransitionScope<*>.() -> ContentTransform?)? = null,
     noinline popTransitionSpec: (AnimatedContentTransitionScope<*>.() -> ContentTransform?)? = null,
-    noinline predictivePopTransitionSpec: (
-        AnimatedContentTransitionScope<Scene<*>>.(@NavigationEvent.SwipeEdge Int) -> ContentTransform?
-    )? = null,
     metadata: Map<String, Any> = emptyMap(),
-    crossinline content: @Composable AnimatedContentScope.(T) -> Unit,
-): NavEntry<NavKey> = NavEntry(
+    noinline predictivePopTransitionSpec: (
+        AnimatedContentTransitionScope<Scene<*>>.(swipe: @NavigationEvent.SwipeEdge Int) -> ContentTransform?
+    )? = null,
+    crossinline content: @Composable AnimatedContentScope.() -> Unit,
+) = NavEntry(
     key = key,
     metadata = buildMap {
         putAll(metadata)
         transitionSpec?.let { putAll(NavDisplay.transitionSpec(transitionSpec)) }
         popTransitionSpec?.let { putAll(NavDisplay.popTransitionSpec(popTransitionSpec)) }
-        predictivePopTransitionSpec?.let {
-            putAll(NavDisplay.predictivePopTransitionSpec(predictivePopTransitionSpec))
-        }
+        predictivePopTransitionSpec?.let { putAll(NavDisplay.predictivePopTransitionSpec(predictivePopTransitionSpec)) }
     },
     content = { _ ->
         with(LocalNavAnimatedContentScope.current) {
-            content(key)
+            content()
         }
     },
 )
