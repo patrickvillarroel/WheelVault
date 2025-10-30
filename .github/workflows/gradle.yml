@@ -18,6 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL || '' }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY || '' }}
+      SUPABASE_WEB_KEY: ${{ secrets.SUPABASE_WEB_KEY || '' }}
 
     steps:
     - uses: actions/checkout@v5
@@ -41,6 +45,13 @@ jobs:
       uses: gradle/actions/setup-gradle@v5
       with:
         validate-wrappers: true
+
+      # Create a .env in root of project
+    - name: Create .env file
+      run: |
+        echo "SUPABASE_URL=${{ env.SUPABASE_URL }}" >> .env
+        echo "SUPABASE_ANON_KEY=${{ env.SUPABASE_ANON_KEY }}" >> .env
+        echo "SUPABASE_WEB_KEY=${{ env.SUPABASE_WEB_KEY }}" >> .env
 
     - name: Build with Gradle Wrapper
       run: ./gradlew build

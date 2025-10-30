@@ -47,3 +47,6 @@ insert_final_newline = false
 
 [*.properties]
 ij_properties_keep_blank_lines = true
+
+[*{.yaml,yml}]
+indent_size = 2
