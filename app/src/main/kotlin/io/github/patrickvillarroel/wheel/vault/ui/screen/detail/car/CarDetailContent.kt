@@ -36,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.github.patrickvillarroel.wheel.vault.BuildConfig
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BackTextButton
@@ -103,10 +104,10 @@ fun CarDetailContent(
 
                     item {
                         Row(
-                            Modifier
+                            modifier = Modifier
                                 .fillMaxWidth()
                                 .wrapContentWidth(Alignment.CenterHorizontally),
-                            ButtonGroupDefaults.HorizontalArrangement,
+                            horizontalArrangement = ButtonGroupDefaults.HorizontalArrangement,
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 OutlinedIconButton(
@@ -117,34 +118,36 @@ fun CarDetailContent(
                                 }
                                 Text(stringResource(R.string.edit), fontWeight = FontWeight.SemiBold)
                             }
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                OutlinedIconButton(
-                                    onClick = { callbacks.onToggleTradeAvailabilityClick() },
-                                    modifier = Modifier.size(65.dp),
-                                ) {
-                                    Icon(
-                                        Icons.Filled.SwapHoriz,
-                                        contentDescription = if (carDetail.availableForTrade) {
+                            if (BuildConfig.ENABLE_TRADING) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    OutlinedIconButton(
+                                        onClick = { callbacks.onToggleTradeAvailabilityClick() },
+                                        modifier = Modifier.size(65.dp),
+                                    ) {
+                                        Icon(
+                                            Icons.Filled.SwapHoriz,
+                                            contentDescription = if (carDetail.availableForTrade) {
+                                                stringResource(
+                                                    R.string.unmark_for_trading,
+                                                )
+                                            } else {
+                                                stringResource(R.string.mark_for_trading)
+                                            },
+                                            modifier = Modifier.size(32.dp),
+                                            tint = if (carDetail.availableForTrade) MaterialTheme.colorScheme.primary else Color.Gray,
+                                        )
+                                    }
+                                    Text(
+                                        if (carDetail.availableForTrade) {
                                             stringResource(
                                                 R.string.unmark_for_trading,
                                             )
                                         } else {
                                             stringResource(R.string.mark_for_trading)
                                         },
-                                        modifier = Modifier.size(32.dp),
-                                        tint = if (carDetail.availableForTrade) MaterialTheme.colorScheme.primary else Color.Gray,
+                                        fontWeight = FontWeight.SemiBold,
                                     )
                                 }
-                                Text(
-                                    if (carDetail.availableForTrade) {
-                                        stringResource(
-                                            R.string.unmark_for_trading,
-                                        )
-                                    } else {
-                                        stringResource(R.string.mark_for_trading)
-                                    },
-                                    fontWeight = FontWeight.SemiBold,
-                                )
                             }
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 OutlinedIconButton(

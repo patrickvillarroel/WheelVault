@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import io.github.patrickvillarroel.wheel.vault.BuildConfig
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
@@ -58,14 +59,17 @@ fun MenuDropDown(menuDropdownCallbacks: HeaderMenuDropdownCallbacks, modifier: M
                 menuDropdownCallbacks.onFavoritesClick()
             },
         )
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.exchange)) },
-            leadingIcon = { Icon(Icons.Outlined.PublishedWithChanges, contentDescription = null) },
-            onClick = {
-                expandedMenu = false
-                menuDropdownCallbacks.onExchangesClick()
-            },
-        )
+
+        if (BuildConfig.ENABLE_TRADING) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.exchange)) },
+                leadingIcon = { Icon(Icons.Outlined.PublishedWithChanges, contentDescription = null) },
+                onClick = {
+                    expandedMenu = false
+                    menuDropdownCallbacks.onExchangesClick()
+                },
+            )
+        }
     }
 }
 
