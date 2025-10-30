@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "io.github.patrickvillarroel"
-version = "2.0.3"
+version = "2.0.4"
 
 dependencyLocking {
     lockAllConfigurations()
@@ -42,7 +42,7 @@ android {
         applicationId = "$group.wheel.vault"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 6
+        versionCode = 7
         versionName = version.toString()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
