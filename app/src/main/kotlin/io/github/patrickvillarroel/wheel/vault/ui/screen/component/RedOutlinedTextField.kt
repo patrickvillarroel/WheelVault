@@ -19,6 +19,7 @@ fun RedOutlinedTextField(
     label: String,
     modifier: Modifier = Modifier,
     readOnly: Boolean = false,
+    isError: Boolean = false,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     trailingIcon: @Composable (() -> Unit)? = null,
 ) {
@@ -37,6 +38,7 @@ fun RedOutlinedTextField(
             focusedLabelColor = Color.Red,
             unfocusedLabelColor = Color.Gray,
         ),
+        isError = isError,
         readOnly = readOnly,
         trailingIcon = trailingIcon,
     )

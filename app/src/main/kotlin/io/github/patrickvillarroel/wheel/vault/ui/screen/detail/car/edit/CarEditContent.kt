@@ -1,6 +1,5 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.edit
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +24,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -34,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import co.touchlab.kermit.Logger
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.BrandViewModel
@@ -45,6 +46,8 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.component.InterceptedHe
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuHeader
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.RedOutlinedTextField
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
+
+private val carEditLogger = Logger.withTag("CarEditContent")
 
 @Composable
 fun CarEditContent(
@@ -58,7 +61,7 @@ fun CarEditContent(
 ) {
     // Internal states
     var car by remember(initial) {
-        Log.i("CarEditContent", "recomposer with $initial")
+        carEditLogger.i { "recomposed with $initial" }
         mutableStateOf(initial)
     }
     var marca by rememberSaveable(initial.brand) { mutableStateOf(initial.brand ?: "") }
@@ -68,7 +71,9 @@ fun CarEditContent(
     var year by rememberSaveable(initial.year) { mutableStateOf(initial.year?.toString() ?: "") }
     var cantidad by rememberSaveable(initial.quantity) { mutableStateOf(initial.quantity.toString()) }
     var categoria by rememberSaveable(initial.category) { mutableStateOf(initial.category ?: "") }
-    val imagenes by remember(initial.images) { mutableStateOf(initial.images + R.drawable.car_add) }
+    val imagenes = remember(initial.images) {
+        mutableStateSetOf<Any>().also { it.addAll(initial.images + R.drawable.car_add) }
+    }
     var showCancelDialog by rememberSaveable { mutableStateOf(false) }
     val headerCallbacks = remember {
         InterceptedHeaderBackCallbacks(
@@ -104,26 +109,32 @@ fun CarEditContent(
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(
                         text = if (isEditAction) {
-                            stringResource(
-                                R.string.edit_car,
-                            )
+                            stringResource(R.string.edit_car)
                         } else {
                             stringResource(R.string.add_car)
                         },
                         style = MaterialTheme.typography.headlineSmall,
                         modifier = Modifier.padding(top = 16.dp),
                     )
-                    FavoriteIcon(car.isFavorite, onFavoriteToggle = {
-                        car = car.copy(isFavorite = it)
-                    })
+                    FavoriteIcon(
+                        isFavorite = car.isFavorite,
+                        onFavoriteToggle = {
+                            car = car.copy(isFavorite = it)
+                        },
+                    )
                 }
             }
 
             item {
-                RedOutlinedTextField(marca, {
-                    marca = it
-                    car = car.copy(brand = it.takeIf(String::isNotBlank)?.trim())
-                }, stringResource(R.string.brand))
+                RedOutlinedTextField(
+                    value = marca,
+                    onValueChange = {
+                        marca = it
+                        car = car.copy(brand = it.takeIf(String::isNotBlank)?.trim())
+                    },
+                    isError = marca.isBlank() || car.manufacturer.isNullOrBlank(),
+                    label = stringResource(R.string.brand),
+                )
             }
 
             item {
@@ -131,28 +142,39 @@ fun CarEditContent(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    RedOutlinedTextField(modelo, {
-                        modelo = it
-                        car = car.copy(model = it)
-                    }, stringResource(R.string.model), Modifier.weight(1f))
                     RedOutlinedTextField(
-                        year,
-                        {
+                        value = modelo,
+                        onValueChange = {
+                            modelo = it
+                            car = car.copy(model = it)
+                        },
+                        isError = modelo.isBlank(),
+                        label = stringResource(R.string.model),
+                        modifier = Modifier.weight(1f),
+                    )
+                    RedOutlinedTextField(
+                        value = year,
+                        onValueChange = {
                             year = it
                             car = car.copy(year = it.trim().takeIf(String::isNotBlank)?.toIntOrNull())
                         },
-                        stringResource(R.string.year),
-                        Modifier.weight(1f),
+                        isError = year.isBlank() || year.toIntOrNull() == null,
+                        label = stringResource(R.string.year),
+                        modifier = Modifier.weight(1f),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     )
                 }
             }
 
             item {
-                RedOutlinedTextField(descripcion, {
-                    descripcion = it
-                    car = car.copy(description = it.takeIf(String::isNotBlank)?.trim())
-                }, stringResource(R.string.description))
+                RedOutlinedTextField(
+                    value = descripcion,
+                    onValueChange = {
+                        descripcion = it
+                        car = car.copy(description = it.takeIf(String::isNotBlank)?.trim())
+                    },
+                    label = stringResource(R.string.description),
+                )
             }
 
             item {
@@ -208,13 +230,18 @@ fun CarEditContent(
                     }
 
                     RedOutlinedTextField(
-                        cantidad,
-                        {
+                        value = cantidad,
+                        onValueChange = {
                             cantidad = it
-                            car = car.copy(quantity = it.takeIf(String::isNotBlank)?.toIntOrNull() ?: 0)
+                            car = car.copy(
+                                quantity = it.takeIf(String::isNotBlank)
+                                    ?.toIntOrNull()
+                                    ?.takeIf { n -> n >= 0 } ?: 0,
+                            )
                         },
-                        stringResource(R.string.quantity),
-                        Modifier.weight(1f),
+                        isError = cantidad.isBlank() || cantidad.toIntOrNull() == null || cantidad.toInt() < 0,
+                        label = stringResource(R.string.quantity),
+                        modifier = Modifier.weight(1f),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     )
                 }
@@ -222,12 +249,12 @@ fun CarEditContent(
 
             item {
                 RedOutlinedTextField(
-                    categoria,
-                    {
+                    value = categoria,
+                    onValueChange = {
                         categoria = it
                         car = car.copy(category = it.takeIf(String::isNotBlank)?.trim())
                     },
-                    stringResource(R.string.category),
+                    label = stringResource(R.string.category),
                 )
             }
 
