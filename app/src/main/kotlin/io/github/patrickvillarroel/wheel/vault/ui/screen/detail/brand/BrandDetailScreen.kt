@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.ui.screen.BrandViewModel
+import io.github.patrickvillarroel.wheel.vault.ui.screen.CarViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.uuid.Uuid
@@ -38,6 +39,7 @@ fun BrandDetailScreen(
     headerBackCallbacks: HeaderBackCallbacks,
     modifier: Modifier = Modifier,
     brandViewModel: BrandViewModel = koinViewModel(),
+    carViewModel: CarViewModel = koinViewModel(),
 ) {
     val brandState by brandViewModel.brandDetailsState.collectAsStateWithLifecycle()
 
@@ -55,7 +57,7 @@ fun BrandDetailScreen(
                     carCollection = state.cars,
                     onAddClick = onAddClick,
                     onCarClick = onCarClick,
-                    onFavoriteToggle = { _, _ -> },
+                    onFavoriteToggle = { car, favorite -> carViewModel.save(car.copy(isFavorite = favorite)) },
                     headerBackCallbacks = headerBackCallbacks,
                     animationKey = "brand-$brandId",
                 ),
