@@ -154,5 +154,4 @@ dependencies {
 
 ktlint {
     version.set(libs.versions.ktlint.core.get())
-    ignoreFailures.set(true)
 }

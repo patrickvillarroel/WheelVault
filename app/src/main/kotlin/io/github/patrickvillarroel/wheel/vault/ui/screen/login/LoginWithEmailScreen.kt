@@ -28,7 +28,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.patrickvillarroel.wheel.vault.R
 import org.koin.compose.viewmodel.koinViewModel
 
-@Suppress("ktlint:compose:multiple-emitters-check")
+@Suppress("compose:multiple-emitters-check")
 @Composable
 fun LoginWithEmailScreen(
     onLoginSuccess: () -> Unit,

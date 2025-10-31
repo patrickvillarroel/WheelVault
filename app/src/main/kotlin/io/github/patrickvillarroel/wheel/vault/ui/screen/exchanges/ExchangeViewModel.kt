@@ -20,14 +20,14 @@ import kotlin.uuid.Uuid
 class ExchangeViewModel(private val tradeRepository: TradeRepository, private val carsRepository: CarsRepository) :
     ViewModel() {
 
-    private val _exchangeUiState = MutableStateFlow<ExchangeUiState>(ExchangeUiState.Loading)
-    val exchangeState = _exchangeUiState.asStateFlow()
+    private val _exchangeState = MutableStateFlow<ExchangeUiState>(ExchangeUiState.Loading)
+    val exchangeState = _exchangeState.asStateFlow()
 
     private val _exchangeConfirmState = MutableStateFlow<ExchangeConfirmUiState>(ExchangeConfirmUiState.Loading)
     val exchangeConfirmState = _exchangeConfirmState.asStateFlow()
 
     // For managing a new trade proposal being drafted
-    private val _selectedOwnCarForOffer = MutableStateFlow<CarItem?>(null)
+    private val selectedOwnCarForOffer = MutableStateFlow<CarItem?>(null)
     // val selectedOwnCarForOffer = _selectedOwnCarForOffer.asStateFlow() // Expose if UI needs to observe it
 
     // To store the context of an existing trade being viewed/acted upon
@@ -39,18 +39,18 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository, private va
 
     fun loadInitialData() {
         viewModelScope.launch {
-            _exchangeUiState.update { ExchangeUiState.Loading }
+            _exchangeState.update { ExchangeUiState.Loading }
             try {
                 // Populate _exchangeUiState with cars user can see/interact with initially
                 // For example, cars available for others to request, or user's own cars.
                 // Using getAvailableCarsForTrade as a placeholder for general available cars.
                 val availableCars = tradeRepository.getAvailableCarsForTrade()
-                _exchangeUiState.update { ExchangeUiState.Success(availableCars) }
+                _exchangeState.update { ExchangeUiState.Success(availableCars) }
             } catch (e: Exception) {
                 currentCoroutineContext().ensureActive()
                 Log.e("ExchangeViewModel", "Error loading initial data", e)
                 // Handle error
-                _exchangeUiState.update { ExchangeUiState.Error }
+                _exchangeState.update { ExchangeUiState.Error }
             }
         }
     }
@@ -59,7 +59,7 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository, private va
      * Call this when the user selects their own car they want to offer in a new trade.
      */
     fun selectOwnCarForOffer(car: CarItem) {
-        _selectedOwnCarForOffer.update { car }
+        selectedOwnCarForOffer.update { car }
     }
 
     /**
@@ -68,7 +68,7 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository, private va
      * Sets up the confirmation screen for a *new* trade proposal.
      */
     fun exchangeCar(requestedCar: CarItem) {
-        val offeredCar = _selectedOwnCarForOffer.value
+        val offeredCar = selectedOwnCarForOffer.value
         if (offeredCar == null) {
             _exchangeConfirmState.update { ExchangeConfirmUiState.Error }
             return

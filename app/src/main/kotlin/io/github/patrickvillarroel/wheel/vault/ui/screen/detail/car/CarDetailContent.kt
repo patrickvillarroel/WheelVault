@@ -134,7 +134,11 @@ fun CarDetailContent(
                                                 stringResource(R.string.mark_for_trading)
                                             },
                                             modifier = Modifier.size(32.dp),
-                                            tint = if (carDetail.availableForTrade) MaterialTheme.colorScheme.primary else Color.Gray,
+                                            tint = if (carDetail.availableForTrade) {
+                                                MaterialTheme.colorScheme.primary
+                                            } else {
+                                                Color.Gray
+                                            },
                                         )
                                     }
                                     Text(
