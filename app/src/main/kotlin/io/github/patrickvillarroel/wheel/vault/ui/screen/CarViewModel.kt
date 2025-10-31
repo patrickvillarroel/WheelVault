@@ -94,6 +94,7 @@ class CarViewModel(
                     _carDetailState.update { CarDetailUiState.NotFound }
                 }
             } catch (e: Exception) {
+                currentCoroutineContext().ensureActive()
                 logger.e(e) { "Failed to find car by id" }
                 _carDetailState.update { CarDetailUiState.Error }
             }
