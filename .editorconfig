@@ -10,6 +10,11 @@ max_line_length = 120
 trim_trailing_whitespace = true
 ij_smart_tabs = false
 
+[**/build/**.{kt,kts}]
+ij_formatter_enabled = false
+# noinspection EditorConfigKeyCorrectness
+ktlint = disabled
+
 [*.{kt,kts}]
 ij_kotlin_code_style_defaults = KOTLIN_OFFICIAL
 ij_kotlin_name_count_to_use_star_import = 10
@@ -33,11 +38,8 @@ compose_preview_naming_enabled = true
 compose_preview_naming_strategy = suffix
 # noinspection EditorConfigKeyCorrectness
 compose_disallow_material2 = true
-
-[**/build/**.{kt,kts}]
-ij_formatter_enabled = false
 # noinspection EditorConfigKeyCorrectness
-ktlint = disabled
+compose_content_emitters_denylist=DropdownMenu,LoginContent,LoginWithEmailContent
 
 [{*.har,*.jsb2,*.jsb3,*.json,*.jsonc,.babelrc,.eslintrc,.prettierrc,.stylelintrc,.ws-context,jest.config}]
 indent_size = 2
