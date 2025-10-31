@@ -191,6 +191,7 @@ fun WheelVaultApp(
                             onProfileClick = { backStack += NavigationKeys.Profile },
                             onExchangesClick = { backStack += NavigationKeys.Exchanges() },
                         ),
+                        carViewModel = koinActivityViewModel(),
                     )
                 }
 
@@ -203,6 +204,7 @@ fun WheelVaultApp(
                                 backStack -= NavigationKeys.AddCamera
                             }
                         },
+                        viewModel = koinActivityViewModel(),
                     )
                 }
 
@@ -255,6 +257,7 @@ fun WheelVaultApp(
                             onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
                             onExchangesClick = { backStack += NavigationKeys.Exchanges() },
                         ),
+                        carViewModel = koinActivityViewModel(),
                     )
                 }
 
@@ -270,6 +273,8 @@ fun WheelVaultApp(
                             onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
                             onExchangesClick = { backStack += NavigationKeys.Exchanges() },
                         ),
+                        carViewModel = koinActivityViewModel(),
+                        cameraViewModel = koinActivityViewModel(),
                     )
                 }
 
