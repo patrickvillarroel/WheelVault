@@ -8,11 +8,11 @@ import android.provider.MediaStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+@Deprecated("This class is not tested, can produce errors")
 class MediaStoreImageDataSource(private val context: Context) : ImageDataSource {
     override suspend fun saveImage(name: String, bytes: ByteArray): Uri? = withContext(Dispatchers.IO) {
-        val values = ContentValues().apply {
+        val values = ContentValues(2).apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, name)
-            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
             put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyApp")
         }
 

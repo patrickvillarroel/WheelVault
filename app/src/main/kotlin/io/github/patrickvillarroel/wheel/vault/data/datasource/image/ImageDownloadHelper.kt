@@ -4,6 +4,7 @@ import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.StorageItem
 import io.github.jan.supabase.storage.authenticatedRequest
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsBytes
@@ -24,9 +25,8 @@ class ImageDownloadHelper(private val httpClient: HttpClient, private val storag
         // 2. descargar los bytes
         return try {
             httpClient.get(url) {
-                if (item.authenticated) {
-                    header("Authorization", "Bearer $token")
-                }
+                expectSuccess = true
+                if (item.authenticated) header("Authorization", "Bearer $token")
             }.bodyAsBytes()
         } catch (_: Exception) {
             currentCoroutineContext().ensureActive()
