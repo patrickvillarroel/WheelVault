@@ -1,19 +1,17 @@
-@file:OptIn(ExperimentalContracts::class)
-
 package io.github.patrickvillarroel.wheel.vault.data
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
-import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 object SyncMediator {
-    suspend inline fun <T : Any> fetch(
+    @JvmStatic
+    suspend fun <T : Any> fetch(
+        forceRefresh: Boolean = false,
         localFetch: suspend () -> T?,
         remoteFetch: suspend () -> T?,
         saveRemote: suspend (T?) -> Unit,
-        forceRefresh: Boolean,
     ): T? {
         contract {
             callsInPlace(localFetch, InvocationKind.AT_MOST_ONCE)
@@ -33,11 +31,12 @@ object SyncMediator {
         }
     }
 
-    suspend inline fun <T : Any> fetchList(
+    @JvmStatic
+    suspend fun <T : Any> fetchList(
+        forceRefresh: Boolean = false,
         localFetch: suspend () -> List<T>,
         remoteFetch: suspend () -> List<T>,
-        crossinline saveRemote: suspend CoroutineScope.(List<T>) -> Unit,
-        forceRefresh: Boolean = false,
+        saveRemote: suspend CoroutineScope.(List<T>) -> Unit,
     ): List<T> {
         contract {
             callsInPlace(localFetch, InvocationKind.AT_MOST_ONCE)
