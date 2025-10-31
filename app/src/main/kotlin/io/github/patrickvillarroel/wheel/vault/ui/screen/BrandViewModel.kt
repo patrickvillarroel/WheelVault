@@ -1,17 +1,19 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen
 
-import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
 import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -63,12 +65,13 @@ class BrandViewModel(
         if (shouldFetch) {
             _brandsState.update { BrandsUiState.Loading }
             viewModelScope.launch(ioDispatcher) {
-                Log.i("Brands", "Fetching all brands")
+                logger.v { "Fetching all brands" }
                 try {
                     val result = brandRepository.fetchAll(force)
                     _brandsState.update { BrandsUiState.Success(result) }
                 } catch (e: Exception) {
-                    Log.e("Brands", "Error fetch all", e)
+                    currentCoroutineContext().ensureActive()
+                    logger.e(e) { "Error fetch all" }
                     _brandsState.update { BrandsUiState.Error }
                 }
             }
@@ -93,10 +96,10 @@ class BrandViewModel(
 
         _brandDetailsState.update { BrandDetailsUiState.Loading }
         viewModelScope.launch(ioDispatcher) {
-            Log.i("Brands", "Fetching brand by id $id")
+            logger.d { "Fetching brand by id $id" }
 
             try {
-                val brand = brandRepository.fetch(id)
+                val brand = brandRepository.fetch(id, false)
                 if (brand != null) {
                     val cars = carRepository.fetchByManufacturer(brand.name)
                     _brandDetailsState.update { BrandDetailsUiState.Success(brand, cars) }
@@ -104,7 +107,8 @@ class BrandViewModel(
                     _brandDetailsState.update { BrandDetailsUiState.NotFound }
                 }
             } catch (e: Exception) {
-                Log.e("Brands", "Error fetching brand by id $id", e)
+                currentCoroutineContext().ensureActive()
+                logger.e(e) { "Error fetching brand by id $id" }
                 _brandDetailsState.update { BrandDetailsUiState.Error }
             }
         }
@@ -129,7 +133,11 @@ class BrandViewModel(
     }
 
     companion object {
+        private val logger = Logger.withTag("BrandViewModel")
+
         @VisibleForTesting
+        @get:VisibleForTesting
+        @JvmStatic
         val manufacturerList = listOf("HotWheels", "MiniGT", "Maisto", "Bburago", "Matchbox").sorted()
     }
 }
