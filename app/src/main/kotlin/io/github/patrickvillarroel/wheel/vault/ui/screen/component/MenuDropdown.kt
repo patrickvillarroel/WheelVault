@@ -26,7 +26,7 @@ import io.github.patrickvillarroel.wheel.vault.BuildConfig
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
-@Suppress("ktlint:compose:multiple-emitters-check")
+@Suppress("compose:multiple-emitters-check")
 @Composable
 fun MenuDropDown(menuDropdownCallbacks: HeaderMenuDropdownCallbacks, modifier: Modifier = Modifier) {
     var expandedMenu by remember { mutableStateOf(false) }

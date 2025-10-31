@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class OnboardingViewModel(private val useCase: UpdateOnboardingStateUseCase) : ViewModel() {
+class OnboardingViewModel(private val useCase: UpdateOnboardingStateUseCase) : ViewModel() {
     private val _uiState = MutableStateFlow<OnboardingUiState>(OnboardingUiState.Loading)
     val uiState = _uiState.asStateFlow()
 
@@ -33,7 +33,11 @@ data class OnboardingViewModel(private val useCase: UpdateOnboardingStateUseCase
     fun reloadOnboardingState() {
         viewModelScope.launch {
             _uiState.update { OnboardingUiState.Loading }
-            val newState = if (useCase.getOnboardingState()) OnboardingUiState.Success else OnboardingUiState.Uncompleted
+            val newState = if (useCase.getOnboardingState()) {
+                OnboardingUiState.Success
+            } else {
+                OnboardingUiState.Uncompleted
+            }
             _uiState.update { newState }
         }
     }
