@@ -7,7 +7,7 @@ import kotlin.uuid.Uuid
 interface BrandRepository {
     suspend fun search(query: String): List<Brand>
     suspend fun fetchAll(forceRefresh: Boolean): List<Brand>
-    suspend fun fetch(id: Uuid): Brand?
+    suspend fun fetch(id: Uuid, forceRefresh: Boolean): Brand?
     suspend fun fetchByName(name: String): Brand?
     suspend fun fetchByDescription(description: String): Brand?
 }
