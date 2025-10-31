@@ -5,8 +5,8 @@ import android.net.Uri
 class ImageRepository(private val cache: CacheImageDataSource, private val mediaStore: MediaStoreImageDataSource) {
 
     suspend fun saveImage(name: String, bytes: ByteArray, persist: Boolean = false): Uri? {
-        cache.saveImage(name, bytes)
-        return if (persist) mediaStore.saveImage(name, bytes) else null
+        val cacheUri = cache.saveImage(name, bytes)
+        return if (persist) mediaStore.saveImage(name, bytes) else cacheUri
     }
 
     suspend fun loadImage(name: String): ByteArray? = cache.loadImage(name) ?: mediaStore.loadImage(name)?.also {
@@ -15,7 +15,7 @@ class ImageRepository(private val cache: CacheImageDataSource, private val media
     }
 
     suspend fun deleteImage(name: String, persist: Boolean = false): Boolean {
-        cache.deleteImage(name)
-        return if (persist) mediaStore.deleteImage(name) else true
+        val cacheDelete = cache.deleteImage(name)
+        return if (persist) mediaStore.deleteImage(name) else cacheDelete
     }
 }
