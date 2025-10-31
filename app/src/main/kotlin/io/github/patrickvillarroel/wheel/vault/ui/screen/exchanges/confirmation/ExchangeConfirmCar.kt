@@ -95,7 +95,7 @@ fun ExchangeConfirmCar(
                 ExchangeTabs(
                     tabs = tabs,
                     selectedTabIndex = selectedTabIndex,
-                    onTabSelected = { index -> selectedTabIndex = index },
+                    onTabClick = { index -> selectedTabIndex = index },
                 )
             }
 
@@ -181,7 +181,7 @@ private fun CarImage(imageUrl: Any?, modifier: Modifier = Modifier) {
 private fun ExchangeTabs(
     tabs: List<String>,
     selectedTabIndex: Int,
-    onTabSelected: (Int) -> Unit,
+    onTabClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
@@ -199,7 +199,7 @@ private fun ExchangeTabs(
             tabs.forEachIndexed { index, title ->
                 Tab(
                     selected = selectedTabIndex == index,
-                    onClick = { onTabSelected(index) },
+                    onClick = { onTabClick(index) },
                     text = {
                         Text(
                             text = title,
