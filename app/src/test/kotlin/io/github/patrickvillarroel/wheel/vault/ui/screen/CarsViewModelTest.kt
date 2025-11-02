@@ -10,7 +10,6 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -21,8 +20,6 @@ class CarsViewModelTest {
     private lateinit var carItem: CarItem
     private lateinit var repository: CarsRepository
     private lateinit var viewModel: CarViewModel
-
-    private val dispatcher = UnconfinedTestDispatcher()
 
     @Before
     fun setup() {
@@ -39,7 +36,7 @@ class CarsViewModelTest {
 
         // Use mocks
         repository = mockk(relaxed = true)
-        viewModel = CarViewModel(repository, dispatcher)
+        viewModel = CarViewModel(repository)
     }
 
     @Test

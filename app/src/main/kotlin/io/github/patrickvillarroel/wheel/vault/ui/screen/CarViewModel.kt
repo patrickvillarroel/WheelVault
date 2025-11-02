@@ -10,8 +10,6 @@ import coil3.toAndroidUri
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
 import io.github.patrickvillarroel.wheel.vault.util.toByteArray
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,10 +23,7 @@ import kotlin.uuid.Uuid
 import android.content.Context as AndroidContext
 import coil3.Uri as Coil3Uri
 
-class CarViewModel(
-    private val carsRepository: CarsRepository,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : ViewModel() {
+class CarViewModel(private val carsRepository: CarsRepository) : ViewModel() {
     private val logger = Logger.withTag("Car VM")
     private val _carsState = MutableStateFlow<CarsUiState>(CarsUiState.Loading)
     val carsState = _carsState.asStateFlow()
@@ -38,7 +33,7 @@ class CarViewModel(
 
     val recentCarsImages = carsState.map { state ->
         if (state is CarsUiState.Success) {
-            state.cars.mapNotNull { car -> car.images.firstOrNull()?.let { car.id to it } }
+            state.cars.map { car -> car.imageUrl.let { car.id to it } }
         } else {
             emptyList()
         }
@@ -57,7 +52,7 @@ class CarViewModel(
 
         if (shouldFetch) {
             _carsState.update { CarsUiState.Loading }
-            viewModelScope.launch(ioDispatcher) {
+            viewModelScope.launch {
                 try {
                     val result = carsRepository.fetchAll(orderAsc = false)
                     _carsState.update { CarsUiState.Success(result) }
@@ -82,7 +77,7 @@ class CarViewModel(
 
         _carDetailState.update { CarDetailUiState.Loading }
 
-        viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch {
             try {
                 logger.i { "Going to find car by id $id" }
                 val car = carsRepository.fetch(id)
@@ -144,7 +139,7 @@ class CarViewModel(
                 imageUrl = imagesToSave.firstOrNull() ?: CarItem.EmptyImage,
             )
             logger.i("Final car: $carToSave")
-            viewModelScope.launch(ioDispatcher) {
+            viewModelScope.launch {
                 try {
                     val newCarState = if (carsRepository.exist(carToSave.id)) {
                         logger.i("The car exist")
@@ -187,7 +182,7 @@ class CarViewModel(
     }
 
     fun delete(car: CarItem) {
-        viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch {
             try {
                 if (!carsRepository.delete(car)) {
                     logger.e("Failed to delete car")
@@ -223,7 +218,7 @@ class CarViewModel(
             }
         }
 
-        viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch {
             try {
                 val updatedCar = carsRepository.setAvailableForTrade(carToUpdate.id, !carToUpdate.availableForTrade)
                 if (updatedCar != null) {
