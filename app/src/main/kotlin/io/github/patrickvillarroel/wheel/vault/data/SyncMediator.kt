@@ -11,7 +11,7 @@ object SyncMediator {
         forceRefresh: Boolean = false,
         localFetch: suspend () -> T?,
         remoteFetch: suspend () -> T?,
-        saveRemote: suspend (T?) -> Unit,
+        saveRemote: suspend CoroutineScope.(data: @JvmSuppressWildcards T?) -> Unit,
     ): T? {
         contract {
             callsInPlace(localFetch, InvocationKind.AT_MOST_ONCE)
@@ -20,12 +20,16 @@ object SyncMediator {
         }
         return if (forceRefresh) {
             val remoteData = remoteFetch()
-            saveRemote(remoteData)
+            coroutineScope {
+                saveRemote(remoteData)
+            }
             remoteData
         } else {
             localFetch() ?: run {
                 val remoteData = remoteFetch()
-                saveRemote(remoteData)
+                coroutineScope {
+                    saveRemote(remoteData)
+                }
                 remoteData
             }
         }
@@ -36,7 +40,7 @@ object SyncMediator {
         forceRefresh: Boolean = false,
         localFetch: suspend () -> List<T>,
         remoteFetch: suspend () -> List<T>,
-        saveRemote: suspend CoroutineScope.(List<T>) -> Unit,
+        saveRemote: suspend CoroutineScope.(data: List<@JvmSuppressWildcards T>) -> Unit,
     ): List<T> {
         contract {
             callsInPlace(localFetch, InvocationKind.AT_MOST_ONCE)

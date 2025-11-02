@@ -33,11 +33,11 @@ class BrandRepositoryImpl(
     override suspend fun fetchAll(forceRefresh: Boolean): List<Brand> = SyncMediator.fetchList(
         localFetch = { room.fetchAll(forceRefresh) },
         remoteFetch = { supabase.fetchAll(forceRefresh) },
-        saveRemote = {
+        saveRemote = { brands ->
             launch {
                 room.saveAll(
-                    it,
-                    it.map { brand ->
+                    brands,
+                    brands.map { brand ->
                         async {
                             imageHelper.downloadImage(supabase.buildImageRequest(brand.id))
                         }
@@ -50,7 +50,17 @@ class BrandRepositoryImpl(
         forceRefresh = forceRefresh,
     )
 
-    override suspend fun fetch(id: Uuid): Brand? = supabase.fetch(id)
+    override suspend fun fetch(id: Uuid, forceRefresh: Boolean): Brand? = SyncMediator.fetch(
+        forceRefresh = forceRefresh,
+        localFetch = { room.fetch(id, forceRefresh) },
+        remoteFetch = { supabase.fetch(id, forceRefresh) },
+        saveRemote = { brand ->
+            if (brand == null) return@fetch
+            launch {
+                room.save(brand, imageHelper.downloadImage(supabase.buildImageRequest(brand.id)))
+            }
+        },
+    )
 
     override suspend fun fetchByName(name: String): Brand? = supabase.fetchByName(name)
 

@@ -13,7 +13,7 @@ class BrandRoomDataSource(private val dao: BrandDao, private val imageRepository
         it.toDomain(imageRepository.loadImage(it.id) ?: Brand.DEFAULT_IMAGE)
     }
 
-    override suspend fun fetch(id: Uuid): Brand? = dao.fetchById(id.toString())?.let { entity ->
+    override suspend fun fetch(id: Uuid, forceRefresh: Boolean): Brand? = dao.fetchById(id.toString())?.let { entity ->
         entity.toDomain(imageRepository.loadImage(entity.id) ?: Brand.DEFAULT_IMAGE)
     }
 
@@ -29,6 +29,11 @@ class BrandRoomDataSource(private val dao: BrandDao, private val imageRepository
 
     override suspend fun fetchByDescription(description: String): Brand? = dao.fetchByDescription(description)?.let {
         it.toDomain(imageRepository.loadImage(it.id) ?: Brand.DEFAULT_IMAGE)
+    }
+
+    suspend fun save(brand: Brand, image: ByteArray?) {
+        dao.insertBrand(brand.toEntity())
+        if (image != null) imageRepository.saveImage(brand.id.toString(), image)
     }
 
     suspend fun saveAll(brands: List<Brand>, images: List<ByteArray>) {
