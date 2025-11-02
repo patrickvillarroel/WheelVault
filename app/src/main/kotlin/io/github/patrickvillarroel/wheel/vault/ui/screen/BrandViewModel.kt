@@ -1,100 +1,50 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen
 
-import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
 import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.uuid.Uuid
 
-class BrandViewModel(
-    private val brandRepository: BrandRepository,
-    private val carRepository: CarsRepository,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : ViewModel() {
-
-    private val _brandsState = MutableStateFlow<BrandsUiState>(BrandsUiState.Loading)
-    val brandsState = _brandsState.asStateFlow()
-
+class BrandViewModel(private val brandRepository: BrandRepository, private val carRepository: CarsRepository) :
+    ViewModel() {
     private val _brandDetailsState = MutableStateFlow<BrandDetailsUiState>(BrandDetailsUiState.Idle)
     val brandDetailsState = _brandDetailsState.asStateFlow()
+    private val _brandsNames = MutableStateFlow(emptyList<String>())
 
-    val brandsImages = brandsState.map { state ->
-        if (state is BrandsUiState.Success) {
-            state.brands.map { it.id to it.image }
-        } else {
-            emptyList()
-        }
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    val brandsNames = _brandsNames.asStateFlow()
 
-    val brandsNames = brandsState.map { state ->
-        if (state is BrandsUiState.Success) {
-            state.brands.map { it.name }.sorted()
-        } else {
-            emptyList()
-        }
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
-
-    init {
-        fetchAll()
-    }
-
-    fun fetchAll(force: Boolean = false) {
-        val shouldFetch = force ||
-            brandsImages.value.isEmpty() ||
-            brandsImages.value.size == 1 ||
-            brandsState.value is BrandsUiState.Error ||
-            brandsState.value is BrandsUiState.Loading
-
-        if (shouldFetch) {
-            _brandsState.update { BrandsUiState.Loading }
-            viewModelScope.launch(ioDispatcher) {
-                Log.i("Brands", "Fetching all brands")
-                try {
-                    val result = brandRepository.fetchAll(force)
-                    _brandsState.update { BrandsUiState.Success(result) }
-                } catch (e: Exception) {
-                    Log.e("Brands", "Error fetch all", e)
-                    _brandsState.update { BrandsUiState.Error }
-                }
+    fun fetchNames(force: Boolean = false) {
+        viewModelScope.launch {
+            logger.d { "Fetching brand names..." }
+            try {
+                val names = brandRepository.fetchAllNames(force)
+                logger.i { "Found ${names.size} brand names" }
+                _brandsNames.update { names }
+            } catch (e: Exception) {
+                currentCoroutineContext().ensureActive()
+                logger.e(e) { "Unexpected error while fetching brand names" }
+                // TODO update UI state with this error or something
             }
         }
     }
 
     fun findById(id: Uuid) {
-        val localBrand = (brandsState.value as? BrandsUiState.Success)
-            ?.brands
-            ?.firstOrNull { it.id == id }
-
-        if (localBrand != null) {
-            val localCars = (brandDetailsState.value as? BrandDetailsUiState.Success)
-                ?.takeIf { it.brand.id == id }
-                ?.cars
-
-            if (localCars != null) {
-                _brandDetailsState.update { BrandDetailsUiState.Success(localBrand, localCars) }
-                return
-            }
-        }
-
         _brandDetailsState.update { BrandDetailsUiState.Loading }
-        viewModelScope.launch(ioDispatcher) {
-            Log.i("Brands", "Fetching brand by id $id")
-
+        logger.d { "Fetching brand by id $id" }
+        viewModelScope.launch {
             try {
                 val brand = brandRepository.fetch(id)
                 if (brand != null) {
@@ -104,18 +54,11 @@ class BrandViewModel(
                     _brandDetailsState.update { BrandDetailsUiState.NotFound }
                 }
             } catch (e: Exception) {
-                Log.e("Brands", "Error fetching brand by id $id", e)
+                currentCoroutineContext().ensureActive()
+                logger.e(e) { "Error fetching brand by id $id" }
                 _brandDetailsState.update { BrandDetailsUiState.Error }
             }
         }
-    }
-
-    sealed interface BrandsUiState {
-        data object Loading : BrandsUiState
-
-        @Immutable
-        data class Success(@Stable val brands: List<Brand>) : BrandsUiState
-        data object Error : BrandsUiState
     }
 
     sealed interface BrandDetailsUiState {
@@ -129,6 +72,8 @@ class BrandViewModel(
     }
 
     companion object {
+        private val logger = Logger.withTag("BrandsViewModel")
+
         @VisibleForTesting
         val manufacturerList = listOf("HotWheels", "MiniGT", "Maisto", "Bburago", "Matchbox").sorted()
     }
