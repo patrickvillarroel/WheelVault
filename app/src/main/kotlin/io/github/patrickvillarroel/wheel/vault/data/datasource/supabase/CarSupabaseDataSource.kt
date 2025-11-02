@@ -1,7 +1,6 @@
 package io.github.patrickvillarroel.wheel.vault.data.datasource.supabase
 
-import android.content.Context
-import android.util.Log
+import co.touchlab.kermit.Logger
 import coil3.request.ImageRequest
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
@@ -25,10 +24,14 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
-import java.util.concurrent.ConcurrentSkipListSet
 import kotlin.uuid.Uuid
+import coil3.PlatformContext as CoilContext
 
-class CarSupabaseDataSource(private val supabase: SupabaseClient, private val context: Context) : CarsRepository {
+class CarSupabaseDataSource(private val supabase: SupabaseClient, private val context: CoilContext) :
+    CarsRepository {
+    companion object {
+        private val logger = Logger.withTag("Cars Supabase DataSource")
+    }
     override suspend fun exist(id: Uuid): Boolean {
         val count = supabase.from(CarObj.TABLE).select {
             filter {
@@ -40,7 +43,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
 
         if (count > 1L) {
             // impossible
-            Log.e("Car Supabase", "Exist count find more than 1 car with id $id")
+            logger.e { "Exist count find more than 1 car with id $id" }
         }
 
         return count >= 1L
@@ -169,7 +172,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
         ?: 0
 
     override suspend fun insert(car: CarItem): CarItem {
-        Log.i("Car Supabase", "Inserting car $car")
+        logger.i { "Inserting car $car" }
         val carObject = supabase.from(CarObj.TABLE)
             .insert(car.toObject().copy(id = null)) {
                 select()
@@ -179,14 +182,14 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
             val realImages = car.images.filterIsInstance<ByteArray>().toSet()
 
             if (realImages.isNotEmpty()) {
-                Log.i("Car Supabase", "Uploading images for car ${car.id}")
+                logger.i { "Uploading images for car ${car.id}" }
                 uploadImages(carObject.id!!, realImages).ifEmpty { setOf(CarItem.EmptyImage) }
             } else {
-                Log.i("Car Supabase", "No images to upload for car ${car.id} after filter is ByteArray")
+                logger.i { "No images to upload for car ${car.id} after filter is ByteArray" }
                 setOf(CarItem.EmptyImage)
             }
         } else {
-            Log.i("Car Supabase", "No images to upload for car ${car.id}")
+            logger.i { "No images to upload for car ${car.id}" }
             setOf(CarItem.EmptyImage)
         }
 
@@ -204,7 +207,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
             }
             .decodeSingleOrNull<CarObj>()
             ?: run {
-                Log.e("Car Supabase", "update return null, manual fetching")
+                logger.e { "update return null, manual fetching" }
                 return fetch(car.id) ?: error("Car not found after update it")
             }
 
@@ -212,14 +215,14 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
             val realImages = car.images.filterIsInstance<ByteArray>().toSet()
 
             if (realImages.isNotEmpty()) {
-                Log.i("Car Supabase", "Uploading images for car ${car.id}")
+                logger.i { "Uploading images for car ${car.id}" }
                 uploadImages(car.id, realImages).ifEmpty { setOf(CarItem.EmptyImage) }
             } else {
-                Log.i("Car Supabase", "No images to upload for car ${car.id} after filter is ByteArray")
+                logger.i { "No images to upload for car ${car.id} after filter is ByteArray" }
                 setOf(CarItem.EmptyImage)
             }
         } else {
-            Log.i("Car Supabase", "No images to upload for car ${car.id}")
+            logger.i { "No images to upload for car ${car.id}" }
             setOf(CarItem.EmptyImage)
         }
 
@@ -313,9 +316,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
         images: Set<ByteArray>,
         userId: String = supabase.auth.currentUserOrNull()!!.id,
     ) = coroutineScope {
-        val results: MutableSet<Pair<Uuid, String>> = ConcurrentSkipListSet()
-
-        images.map { bytes ->
+        val successfulUploads = images.map { bytes ->
             async {
                 val imageId = Uuid.random()
                 val path = "$userId/$carId/$imageId.webp"
@@ -325,31 +326,39 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
                         upsert = true
                         contentType = ContentType.Image.WEBP
                     }
-                    results.add(imageId to path)
-                } catch (e: Exception) {
-                    currentCoroutineContext().ensureActive()
-                    Log.e("Car Images", "Failed to upload image", e)
-                }
-            }
-        }.awaitAll()
-
-        supabase.postgrest
-            .from(CarImagesObj.TABLE)
-            .upsert(
-                results.map { (imageId, fullPath) ->
                     CarImagesObj(
+                        id = imageId,
                         carId = carId,
-                        storagePath = fullPath,
+                        storagePath = path,
                         mimeType = "image/webp",
                         uploadedBy = Uuid.parse(userId),
-                        id = imageId,
                     )
-                },
-            )
+                } catch (e: Exception) {
+                    currentCoroutineContext().ensureActive()
+                    logger.e(e) { "Upload failed for $path" }
+                    null
+                }
+            }
+        }.awaitAll().filterNotNull()
 
-        results.map { (_, path) ->
+        if (successfulUploads.isEmpty()) {
+            logger.w { "No images uploaded successfully for car $carId" }
+            return@coroutineScope emptySet()
+        }
+
+        val response = supabase.postgrest
+            .from(CarImagesObj.TABLE)
+            .upsert(successfulUploads) {
+                select(Columns.list("storage_path"))
+            }
+            .decodeList<Map<String, String>>()
+            .flatMap { it.values }
+
+        logger.i { "Inserted ${response.size} image records for car $carId" }
+
+        response.map { storagePath ->
             ImageRequest.Builder(context)
-                .data(authenticatedStorageItem(CarObj.BUCKET_IMAGES, path))
+                .data(authenticatedStorageItem(CarObj.BUCKET_IMAGES, storagePath))
                 .build()
         }.toSet()
     }
