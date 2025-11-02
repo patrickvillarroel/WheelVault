@@ -75,6 +75,9 @@ fun WheelVaultApp(
     }
     var isSplashDone by rememberSaveable { mutableStateOf(false) }
 
+    // prevent exceptions with empty navigation, this trigger recomposition
+    if (backStack.isEmpty()) backStack += NavigationKeys.Home
+
     LaunchedEffect(session, isSplashDone) {
         if (!isSplashDone) return@LaunchedEffect
 
