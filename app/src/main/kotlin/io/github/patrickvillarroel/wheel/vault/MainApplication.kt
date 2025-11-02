@@ -12,6 +12,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.coil.coil3
 import io.github.patrickvillarroel.wheel.vault.di.wheelVaultModule
+import io.ktor.client.HttpClient
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.androix.startup.KoinStartup
@@ -31,6 +32,7 @@ class MainApplication :
     KoinStartup,
     SingletonImageLoader.Factory {
     private val supabase: SupabaseClient by inject()
+    private val httpClient: HttpClient by inject()
 
     override fun onKoinStartup() = KoinConfiguration {
         modules(wheelVaultModule)
@@ -41,7 +43,7 @@ class MainApplication :
     override fun newImageLoader(context: PlatformContext): ImageLoader = ImageLoader.Builder(context)
         .components {
             add(supabase.coil3)
-            add(KtorNetworkFetcherFactory())
+            add(KtorNetworkFetcherFactory(httpClient))
         }
         .memoryCache {
             MemoryCache.Builder()
