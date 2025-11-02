@@ -21,6 +21,14 @@ class BrandRepositoryImpl(
     private val imageHelper: ImageDownloadHelper,
 ) : BrandRepository {
     override suspend fun search(query: String): List<Brand> = supabase.search(query)
+    override suspend fun fetchAllNames(forceRefresh: Boolean): List<String> = SyncMediator.fetchList(
+        forceRefresh = forceRefresh,
+        localFetch = { room.fetchAllNames() },
+        remoteFetch = { room.fetchAllNames() },
+        saveRemote = {
+            /* TODO */
+        },
+    )
 
     override suspend fun fetchAll(forceRefresh: Boolean): List<Brand> = SyncMediator.fetchList(
         localFetch = { room.fetchAll(forceRefresh) },

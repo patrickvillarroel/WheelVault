@@ -21,6 +21,8 @@ class BrandRoomDataSource(private val dao: BrandDao, private val imageRepository
         it.toDomain(imageRepository.loadImage(it.id) ?: Brand.DEFAULT_IMAGE)
     }
 
+    override suspend fun fetchAllNames(forceRefresh: Boolean): List<String> = dao.fetchAllNames()
+
     override suspend fun fetchByName(name: String): Brand? = dao.fetchByName(name)?.let {
         it.toDomain(imageRepository.loadImage(it.id) ?: Brand.DEFAULT_IMAGE)
     }
