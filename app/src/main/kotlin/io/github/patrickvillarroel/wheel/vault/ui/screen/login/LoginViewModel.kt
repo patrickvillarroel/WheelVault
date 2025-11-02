@@ -67,7 +67,7 @@ class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.TIMEOUT, "Timeout") }
             } catch (e: RestException) {
                 logger.e("Register with email and password fail with RestException", e)
-                _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
+                _state.update { LoginUiState.Error(LoginUiState.ErrorType.NETWORK, "Unknown error with request") }
             } catch (e: Exception) {
                 currentCoroutineContext().ensureActive()
                 logger.e("Register with email and password fail with Unhandled Exception", e)
@@ -87,7 +87,10 @@ class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
                 }
                 _state.update { LoginUiState.Success }
             } catch (e: AuthRestException) {
-                logger.e("Login with email and password fail with AuthRestException: ${e.errorCode?.value ?: e.errorDescription}", e)
+                logger.e(
+                    "Login with email and password fail with AuthRestException: ${e.errorCode?.value ?: e.errorDescription}",
+                    e,
+                )
                 _state.update {
                     LoginUiState.Error(
                         LoginUiState.ErrorType.INVALID_CREDENTIALS,
@@ -102,7 +105,7 @@ class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.TIMEOUT, "Timeout") }
             } catch (e: RestException) {
                 logger.e("Login with email and password fail with RestException", e)
-                _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
+                _state.update { LoginUiState.Error(LoginUiState.ErrorType.NETWORK, "Unknown error with network") }
             } catch (e: Exception) {
                 currentCoroutineContext().ensureActive()
                 logger.e("Login with email and password fail with Unhandled Exception", e)
@@ -147,7 +150,7 @@ class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
                 _state.update { LoginUiState.Success }
             } catch (e: GetCredentialException) {
                 logger.e("Login with Google fail with GetCredentialException", e)
-                _state.update { LoginUiState.Error(LoginUiState.ErrorType.INVALID_CREDENTIALS, "Problems with Google. ${e.message}") }
+                _state.update { LoginUiState.Error(LoginUiState.ErrorType.INVALID_CREDENTIALS, "Problems with Google") }
             } catch (e: HttpRequestException) {
                 logger.e("Login with Google fail with HttpRequestException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.NETWORK, "Network") }
@@ -156,7 +159,7 @@ class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.TIMEOUT, "Timeout") }
             } catch (e: RestException) {
                 logger.e("Login with Google fail with RestException", e)
-                _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
+                _state.update { LoginUiState.Error(LoginUiState.ErrorType.NETWORK, "Unknown error with network") }
             } catch (e: Exception) {
                 currentCoroutineContext().ensureActive()
                 logger.e("Login with Google fail with Unhandled Exception", e)
@@ -180,7 +183,7 @@ class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.TIMEOUT, "Timeout") }
             } catch (e: RestException) {
                 logger.e("Login with email magic link fail with RestException", e)
-                _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
+                _state.update { LoginUiState.Error(LoginUiState.ErrorType.NETWORK, "Unknown error with network") }
             } catch (e: Exception) {
                 currentCoroutineContext().ensureActive()
                 logger.e("Login with email magic link fail with Unhandled Exception", e)
