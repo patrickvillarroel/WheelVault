@@ -34,7 +34,7 @@ class BrandSupabaseDataSource(private val supabase: SupabaseClient, private val 
         order("created_at", Order.DESCENDING)
     }.decodeList<BrandObj>().map { it.toDomain(fetchImage(it.id!!)) }
 
-    override suspend fun fetch(id: Uuid): Brand? = supabase.from(BrandObj.TABLE).select {
+    override suspend fun fetch(id: Uuid, forceRefresh: Boolean): Brand? = supabase.from(BrandObj.TABLE).select {
         filter { eq("id", id) }
     }.decodeSingleOrNull<BrandObj>()?.toDomain { fetchImage(it.id!!) }
 
@@ -47,7 +47,7 @@ class BrandSupabaseDataSource(private val supabase: SupabaseClient, private val 
     }.decodeSingleOrNull<BrandObj>()?.toDomain { fetchImage(it.id!!) }
 
     private fun fetchImage(id: Uuid, contentType: String = "png") = ImageRequest.Builder(context)
-        .data(authenticatedStorageItem(BrandObj.BUCKET_IMAGES, "$id.$contentType"))
+        .data(buildImageRequest(id, contentType))
         .build()
 
     fun buildImageRequest(id: Uuid, contentType: String = "png") =
