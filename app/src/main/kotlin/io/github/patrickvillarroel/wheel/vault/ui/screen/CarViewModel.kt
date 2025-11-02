@@ -70,7 +70,7 @@ class CarViewModel(private val carsRepository: CarsRepository) : ViewModel() {
             ?.firstOrNull { it.id == id }
 
         if (localMatch != null && !force) {
-            logger.i { "Found car in local state. $localMatch" }
+            logger.v { "Found car with id='${localMatch.id}' in local state." }
             _carDetailState.update { CarDetailUiState.Success(localMatch) }
             return
         }
@@ -79,7 +79,7 @@ class CarViewModel(private val carsRepository: CarsRepository) : ViewModel() {
 
         viewModelScope.launch {
             try {
-                logger.i { "Going to find car by id $id" }
+                logger.d { "Going to find car by id $id" }
                 val car = carsRepository.fetch(id)
                 if (car != null) {
                     logger.i { "Found car by id $id. $car" }
@@ -97,7 +97,7 @@ class CarViewModel(private val carsRepository: CarsRepository) : ViewModel() {
     }
 
     fun save(car: CarItem.Builder, context: AndroidContext? = null) {
-        logger.v { "Going to save this car $car" }
+        logger.v { "Going to map car builder to save $car" }
         _carDetailState.update { CarDetailUiState.Loading }
         val built = car.build() ?: run {
             logger.e(
@@ -112,7 +112,7 @@ class CarViewModel(private val carsRepository: CarsRepository) : ViewModel() {
     }
 
     fun save(car: CarItem, context: AndroidContext? = null) {
-        logger.i("Going to save this car $car")
+        logger.v("Going to save this car $car")
         _carDetailState.update { CarDetailUiState.Loading }
         try {
             val pictures = car.images.mapNotNull {
@@ -147,7 +147,7 @@ class CarViewModel(private val carsRepository: CarsRepository) : ViewModel() {
                     } else {
                         carsRepository.insert(carToSave)
                     }
-                    logger.i("New car state: $newCarState")
+                    logger.d("New car state: $newCarState")
                     _carDetailState.update { CarDetailUiState.Success(newCarState) }
 
                     // Update the car in the main list as well
