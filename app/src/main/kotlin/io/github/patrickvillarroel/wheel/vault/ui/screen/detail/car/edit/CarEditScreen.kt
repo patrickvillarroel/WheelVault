@@ -3,6 +3,7 @@ package io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.edit
 import android.content.pm.PackageManager
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -62,6 +63,10 @@ fun CarEditScreen(
         )
     }
 
+    LaunchedEffect(Unit) {
+        brandViewModel.fetchNames()
+    }
+
     DisposableEffect(partialCarItem.id) {
         if (partialCarItem.id != null) {
             carViewModel.findById(partialCarItem.id)
@@ -72,13 +77,12 @@ fun CarEditScreen(
     }
 
     // Navigate back when save is successful
-    DisposableEffect(detailState, shouldNavigateBack) {
+    LaunchedEffect(detailState, shouldNavigateBack) {
         if (shouldNavigateBack && detailState is CarViewModel.CarDetailUiState.Success) {
             logger.v("Save successful, navigating back")
             headersBackCallbacks.onBackClick()
             shouldNavigateBack = false
         }
-        onDispose { }
     }
 
     CarEditContent(

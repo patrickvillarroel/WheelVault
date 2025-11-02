@@ -1,6 +1,7 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.garage
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -31,6 +32,10 @@ fun ExchangeScreen(
     var searchQuery by rememberSaveable { mutableStateOf(query.trim()) }
     var topBarState by rememberSaveable { mutableStateOf(GarageTopBarState.DEFAULT) }
 
+    LaunchedEffect(Unit) {
+        brandViewModel.fetchNames()
+    }
+
     ExchangeContent(
         topBarState = topBarState,
         searchQuery = searchQuery,
@@ -51,6 +56,7 @@ fun ExchangeScreen(
             },
             onRefresh = {
                 garageViewModel.fetchAll(true)
+                brandViewModel.fetchNames(true)
             },
             onUiStateChange = { topBarState = it },
             headersCallbacks = HeaderCallbacks.default,
