@@ -1,11 +1,12 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.login
 
 import android.content.Context
-import android.util.Log
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import io.github.jan.supabase.SupabaseClient
@@ -19,6 +20,8 @@ import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.patrickvillarroel.wheel.vault.BuildConfig
 import io.ktor.client.plugins.HttpRequestTimeoutException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -28,7 +31,10 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 import io.github.jan.supabase.auth.providers.builtin.Email as ProviderEmail
 
-data class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
+class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
+    companion object {
+        private val logger = Logger.withTag("LoginViewModel")
+    }
     private val _state = MutableStateFlow<LoginUiState>(LoginUiState.Waiting)
     val state = _state.asStateFlow()
 
@@ -43,10 +49,10 @@ data class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
                 }
                 _state.update { LoginUiState.Success }
             } catch (e: AuthWeakPasswordException) {
-                Log.e("LoginViewModel", "AuthWeakPasswordException", e)
+                logger.e("Register with email and password fail with AuthWeakPasswordException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.INVALID_CREDENTIALS, "Password is too weak") }
             } catch (e: AuthRestException) {
-                Log.e("LoginViewModel", "AuthRestException: ${e.errorCode?.value ?: e.errorDescription}", e)
+                logger.e("AuthRestException: ${e.errorCode?.value ?: e.errorDescription}", e)
                 _state.update {
                     LoginUiState.Error(
                         LoginUiState.ErrorType.INVALID_CREDENTIALS,
@@ -54,16 +60,17 @@ data class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
                     )
                 }
             } catch (e: HttpRequestException) {
-                Log.e("LoginViewModel", "HttpRequestException", e)
+                logger.e("Register with email and password fail with HttpRequestException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.NETWORK, "Network") }
             } catch (e: HttpRequestTimeoutException) {
-                Log.e("LoginViewModel", "HttpRequestTimeoutException", e)
+                logger.e("Register with email and password fail with HttpRequestTimeoutException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.TIMEOUT, "Timeout") }
             } catch (e: RestException) {
-                Log.e("LoginViewModel", "RestException", e)
+                logger.e("Register with email and password fail with RestException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
             } catch (e: Exception) {
-                Log.e("LoginViewModel", "Unhandled Exception", e)
+                currentCoroutineContext().ensureActive()
+                logger.e("Register with email and password fail with Unhandled Exception", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
             }
         }
@@ -80,7 +87,7 @@ data class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
                 }
                 _state.update { LoginUiState.Success }
             } catch (e: AuthRestException) {
-                Log.e("LoginViewModel", "AuthRestException: ${e.errorCode?.value ?: e.errorDescription}", e)
+                logger.e("Login with email and password fail with AuthRestException: ${e.errorCode?.value ?: e.errorDescription}", e)
                 _state.update {
                     LoginUiState.Error(
                         LoginUiState.ErrorType.INVALID_CREDENTIALS,
@@ -88,16 +95,17 @@ data class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
                     )
                 }
             } catch (e: HttpRequestException) {
-                Log.e("LoginViewModel", "HttpRequestException", e)
+                logger.e("Login with email and password fail with HttpRequestException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.NETWORK, "Network") }
             } catch (e: HttpRequestTimeoutException) {
-                Log.e("LoginViewModel", "HttpRequestTimeoutException", e)
+                logger.e("Login with email and password fail with HttpRequestTimeoutException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.TIMEOUT, "Timeout") }
             } catch (e: RestException) {
-                Log.e("LoginViewModel", "RestException", e)
+                logger.e("Login with email and password fail with RestException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
             } catch (e: Exception) {
-                Log.e("LoginViewModel", "Unhandled Exception", e)
+                currentCoroutineContext().ensureActive()
+                logger.e("Login with email and password fail with Unhandled Exception", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
             }
         }
@@ -137,20 +145,21 @@ data class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
                 }
 
                 _state.update { LoginUiState.Success }
-            } catch (e: androidx.credentials.exceptions.GetCredentialException) {
-                Log.e("LoginViewModel", "GetCredentialException", e)
-                _state.update { LoginUiState.Error(LoginUiState.ErrorType.INVALID_CREDENTIALS, "Problems with Google") }
+            } catch (e: GetCredentialException) {
+                logger.e("Login with Google fail with GetCredentialException", e)
+                _state.update { LoginUiState.Error(LoginUiState.ErrorType.INVALID_CREDENTIALS, "Problems with Google. ${e.message}") }
             } catch (e: HttpRequestException) {
-                Log.e("LoginViewModel", "HttpRequestException", e)
+                logger.e("Login with Google fail with HttpRequestException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.NETWORK, "Network") }
             } catch (e: HttpRequestTimeoutException) {
-                Log.e("LoginViewModel", "HttpRequestTimeoutException", e)
+                logger.e("Login with Google fail with HttpRequestTimeoutException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.TIMEOUT, "Timeout") }
             } catch (e: RestException) {
-                Log.e("LoginViewModel", "RestException", e)
+                logger.e("Login with Google fail with RestException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
             } catch (e: Exception) {
-                Log.e("LoginViewModel", "Unhandled Exception", e)
+                currentCoroutineContext().ensureActive()
+                logger.e("Login with Google fail with Unhandled Exception", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
             }
         }
@@ -164,22 +173,23 @@ data class LoginViewModel(private val supabase: SupabaseClient) : ViewModel() {
                     this.email = email
                 }
             } catch (e: HttpRequestException) {
-                Log.e("LoginViewModel", "HttpRequestException", e)
+                logger.e("Login with email magic link fail with HttpRequestException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.NETWORK, "Network") }
             } catch (e: HttpRequestTimeoutException) {
-                Log.e("LoginViewModel", "HttpRequestTimeoutException", e)
+                logger.e("Login with email magic link fail with HttpRequestTimeoutException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.TIMEOUT, "Timeout") }
             } catch (e: RestException) {
-                Log.e("LoginViewModel", "RestException", e)
+                logger.e("Login with email magic link fail with RestException", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
             } catch (e: Exception) {
-                Log.e("LoginViewModel", "Unhandled Exception", e)
+                currentCoroutineContext().ensureActive()
+                logger.e("Login with email magic link fail with Unhandled Exception", e)
                 _state.update { LoginUiState.Error(LoginUiState.ErrorType.UNKNOWN, "Unknown error") }
             }
         }
     }
 
     fun resetState() {
-        _state.value = LoginUiState.Waiting
+        _state.update { LoginUiState.Waiting }
     }
 }
