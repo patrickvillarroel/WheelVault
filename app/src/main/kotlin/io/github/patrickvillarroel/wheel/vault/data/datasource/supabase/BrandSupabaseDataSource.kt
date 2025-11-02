@@ -1,6 +1,5 @@
 package io.github.patrickvillarroel.wheel.vault.data.datasource.supabase
 
-import android.content.Context
 import coil3.request.ImageRequest
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
@@ -12,8 +11,10 @@ import io.github.patrickvillarroel.wheel.vault.data.objects.toDomain
 import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
 import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
 import kotlin.uuid.Uuid
+import coil3.PlatformContext as CoilContext
 
-class BrandSupabaseDataSource(private val supabase: SupabaseClient, private val context: Context) : BrandRepository {
+class BrandSupabaseDataSource(private val supabase: SupabaseClient, private val context: CoilContext) :
+    BrandRepository {
 
     override suspend fun search(query: String): List<Brand> = supabase.from(BrandObj.TABLE).select {
         filter {
