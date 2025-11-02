@@ -32,6 +32,10 @@ fun GarageScreen(
     var uiState by rememberSaveable { mutableStateOf(GarageTopBarState.DEFAULT) }
     var searchQuery by rememberSaveable { mutableStateOf(query.trim()) }
 
+    LaunchedEffect(Unit) {
+        brandViewModel.fetchNames()
+    }
+
     LaunchedEffect(query, favorites) {
         when {
             favorites && query.isBlank() -> viewModel.fetchFavorites()
@@ -63,6 +67,7 @@ fun GarageScreen(
             },
             onRefresh = {
                 viewModel.fetchAll(true)
+                brandViewModel.fetchNames(true)
             },
             onUiStateChange = { uiState = it },
             headersCallbacks = HeaderCallbacks(

@@ -4,12 +4,12 @@ import android.content.Intent
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.github.patrickvillarroel.wheel.vault.ui.screen.BrandViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.CarViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -19,14 +19,18 @@ fun HomeScreen(
     animatedVisibilityScope: AnimatedVisibilityScope,
     callbacks: HomeNavCallbacks,
     modifier: Modifier = Modifier,
-    brandViewModel: BrandViewModel = koinViewModel(),
     carViewModel: CarViewModel = koinViewModel(),
     homeViewModel: HomeViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
-    val brands by brandViewModel.brandsImages.collectAsStateWithLifecycle()
+    val brands by homeViewModel.brandsImages.collectAsStateWithLifecycle()
     val recentCars by carViewModel.recentCarsImages.collectAsStateWithLifecycle()
     val news by homeViewModel.news.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        homeViewModel.fetchAllBrands()
+        homeViewModel.fetchNews()
+    }
 
     HomeContent(
         sharedTransitionScope = sharedTransitionScope,
@@ -52,9 +56,9 @@ fun HomeScreen(
             },
             onCarClick = callbacks.onCarClick,
             onRefresh = {
-                brandViewModel.fetchAll(true)
+                homeViewModel.fetchAllBrands(true)
                 carViewModel.fetchAll(true)
-                homeViewModel.fetchNews()
+                homeViewModel.fetchNews(true)
             },
             headerCallbacks = callbacks.headerCallbacks,
         ),
