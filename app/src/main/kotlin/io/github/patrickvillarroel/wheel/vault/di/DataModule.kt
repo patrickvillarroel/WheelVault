@@ -68,10 +68,10 @@ val dataModule = module {
     single { BrandRoomDataSource(get<AppDatabase>().brandDao(), get()) }
     single { CarRoomDataSource(get<AppDatabase>().carDao(), get()) }
     single { NewsRoomDataSource(get<AppDatabase>().newsDao()) }
-    single { BrandSupabaseDataSource(get(), get()) }
+    single { BrandSupabaseDataSource(get(), androidContext()) }
     single<BrandRepository> { BrandRepositoryImpl(get(), get(), get()) }
 
-    single { CarSupabaseDataSource(get(), get()) }
+    single { CarSupabaseDataSource(get(), androidContext()) }
     single<CarsRepository> { CarRepositoryImpl(get()) }
 
     single<TradeRepository> { TradeSupabaseDataSource(get(), get()) }
