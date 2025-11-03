@@ -39,17 +39,24 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BrandCard
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.CarCard
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.RaceDivider
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.VideoCardPreview
+import io.github.patrickvillarroel.wheel.vault.ui.screen.items
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 import kotlin.uuid.Uuid
 
+/**
+ * @param brands where the first element is the id and the second is the image
+ * @param recentCars where the first element is the id and the second is the image
+ */
 @Composable
 fun HomeContent(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
+    brands: Map<Uuid, Any>,
+    news: List<VideoNews>,
+    recentCars: Map<Uuid, Any>,
     info: HomeCallbacks,
     modifier: Modifier = Modifier,
 ) {
-    val (brands, news, recentCars) = remember(info.homeInfo) { info.homeInfo }
     val layoutDirection = LocalLayoutDirection.current
     var isRefreshing by remember { mutableStateOf(false) }
 
@@ -176,19 +183,18 @@ private fun HomeContentPreview() {
                 HomeContent(
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
-                    info = HomeCallbacks.default(
-                        brands = List(10) { Uuid.random() to R.drawable.hot_wheels_logo_black },
-                        news = List(10) {
-                            VideoNews(
-                                thumbnail = R.drawable.thumbnail_example,
-                                id = Uuid.random(),
-                                name = "Example",
-                                link = "Example",
-                                description = "A video of hot wheels events.",
-                            )
-                        },
-                        recentCars = List(10) { Uuid.random() to R.drawable.batman_car },
-                    ),
+                    brands = List(10) { Uuid.random() to R.drawable.hot_wheels_logo_black }.toMap(),
+                    news = List(10) {
+                        VideoNews(
+                            thumbnail = R.drawable.thumbnail_example,
+                            id = Uuid.random(),
+                            name = "Example",
+                            link = "Example",
+                            description = "A video of hot wheels events.",
+                        )
+                    },
+                    recentCars = List(10) { Uuid.random() to R.drawable.batman_car }.toMap(),
+                    info = HomeCallbacks.default,
                 )
             }
         }
@@ -205,11 +211,10 @@ private fun HomeNoContentPreview() {
                 HomeContent(
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
-                    info = HomeCallbacks.default(
-                        brands = emptyList(),
-                        news = emptyList(),
-                        recentCars = emptyList(),
-                    ),
+                    brands = emptyMap(),
+                    news = emptyList(),
+                    recentCars = emptyMap(),
+                    info = HomeCallbacks.default,
                 )
             }
         }
