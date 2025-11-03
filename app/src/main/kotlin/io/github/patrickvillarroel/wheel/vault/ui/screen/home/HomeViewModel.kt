@@ -73,17 +73,10 @@ class HomeViewModel(
     }
 
     fun fetchNews(force: Boolean = false) {
-        // Only this needs a manual force decision because don't have a room table to local persist
-        val snapshotState = _news.value
-        if (!force && snapshotState.size > 1) {
-            logger.d { "Skipping load news, current have ${snapshotState.size} news" }
-            return
-        }
-        logger.d("Fetching news...")
-
+        logger.v("Fetching news...")
         viewModelScope.launch {
             try {
-                val videos = getVideosNewsUseCase.getVideos()
+                val videos = getVideosNewsUseCase.getVideos(force)
                 logger.d { "Fetched ${videos.size} news" }
                 _news.update { videos }
             } catch (e: Exception) {

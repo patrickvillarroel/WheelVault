@@ -7,12 +7,10 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "news")
 class NewsEntity(
     @PrimaryKey
-    val id: Long? = null,
+    val id: String,
     val name: String,
     val description: String?,
     val link: String,
-    @ColumnInfo(name = "created_at")
+    @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP")
     val createdAt: Long? = null,
-    @ColumnInfo(name = "id_remote")
-    val idRemote: String,
 )

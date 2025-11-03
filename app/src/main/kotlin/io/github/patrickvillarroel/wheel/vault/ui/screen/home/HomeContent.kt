@@ -198,6 +198,7 @@ private fun HomeContentPreview() {
                             name = "Example",
                             link = "Example",
                             description = "A video of hot wheels events.",
+                            createdAt = null,
                         )
                     },
                     recentCars = List(10) { Uuid.random() to R.drawable.batman_car }.toMap(),

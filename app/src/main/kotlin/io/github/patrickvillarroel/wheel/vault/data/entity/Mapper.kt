@@ -2,7 +2,6 @@ package io.github.patrickvillarroel.wheel.vault.data.entity
 
 import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
-import io.github.patrickvillarroel.wheel.vault.domain.model.VideoNews
 import kotlin.time.Instant
 import kotlin.uuid.Uuid
 
@@ -47,21 +46,4 @@ fun CarItem.toEntity(userId: String?) = CarEntity(
     description = this.description,
     category = this.category,
     userId = userId,
-)
-
-// VideoNews
-fun NewsEntity.toDomain(thumbnail: Any) = VideoNews(
-    id = Uuid.parse(idRemote),
-    name = this.name,
-    link = this.link,
-    thumbnail = thumbnail,
-    description = this.description,
-)
-
-fun VideoNews.toEntity(idRemote: String) = NewsEntity(
-    id = null,
-    name = this.name,
-    link = this.link,
-    description = this.description,
-    idRemote = idRemote,
 )

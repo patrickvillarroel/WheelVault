@@ -1,9 +1,7 @@
 package io.github.patrickvillarroel.wheel.vault.data.objects
 
 import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
-import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.domain.model.TradeProposal
-import io.github.patrickvillarroel.wheel.vault.domain.model.VideoNews
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
@@ -21,44 +19,6 @@ inline fun BrandObj.toDomain(image: (BrandObj) -> Any): Brand {
     contract { callsInPlace(image, InvocationKind.EXACTLY_ONCE) }
     return this.toDomain(image(this))
 }
-
-// Car
-
-fun CarItem.toObject() = CarObj(
-    id = this.id,
-    model = this.model,
-    year = this.year,
-    brand = this.brand,
-    manufacturer = this.manufacturer,
-    category = this.category,
-    description = this.description,
-    quantity = this.quantity,
-    isFavorite = this.isFavorite,
-    availableForTrade = this.availableForTrade,
-)
-
-fun CarObj.toDomain(images: Set<Any>) = CarItem(
-    id = this.id!!,
-    model = this.model,
-    year = this.year,
-    brand = this.brand,
-    manufacturer = this.manufacturer,
-    category = this.category,
-    description = this.description,
-    quantity = this.quantity,
-    isFavorite = this.isFavorite,
-    availableForTrade = this.availableForTrade,
-    images = images,
-)
-
-// Videos
-fun VideoObj.toDomain(thumbnail: Any) = VideoNews(
-    id = this.id,
-    name = this.name,
-    link = this.link,
-    thumbnail = thumbnail,
-    description = this.description,
-)
 
 // Trades
 fun TradeEventTypeObj.toDomain() = when (this) {

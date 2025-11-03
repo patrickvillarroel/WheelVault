@@ -11,7 +11,7 @@ import io.github.patrickvillarroel.wheel.vault.data.entity.NewsEntity
 
 @Database(
     entities = [BrandEntity::class, CarEntity::class, NewsEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
