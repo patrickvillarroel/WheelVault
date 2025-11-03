@@ -3,7 +3,7 @@ package io.github.patrickvillarroel.wheel.vault.domain.model
 import kotlin.time.Instant
 import kotlin.uuid.Uuid
 
-class TradeProposal(
+data class TradeProposal(
     val id: Uuid? = null,
     val tradeGroupId: Uuid,
     val requesterId: Uuid,
@@ -36,7 +36,7 @@ class TradeProposal(
         COMPLETED,
     }
 
-    class CurrentTradeStatus(
+    data class CurrentTradeStatus(
         val tradeGroupId: Uuid,
         val currentStatus: TradeEventType,
         val effectiveStatus: String,
