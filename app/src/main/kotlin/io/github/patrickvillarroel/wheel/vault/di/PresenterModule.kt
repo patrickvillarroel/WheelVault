@@ -19,7 +19,7 @@ val presenterModule = module {
     viewModel { BrandViewModel(get(), get()) }
     viewModel { CarViewModel(get()) }
     viewModel { OnboardingViewModel(get()) }
-    viewModel { HomeViewModel(get(), get()) }
+    viewModel { HomeViewModel(get(), get(), get()) }
     viewModel { GarageViewModel(get()) }
     viewModel { ExchangeViewModel(get(), get()) }
 }
