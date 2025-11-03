@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.github.patrickvillarroel.wheel.vault.ui.screen.CarViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -19,26 +18,26 @@ fun HomeScreen(
     animatedVisibilityScope: AnimatedVisibilityScope,
     callbacks: HomeNavCallbacks,
     modifier: Modifier = Modifier,
-    carViewModel: CarViewModel = koinViewModel(),
-    homeViewModel: HomeViewModel = koinViewModel(),
+    viewModel: HomeViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
-    val brands by homeViewModel.brandsImages.collectAsStateWithLifecycle()
-    val recentCars by carViewModel.recentCarsImages.collectAsStateWithLifecycle()
-    val news by homeViewModel.news.collectAsStateWithLifecycle()
+    val brands by viewModel.brandsImages.collectAsStateWithLifecycle()
+    val recentCars by viewModel.recentCarImages.collectAsStateWithLifecycle()
+    val news by viewModel.news.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        homeViewModel.fetchAllBrands()
-        homeViewModel.fetchNews()
+        viewModel.fetchAllBrands()
+        viewModel.fetchNews()
+        viewModel.fetchAllCarImages()
     }
 
     HomeContent(
         sharedTransitionScope = sharedTransitionScope,
         animatedVisibilityScope = animatedVisibilityScope,
+        brands = brands,
+        news = news,
+        recentCars = recentCars,
         info = HomeCallbacks(
-            brands = brands,
-            news = news,
-            recentCars = recentCars,
             onAddClick = callbacks.onAddClick,
             onSearchClick = callbacks.onSearchClick,
             onBrandClick = callbacks.onBrandClick,
@@ -56,11 +55,11 @@ fun HomeScreen(
             },
             onCarClick = callbacks.onCarClick,
             onRefresh = {
-                homeViewModel.fetchAllBrands(true)
-                carViewModel.fetchAll(true)
-                homeViewModel.fetchNews(true)
+                viewModel.fetchAllBrands(true)
+                viewModel.fetchNews(true)
+                viewModel.fetchAllCarImages(true)
             },
-            headerCallbacks = callbacks.headerCallbacks,
+            headersCallbacks = callbacks.headerCallbacks,
         ),
         modifier = modifier,
     )

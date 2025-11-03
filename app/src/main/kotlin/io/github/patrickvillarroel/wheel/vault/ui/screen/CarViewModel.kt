@@ -13,10 +13,7 @@ import io.github.patrickvillarroel.wheel.vault.util.toByteArray
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.uuid.Uuid
@@ -24,20 +21,14 @@ import android.content.Context as AndroidContext
 import coil3.Uri as Coil3Uri
 
 class CarViewModel(private val carsRepository: CarsRepository) : ViewModel() {
-    private val logger = Logger.withTag("Car VM")
+    companion object {
+        private val logger = Logger.withTag("Car VM")
+    }
     private val _carsState = MutableStateFlow<CarsUiState>(CarsUiState.Loading)
     val carsState = _carsState.asStateFlow()
 
     private val _carDetailState = MutableStateFlow<CarDetailUiState>(CarDetailUiState.Idle)
     val carDetailState = _carDetailState.asStateFlow()
-
-    val recentCarsImages = carsState.map { state ->
-        if (state is CarsUiState.Success) {
-            state.cars.map { car -> car.imageUrl.let { car.id to it } }
-        } else {
-            emptyList()
-        }
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     init {
         fetchAll()
@@ -45,8 +36,6 @@ class CarViewModel(private val carsRepository: CarsRepository) : ViewModel() {
 
     fun fetchAll(force: Boolean = false) {
         val shouldFetch = force ||
-            recentCarsImages.value.isEmpty() ||
-            recentCarsImages.value.size == 1 ||
             carsState.value is CarsUiState.Error ||
             carsState.value is CarsUiState.Loading
 
