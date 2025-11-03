@@ -12,17 +12,6 @@ class OnboardingViewModel(private val useCase: UpdateOnboardingStateUseCase) : V
     private val _uiState = MutableStateFlow<OnboardingUiState>(OnboardingUiState.Loading)
     val uiState = _uiState.asStateFlow()
 
-    init {
-        viewModelScope.launch {
-            val newState = if (useCase.getOnboardingState()) {
-                OnboardingUiState.Success
-            } else {
-                OnboardingUiState.Uncompleted
-            }
-            _uiState.update { newState }
-        }
-    }
-
     fun updateOnboardingState() {
         viewModelScope.launch {
             useCase.updateOnboardingState(true)

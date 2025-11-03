@@ -78,6 +78,10 @@ fun WheelVaultApp(
     // prevent exceptions with empty navigation, this trigger recomposition
     if (backStack.isEmpty()) backStack += NavigationKeys.Home
 
+    LaunchedEffect(Unit) {
+        onboardingViewModel.reloadOnboardingState()
+    }
+
     LaunchedEffect(session, isSplashDone) {
         if (!isSplashDone) return@LaunchedEffect
 
@@ -194,7 +198,6 @@ fun WheelVaultApp(
                             onProfileClick = { backStack += NavigationKeys.Profile },
                             onExchangesClick = { backStack += NavigationKeys.Exchanges() },
                         ),
-                        carViewModel = koinActivityViewModel(),
                     )
                 }
 
