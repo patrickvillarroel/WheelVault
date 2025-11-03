@@ -1,57 +1,59 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.garage
 
-import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class GarageViewModel(
-    private val carsRepository: CarsRepository,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : ViewModel() {
+class GarageViewModel(private val carsRepository: CarsRepository) : ViewModel() {
+    companion object {
+        private val logger = Logger.withTag("GarageViewModel")
+    }
+
     private val _garageState = MutableStateFlow<GarageUiState>(GarageUiState.Loading)
     val garageState = _garageState.asStateFlow()
-
-    init {
-        fetchAll()
-    }
 
     fun fetchAll(force: Boolean = false, orderAsc: Boolean = false) {
         val shouldFetch = force ||
             garageState.value is GarageUiState.Error ||
             garageState.value is GarageUiState.Loading
 
-        if (shouldFetch) {
-            _garageState.update { GarageUiState.Loading }
-            viewModelScope.launch(ioDispatcher) {
-                try {
-                    val result = carsRepository.fetchAll(limit = 100, orderAsc = orderAsc)
-                    if (result.isEmpty()) {
-                        _garageState.update { GarageUiState.Empty }
-                    } else {
-                        _garageState.update { GarageUiState.Success(result) }
-                    }
-                } catch (e: Exception) {
-                    Log.e("CarViewModel", "Failed to fetch cars", e)
-                    _garageState.update { GarageUiState.Error }
+        if (!shouldFetch) {
+            // TODO remove this when cars repositor impl have cache/local fetch internally
+            logger.d { "No fetching cars on garage" }
+            return
+        }
+
+        _garageState.update { GarageUiState.Loading }
+        viewModelScope.launch {
+            try {
+                val result = carsRepository.fetchAll(limit = 100, orderAsc = orderAsc)
+                if (result.isEmpty()) {
+                    _garageState.update { GarageUiState.Empty }
+                } else {
+                    _garageState.update { GarageUiState.Success(result) }
                 }
+            } catch (e: Exception) {
+                currentCoroutineContext().ensureActive()
+                logger.e("Failed to fetch cars", e)
+                _garageState.update { GarageUiState.Error }
             }
         }
     }
 
     fun search(query: String, favoritesOnly: Boolean = false) {
-        viewModelScope.launch(ioDispatcher) {
+        _garageState.update { GarageUiState.Loading }
+        viewModelScope.launch {
             try {
-                _garageState.update { GarageUiState.Loading }
                 val result = carsRepository.search(query, favoritesOnly)
                 if (result.isEmpty()) {
                     _garageState.update { GarageUiState.Empty }
@@ -59,16 +61,17 @@ data class GarageViewModel(
                     _garageState.update { GarageUiState.Success(result) }
                 }
             } catch (e: Exception) {
-                Log.e("CarViewModel", "Failed to search cars", e)
+                currentCoroutineContext().ensureActive()
+                logger.e("Failed to search cars", e)
                 _garageState.update { GarageUiState.Error }
             }
         }
     }
 
     fun fetchFavorites() {
-        viewModelScope.launch(ioDispatcher) {
+        _garageState.update { GarageUiState.Loading }
+        viewModelScope.launch {
             try {
-                _garageState.update { GarageUiState.Loading }
                 val result = carsRepository.fetchAll(true, 25)
                 if (result.isEmpty()) {
                     _garageState.update { GarageUiState.Empty }
@@ -76,16 +79,17 @@ data class GarageViewModel(
                     _garageState.update { GarageUiState.Success(result) }
                 }
             } catch (e: Exception) {
-                Log.e("CarViewModel", "Failed to get favorites", e)
+                currentCoroutineContext().ensureActive()
+                logger.e("Failed to get favorites", e)
                 _garageState.update { GarageUiState.Error }
             }
         }
     }
 
     fun filterByManufacturer(manufacturer: String) {
-        viewModelScope.launch(ioDispatcher) {
+        _garageState.update { GarageUiState.Loading }
+        viewModelScope.launch {
             try {
-                _garageState.update { GarageUiState.Loading }
                 val result = carsRepository.fetchByManufacturer(manufacturer)
                 if (result.isEmpty()) {
                     _garageState.update { GarageUiState.Empty }
@@ -93,7 +97,8 @@ data class GarageViewModel(
                     _garageState.update { GarageUiState.Success(result) }
                 }
             } catch (e: Exception) {
-                Log.e("CarViewModel", "Failed to filter by brand", e)
+                currentCoroutineContext().ensureActive()
+                logger.e("Failed to filter by brand", e)
                 _garageState.update { GarageUiState.Error }
             }
         }
