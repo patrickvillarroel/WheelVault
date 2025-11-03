@@ -20,6 +20,9 @@ interface BrandDao {
     @Query("SELECT name FROM brands ORDER BY created_at DESC")
     suspend fun fetchAllNames(): List<String>
 
+    @Query("SELECT id FROM brands ORDER BY created_at DESC")
+    suspend fun fetchAllIds(): List<String>
+
     @Query("SELECT * FROM brands WHERE name = :name LIMIT 1")
     suspend fun fetchByName(name: String): BrandEntity?
 

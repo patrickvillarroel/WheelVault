@@ -30,6 +30,13 @@ class BrandSupabaseDataSource(private val supabase: SupabaseClient, private val 
             order("created_at", Order.DESCENDING)
         }.decodeList<Map<String, String>>().flatMap { it.values }
 
+    override suspend fun fetchAllImages(forceRefresh: Boolean): Map<Uuid, Any> =
+        supabase.from(BrandObj.TABLE).select(Columns.list("id")) {
+            order("created_at", Order.DESCENDING)
+        }.decodeList<Map<String, Uuid>>()
+            .flatMap { it.values }
+            .associateWith { fetchImage(it) }
+
     override suspend fun fetchAll(forceRefresh: Boolean): List<Brand> = supabase.from(BrandObj.TABLE).select {
         order("created_at", Order.DESCENDING)
     }.decodeList<BrandObj>().map { it.toDomain(fetchImage(it.id!!)) }
