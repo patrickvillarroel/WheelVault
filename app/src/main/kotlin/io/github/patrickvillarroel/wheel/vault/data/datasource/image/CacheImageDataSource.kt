@@ -11,6 +11,7 @@ class CacheImageDataSource(context: Context) : ImageDataSource {
 
     override suspend fun saveImage(name: String, bytes: ByteArray): Uri? = withContext(Dispatchers.IO) {
         val file = File(cacheDir, name)
+        if (file.exists()) file.delete()
         file.outputStream().use { it.write(bytes) }
         Uri.fromFile(file)
     }
