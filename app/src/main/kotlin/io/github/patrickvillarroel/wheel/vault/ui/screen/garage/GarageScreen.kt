@@ -33,7 +33,6 @@ fun GarageScreen(
     var searchQuery by rememberSaveable { mutableStateOf(query.trim()) }
 
     LaunchedEffect(Unit) {
-        viewModel.fetchAll()
         brandViewModel.fetchNames()
     }
 
