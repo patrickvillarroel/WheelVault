@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,16 +45,19 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.component.FavoriteIcon
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeroImageCarousel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuHeader
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun CarDetailContent(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
+    carDetail: CarItem,
     callbacks: CarDetailCallbacks,
     modifier: Modifier = Modifier,
 ) {
+    val coroutineScope = rememberCoroutineScope()
     var isRefreshing by remember { mutableStateOf(false) }
-    val carDetail = callbacks.carDetail
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -69,7 +73,10 @@ fun CarDetailContent(
                 onRefresh = {
                     isRefreshing = true
                     callbacks.onRefresh()
-                    isRefreshing = false
+                    coroutineScope.launch {
+                        delay(800)
+                        isRefreshing = false
+                    }
                 },
                 Modifier.fillMaxSize().padding(paddingValues),
             ) {
@@ -198,7 +205,8 @@ private fun CarDetailContentPreview() {
                 CarDetailContent(
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
-                    callbacks = CarDetailCallbacks.default(carDetail),
+                    carDetail = carDetail,
+                    callbacks = CarDetailCallbacks.default,
                 )
             }
         }

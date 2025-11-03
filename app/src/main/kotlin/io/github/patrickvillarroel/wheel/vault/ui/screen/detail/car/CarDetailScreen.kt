@@ -53,8 +53,8 @@ fun CarDetailScreen(
                 CarDetailContent(
                     sharedTransitionScope = sharedTransitionScope,
                     animatedVisibilityScope = animatedVisibilityScope,
+                    carDetail = carDetail,
                     callbacks = CarDetailCallbacks(
-                        carDetail = carDetail,
                         headersBackCallbacks = headerBackCallbacks,
                         onEditClick = { onEditClick(carDetail) },
                         onDeleteClick = { showCancelDialog = true },
