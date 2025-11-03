@@ -1,6 +1,7 @@
 package io.github.patrickvillarroel.wheel.vault.data
 
 import io.github.patrickvillarroel.wheel.vault.data.datasource.image.ImageDownloadHelper
+import io.github.patrickvillarroel.wheel.vault.data.datasource.image.ImageRepository
 import io.github.patrickvillarroel.wheel.vault.data.datasource.room.BrandRoomDataSource
 import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.BrandSupabaseDataSource
 import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
@@ -19,6 +20,7 @@ class BrandRepositoryImpl(
     private val supabase: BrandSupabaseDataSource,
     private val room: BrandRoomDataSource,
     private val imageHelper: ImageDownloadHelper,
+    private val imageRepository: ImageRepository,
 ) : BrandRepository {
     // TODO brand FTS is not ready yet
     override suspend fun search(query: String): List<Brand> = supabase.search(query)
@@ -36,8 +38,15 @@ class BrandRepositoryImpl(
         forceRefresh = forceRefresh,
         localFetch = { room.fetchAllImages(forceRefresh) },
         remoteFetch = { supabase.fetchAllImages(forceRefresh) },
-        saveRemote = { _ ->
-            /* TODO */
+        saveRemote = { remoteImages ->
+            launch {
+                remoteImages.forEach { (id) ->
+                    imageHelper.downloadImage(supabase.buildImageRequest(id))?.let { imageBytes ->
+                        // TODO save partial data into room database
+                        imageRepository.saveImage("$id.png", imageBytes)
+                    }
+                }
+            }
         },
     )
 
@@ -74,8 +83,8 @@ class BrandRepositoryImpl(
         forceRefresh = false,
         localFetch = { room.fetchByName(name) },
         remoteFetch = { supabase.fetchByName(name) },
-        saveRemote = { _ ->
-            /* TODO */
+        saveRemote = { brand ->
+            launch { room.save(brand, imageHelper.downloadImage(supabase.buildImageRequest(brand.id))) }
         },
     )
 
@@ -83,8 +92,8 @@ class BrandRepositoryImpl(
         forceRefresh = false,
         localFetch = { room.fetchByDescription(description) },
         remoteFetch = { supabase.fetchByDescription(description) },
-        saveRemote = { _ ->
-            /* TODO */
+        saveRemote = { brand ->
+            launch { room.save(brand, imageHelper.downloadImage(supabase.buildImageRequest(brand.id))) }
         },
     )
 }
