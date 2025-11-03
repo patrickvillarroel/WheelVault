@@ -1,11 +1,15 @@
 package io.github.patrickvillarroel.wheel.vault.data
 
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
+// TODO can catch exceptions of remote fetch and fallback to local fetch maybe
 object SyncMediator {
+    private val logger = Logger.withTag("SyncMediator")
+
     @JvmStatic
     suspend fun <T> fetch(
         forceRefresh: Boolean = false,
@@ -19,8 +23,10 @@ object SyncMediator {
             callsInPlace(saveRemote, InvocationKind.AT_MOST_ONCE)
         }
         return if (forceRefresh) {
+            logger.v { "Forced refresh triggered" }
             val remoteData = remoteFetch()
             if (remoteData != null) {
+                logger.v { "Found data in remote was not null, saving in local store" }
                 coroutineScope {
                     saveRemote(remoteData)
                 }
@@ -28,8 +34,10 @@ object SyncMediator {
             remoteData
         } else {
             localFetch() ?: run {
+                logger.v { "Local store don't have data, fallback to remote store" }
                 val remoteData = remoteFetch()
                 if (remoteData != null) {
+                    logger.v { "Remote store have data was not null, saving in local store" }
                     coroutineScope {
                         saveRemote(remoteData)
                     }
@@ -52,16 +60,22 @@ object SyncMediator {
             callsInPlace(saveRemote, InvocationKind.AT_MOST_ONCE)
         }
         return if (forceRefresh) {
+            logger.v { "Forced refresh a list of data" }
             val remoteData = remoteFetch()
-            coroutineScope {
-                saveRemote(remoteData)
+            if (remoteData.isNotEmpty()) {
+                logger.v { "Remote store found data and is not empty list, saving in local store" }
+                coroutineScope {
+                    saveRemote(remoteData)
+                }
             }
             remoteData
         } else {
             val localData = localFetch()
             localData.ifEmpty {
+                logger.v { "Local store don't have data in list, fallback to remote store" }
                 val remoteData = remoteFetch()
                 if (remoteData.isNotEmpty()) {
+                    logger.v { "Remote store found data and is not empty list, saving in local store" }
                     coroutineScope {
                         saveRemote(remoteData)
                     }
@@ -84,16 +98,22 @@ object SyncMediator {
             callsInPlace(saveRemote, InvocationKind.AT_MOST_ONCE)
         }
         return if (forceRefresh) {
+            logger.v { "Forced refresh data as map" }
             val remoteData = remoteFetch()
-            coroutineScope {
-                saveRemote(remoteData)
+            if (remoteData.isNotEmpty()) {
+                logger.v { "Remote store have data and is not empty map, saving in local store" }
+                coroutineScope {
+                    saveRemote(remoteData)
+                }
             }
             remoteData
         } else {
             val localData = localFetch()
             localData.ifEmpty {
+                logger.v { "Local store have empty map, fallback to remote store" }
                 val remoteData = remoteFetch()
                 if (remoteData.isNotEmpty()) {
+                    logger.v { "Remote store found data and is not empty map, saving in local store" }
                     coroutineScope {
                         saveRemote(remoteData)
                     }
