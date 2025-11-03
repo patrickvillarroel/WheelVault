@@ -157,7 +157,6 @@ fun WheelVaultApp(
                         onRegisterClick = {
                             backStack += NavigationKeys.LoginWithEmailAndPassword(isRegister = true)
                         },
-                        loginViewModel = koinActivityViewModel(),
                     )
                 }
 
@@ -172,7 +171,6 @@ fun WheelVaultApp(
                                 backStack -= key
                             }
                         },
-                        loginViewModel = koinActivityViewModel(),
                     )
                 }
 
@@ -180,7 +178,7 @@ fun WheelVaultApp(
                     OnboardingScreen(onFinish = {
                         isSplashDone = true
                         backStack -= NavigationKeys.Onboarding
-                    }, viewModel = koinActivityViewModel())
+                    })
                 }
 
                 is NavigationKeys.Home -> route(key) {
@@ -263,7 +261,6 @@ fun WheelVaultApp(
                             onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
                             onExchangesClick = { backStack += NavigationKeys.Exchanges() },
                         ),
-                        carViewModel = koinActivityViewModel(),
                     )
                 }
 
@@ -279,7 +276,6 @@ fun WheelVaultApp(
                             onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
                             onExchangesClick = { backStack += NavigationKeys.Exchanges() },
                         ),
-                        carViewModel = koinActivityViewModel(),
                         cameraViewModel = koinActivityViewModel(),
                     )
                 }
@@ -294,7 +290,6 @@ fun WheelVaultApp(
                             onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
                             onExchangesClick = { backStack += NavigationKeys.Exchanges() },
                         ),
-                        sessionViewModel = koinActivityViewModel(),
                     )
                 }
 
