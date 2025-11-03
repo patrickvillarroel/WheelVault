@@ -52,11 +52,11 @@ val dataModule = module {
         }
     }
 
-    single { CacheImageDataSource(androidContext()) }
-    single { MediaStoreImageDataSource(androidContext()) }
-    single { ImageRepository(get(), get()) }
+    factory { CacheImageDataSource(androidContext()) }
+    factory { MediaStoreImageDataSource(androidContext()) }
+    factory { ImageRepository(get(), get()) }
 
-    single { ImageDownloadHelper(get(), get<SupabaseClient>().storage) }
+    factory { ImageDownloadHelper(get(), get<SupabaseClient>().storage) }
 
     single<AppDatabase> {
         Room.databaseBuilder<AppDatabase>(androidContext(), "wheel_vault")
@@ -65,17 +65,17 @@ val dataModule = module {
     }
     single { androidContext().dataStore }
 
-    single { BrandRoomDataSource(get<AppDatabase>().brandDao(), get()) }
-    single { CarRoomDataSource(get<AppDatabase>().carDao(), get()) }
-    single { NewsRoomDataSource(get<AppDatabase>().newsDao()) }
-    single { BrandSupabaseDataSource(get(), androidContext()) }
-    single<BrandRepository> { BrandRepositoryImpl(get(), get(), get()) }
+    factory { BrandRoomDataSource(get<AppDatabase>().brandDao(), get()) }
+    factory { CarRoomDataSource(get<AppDatabase>().carDao(), get()) }
+    factory { NewsRoomDataSource(get<AppDatabase>().newsDao()) }
+    factory { BrandSupabaseDataSource(get(), androidContext()) }
+    factory<BrandRepository> { BrandRepositoryImpl(get(), get(), get()) }
 
-    single { CarSupabaseDataSource(get(), androidContext()) }
-    single<CarsRepository> { CarRepositoryImpl(get()) }
+    factory { CarSupabaseDataSource(get(), androidContext()) }
+    factory<CarsRepository> { CarRepositoryImpl(get()) }
 
-    single<TradeRepository> { TradeSupabaseDataSource(get(), get()) }
+    factory<TradeRepository> { TradeSupabaseDataSource(get(), get()) }
 
-    single<UpdateOnboardingStateUseCase> { UpdateOnboardingStateUseCaseImpl(get()) }
-    single<GetVideosNewsUseCase> { GetVideosNewsUseCaseImpl(get(), get()) }
+    factory<UpdateOnboardingStateUseCase> { UpdateOnboardingStateUseCaseImpl(get()) }
+    factory<GetVideosNewsUseCase> { GetVideosNewsUseCaseImpl(get(), get()) }
 }
