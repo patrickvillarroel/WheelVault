@@ -2,7 +2,6 @@ package io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.edit
 
 import android.content.pm.PackageManager
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,44 +38,51 @@ fun CarEditScreen(
         ContextCompat.checkSelfPermission(context, android.Manifest.permission.CAMERA) !=
             PackageManager.PERMISSION_GRANTED
     }
+
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
     var shouldNavigateBack by rememberSaveable { mutableStateOf(false) }
+
     val detailState by carViewModel.carDetailState.collectAsStateWithLifecycle()
     val brandsNames by brandViewModel.brandsNames.collectAsStateWithLifecycle()
-    var initial by remember(partialCarItem) {
-        val stateSnapshot = detailState
-        mutableStateOf(
-            if (stateSnapshot is CarViewModel.CarDetailUiState.Success && stateSnapshot.car.id == partialCarItem.id) {
-                logger.d { "Recovering state from car detail" }
-                // Recover the full state of the car because navigation don't preserve network images, only links (strings)
-                stateSnapshot.car.toBuilder()
-            } else if (fromCamera) {
-                logger.d { "Recovering state from camera, cleaning camera view model" }
-                val capturedImage = cameraViewModel.getCapturedImage()
-                cameraViewModel.resetImage()
-                partialCarItem.copy(images = setOfNotNull(capturedImage) + partialCarItem.images)
-            } else {
-                logger.d { "Recovering state from navigation" }
-                // WARNING: only have images of strings (links) because limitations of navigation serialization
-                partialCarItem
-            },
-        )
-    }
 
+    // Estado editable del formulario
+    var editableCar by remember { mutableStateOf(partialCarItem) }
+
+    /*
+     * Lógica de inicialización:
+     * - Si es desde cámara → agrega la imagen capturada.
+     * - Si tiene ID (editar) → pide al VM que cargue el detalle completo.
+     * - Si no tiene ID → queda el builder parcial.
+     */
     LaunchedEffect(Unit) {
         brandViewModel.fetchNames()
-    }
 
-    DisposableEffect(partialCarItem.id) {
-        if (partialCarItem.id != null) {
+        if (fromCamera) {
+            logger.d { "Initializing from camera" }
+            cameraViewModel.getCapturedImage()?.let { captured ->
+                editableCar = editableCar.copy(images = setOf(captured) + editableCar.images)
+            }
+            cameraViewModel.resetImage()
+        } else if (partialCarItem.id != null) {
+            logger.d { "Loading car from ViewModel by ID=${partialCarItem.id}" }
             carViewModel.findById(partialCarItem.id)
         }
-        onDispose {
-            openBottomSheet = false
+    }
+
+    /*
+     * Cuando el ViewModel carga el auto, sincronizamos el estado editable.
+     * Solo ocurre en edición (cuando se obtuvo el detalle con éxito).
+     */
+    LaunchedEffect(detailState) {
+        val snapshot = detailState
+        if (snapshot is CarViewModel.CarDetailUiState.Success) {
+            val car = snapshot.car
+            editableCar = car.toBuilder()
+            logger.d { "Loaded car from VM with id='${car.id}'" }
         }
     }
 
-    // Navigate back when save is successful
+    // Navegación automática tras guardado exitoso.
     LaunchedEffect(detailState, shouldNavigateBack) {
         if (shouldNavigateBack && detailState is CarViewModel.CarDetailUiState.Success) {
             logger.v("Save successful, navigating back")
@@ -85,13 +91,11 @@ fun CarEditScreen(
         }
     }
 
+    // --- UI principal ---
     CarEditContent(
-        initial = initial,
+        initial = editableCar,
         onAddPictureClick = {
             openBottomSheet = true
-            logger.d { "onAddPictureClick, current: $initial, new state: $it" }
-            // Receive the current status of the car, after the picture is added re-assign with copy
-            initial = it
         },
         onConfirmClick = {
             logger.d { "Saving car: $it" }
@@ -100,23 +104,25 @@ fun CarEditScreen(
         },
         isEditAction = partialCarItem.id != null,
         headersBackCallbacks = headersBackCallbacks,
-        manufacturerList = brandsNames,
+        manufacturerList = brandsNames.ifEmpty {
+            logger.e { "Brands names is empty, fallback in UI to prevent exceptions" }
+            listOf("Otros")
+        },
         modifier = modifier,
     )
 
+    // --- Modal de añadir imagen ---
     if (openBottomSheet) {
         ModalAddImage(
-            onResultGallery = {
-                logger.d { "onResult, current: $initial, new state with image: $it" }
-                initial = initial.copy(images = setOf(it) + initial.images)
-            },
-            onModalClose = {
+            onResultGallery = { image ->
+                editableCar = editableCar.copy(images = setOf(image) + editableCar.images)
                 openBottomSheet = false
             },
-            onResultCamera = {
-                logger.d { "onResultCamera, current: $initial, new state with camera: $it" }
-                initial = initial.copy(images = setOf(it) + initial.images)
+            onResultCamera = { image ->
+                editableCar = editableCar.copy(images = setOf(image) + editableCar.images)
+                openBottomSheet = false
             },
+            onModalClose = { openBottomSheet = false },
             isCameraPermission = !missingPermissions,
         )
     }

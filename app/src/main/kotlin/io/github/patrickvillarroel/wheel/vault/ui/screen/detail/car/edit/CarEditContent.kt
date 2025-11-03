@@ -59,9 +59,10 @@ fun CarEditContent(
     headersBackCallbacks: HeaderBackCallbacks,
     modifier: Modifier = Modifier,
 ) {
+    require(manufacturerList.isNotEmpty()) { "Implementation error: manufacturer list must not be empty" }
     // Internal states
     var car by remember(initial) {
-        carEditLogger.i { "recomposed with $initial" }
+        carEditLogger.v { "recomposed with $initial" }
         mutableStateOf(initial)
     }
     var marca by rememberSaveable(initial.brand) { mutableStateOf(initial.brand ?: "") }
@@ -193,7 +194,7 @@ fun CarEditContent(
                 ) {
                     Box(modifier = Modifier.weight(1f)) {
                         val textFieldState = rememberTextFieldState(
-                            manufacturerList.firstOrNull { it == car.manufacturer } ?: "Otros",
+                            manufacturerList.firstOrNull { it == car.manufacturer } ?: manufacturerList.first(),
                         )
 
                         ExposedDropdownMenuBox(
