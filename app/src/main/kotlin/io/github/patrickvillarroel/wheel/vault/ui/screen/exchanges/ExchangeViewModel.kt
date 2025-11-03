@@ -1,10 +1,10 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges
 
-import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.domain.model.TradeProposal
 import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
@@ -19,6 +19,9 @@ import kotlin.uuid.Uuid
 
 class ExchangeViewModel(private val tradeRepository: TradeRepository, private val carsRepository: CarsRepository) :
     ViewModel() {
+    companion object {
+        private val logger = Logger.withTag("ExchangeViewModel")
+    }
 
     private val _exchangeState = MutableStateFlow<ExchangeUiState>(ExchangeUiState.Loading)
     val exchangeState = _exchangeState.asStateFlow()
@@ -33,13 +36,9 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository, private va
     // To store the context of an existing trade being viewed/acted upon
     private var currentViewedTradeGroupId: Uuid? = null
 
-    init {
-        loadInitialData()
-    }
-
     fun loadInitialData() {
+        _exchangeState.update { ExchangeUiState.Loading }
         viewModelScope.launch {
-            _exchangeState.update { ExchangeUiState.Loading }
             try {
                 // Populate _exchangeUiState with cars user can see/interact with initially
                 // For example, cars available for others to request, or user's own cars.
@@ -48,8 +47,7 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository, private va
                 _exchangeState.update { ExchangeUiState.Success(availableCars) }
             } catch (e: Exception) {
                 currentCoroutineContext().ensureActive()
-                Log.e("ExchangeViewModel", "Error loading initial data", e)
-                // Handle error
+                logger.e("Error loading initial data", e)
                 _exchangeState.update { ExchangeUiState.Error }
             }
         }
@@ -87,10 +85,10 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository, private va
      * that was previously set up by [exchangeCar].
      */
     fun confirmAndCreateTradeProposal(message: String? = null) {
-        viewModelScope.launch {
-            val currentState = _exchangeConfirmState.value
-            if (currentState is ExchangeConfirmUiState.WaitingConfirm && currentViewedTradeGroupId == null) {
-                _exchangeConfirmState.update { ExchangeConfirmUiState.Loading }
+        val currentState = _exchangeConfirmState.value
+        if (currentState is ExchangeConfirmUiState.WaitingConfirm && currentViewedTradeGroupId == null) {
+            _exchangeConfirmState.update { ExchangeConfirmUiState.Loading }
+            viewModelScope.launch {
                 try {
                     tradeRepository.createTradeProposal(
                         offeredCarId = currentState.offeredCar.id,
@@ -102,13 +100,13 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository, private va
                     _exchangeConfirmState.update { ExchangeConfirmUiState.Accepted }
                 } catch (e: Exception) {
                     currentCoroutineContext().ensureActive()
-                    Log.e("ExchangeViewModel", "Error creating trade proposal", e)
+                    logger.e("Error creating trade proposal", e)
                     _exchangeConfirmState.update { ExchangeConfirmUiState.Error }
                 }
-            } else {
-                // Not in the correct state to create a proposal or it's for an existing trade
-                _exchangeConfirmState.update { ExchangeConfirmUiState.Error }
             }
+        } else {
+            // Not in the correct state to create a proposal or it's for an existing trade
+            _exchangeConfirmState.update { ExchangeConfirmUiState.Error }
         }
     }
 
@@ -117,8 +115,8 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository, private va
      * If multiple offers exist for the car, it currently picks the first active "proposed" one.
      */
     fun offersOf(carId: Uuid) {
+        _exchangeConfirmState.update { ExchangeConfirmUiState.Loading }
         viewModelScope.launch {
-            _exchangeConfirmState.update { ExchangeConfirmUiState.Loading }
             try {
                 val tradesForCar = tradeRepository.getActiveTradesForCar(carId)
                 // Find a suitable trade to display - e.g., first active one that is 'PROPOSED'
@@ -147,7 +145,7 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository, private va
                 }
             } catch (e: Exception) {
                 currentCoroutineContext().ensureActive()
-                Log.e("ExchangeViewModel", "Error fetching trade offers", e)
+                logger.e("Error fetching trade offers", e)
                 _exchangeConfirmState.update { ExchangeConfirmUiState.Error }
             }
         }
@@ -158,13 +156,13 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository, private va
      * The [offeredCar] and [requestedCar] params are per signature but action uses stored tradeGroupId.
      */
     fun rejectExchange(offeredCar: CarItem, requestedCar: CarItem) {
+        val tradeId = currentViewedTradeGroupId
+        if (tradeId == null) {
+            _exchangeConfirmState.update { ExchangeConfirmUiState.Error }
+            return
+        }
+        _exchangeConfirmState.update { ExchangeConfirmUiState.Loading }
         viewModelScope.launch {
-            val tradeId = currentViewedTradeGroupId
-            if (tradeId == null) {
-                _exchangeConfirmState.update { ExchangeConfirmUiState.Error }
-                return@launch
-            }
-            _exchangeConfirmState.update { ExchangeConfirmUiState.Loading }
             try {
                 tradeRepository.respondToTrade(
                     tradeGroupId = tradeId,
@@ -175,7 +173,7 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository, private va
                 currentViewedTradeGroupId = null
             } catch (e: Exception) {
                 currentCoroutineContext().ensureActive()
-                Log.e("ExchangeViewModel", "Error rejecting trade", e)
+                logger.e("Error rejecting trade", e)
                 _exchangeConfirmState.update { ExchangeConfirmUiState.Error }
             }
         }
@@ -186,13 +184,13 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository, private va
      * The [offeredCar] and [requestedCar] params are per signature but action uses stored tradeGroupId.
      */
     fun acceptExchange(offeredCar: CarItem, requestedCar: CarItem) {
+        val tradeId = currentViewedTradeGroupId
+        if (tradeId == null) {
+            _exchangeConfirmState.update { ExchangeConfirmUiState.Error }
+            return
+        }
+        _exchangeConfirmState.update { ExchangeConfirmUiState.Loading }
         viewModelScope.launch {
-            val tradeId = currentViewedTradeGroupId
-            if (tradeId == null) {
-                _exchangeConfirmState.update { ExchangeConfirmUiState.Error }
-                return@launch
-            }
-            _exchangeConfirmState.update { ExchangeConfirmUiState.Loading }
             try {
                 tradeRepository.respondToTrade(
                     tradeGroupId = tradeId,
@@ -203,27 +201,27 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository, private va
                 currentViewedTradeGroupId = null
             } catch (e: Exception) {
                 currentCoroutineContext().ensureActive()
-                Log.e("ExchangeViewModel", "Error accepting trade", e)
+                logger.e("Error accepting trade", e)
                 _exchangeConfirmState.update { ExchangeConfirmUiState.Error }
             }
         }
     }
 
     sealed interface ExchangeUiState {
-        object Loading : ExchangeUiState
+        data object Loading : ExchangeUiState
 
         @Immutable
-        class Success(@Stable val cars: List<CarItem>) : ExchangeUiState
-        object Error : ExchangeUiState
+        data class Success(@Stable val cars: List<CarItem>) : ExchangeUiState
+        data object Error : ExchangeUiState
     }
 
     sealed interface ExchangeConfirmUiState {
-        object Loading : ExchangeConfirmUiState
+        data object Loading : ExchangeConfirmUiState
 
         @Immutable
-        class WaitingConfirm(val offeredCar: CarItem, val requestedCar: CarItem) : ExchangeConfirmUiState
-        object Accepted : ExchangeConfirmUiState
-        object Rejected : ExchangeConfirmUiState
-        object Error : ExchangeConfirmUiState
+        data class WaitingConfirm(val offeredCar: CarItem, val requestedCar: CarItem) : ExchangeConfirmUiState
+        data object Accepted : ExchangeConfirmUiState
+        data object Rejected : ExchangeConfirmUiState
+        data object Error : ExchangeConfirmUiState
     }
 }

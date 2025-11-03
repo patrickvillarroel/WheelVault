@@ -33,6 +33,8 @@ fun ExchangeScreen(
     var topBarState by rememberSaveable { mutableStateOf(GarageTopBarState.DEFAULT) }
 
     LaunchedEffect(Unit) {
+        exchangeViewModel.loadInitialData()
+        garageViewModel.fetchAll()
         brandViewModel.fetchNames()
     }
 
