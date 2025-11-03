@@ -3,7 +3,6 @@ package io.github.patrickvillarroel.wheel.vault.di
 import androidx.room.Room
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.storage.storage
-import io.github.patrickvillarroel.wheel.vault.data.BrandRepositoryImpl
 import io.github.patrickvillarroel.wheel.vault.data.CarRepositoryImpl
 import io.github.patrickvillarroel.wheel.vault.data.GetVideosNewsUseCaseImpl
 import io.github.patrickvillarroel.wheel.vault.data.UpdateOnboardingStateUseCaseImpl
@@ -68,8 +67,9 @@ val dataModule = module {
     factory { BrandRoomDataSource(get<AppDatabase>().brandDao(), get()) }
     factory { CarRoomDataSource(get<AppDatabase>().carDao(), get()) }
     factory { NewsRoomDataSource(get<AppDatabase>().newsDao()) }
-    factory { BrandSupabaseDataSource(get(), androidContext()) }
-    factory<BrandRepository> { BrandRepositoryImpl(get(), get(), get()) }
+    // TODO change to impl when sync mediator and room is ready
+    factory<BrandRepository> { BrandSupabaseDataSource(get(), androidContext()) }
+    // factory<BrandRepository> { BrandRepositoryImpl(get(), get(), get(), get()) }
 
     factory { CarSupabaseDataSource(get(), androidContext()) }
     factory<CarsRepository> { CarRepositoryImpl(get()) }
