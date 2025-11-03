@@ -31,19 +31,20 @@ class CarViewModel(private val carsRepository: CarsRepository) : ViewModel() {
         _carDetailState.update { CarDetailUiState.Loading }
         viewModelScope.launch {
             try {
-                logger.d { "Going to find car by id $id" }
+                logger.d { "Going to find car by id='$id'" }
                 // TODO pass force param to fetch
                 val car = carsRepository.fetch(id)
                 if (car != null) {
-                    logger.i { "Found car by id $id. $car" }
+                    logger.i { "Found car by id='$id'" }
+                    logger.v { "Car founded=$car" }
                     _carDetailState.update { CarDetailUiState.Success(car) }
                 } else {
-                    logger.i { "Car not found by id $id" }
+                    logger.i { "Car not found by id='$id'" }
                     _carDetailState.update { CarDetailUiState.NotFound }
                 }
             } catch (e: Exception) {
                 currentCoroutineContext().ensureActive()
-                logger.e(e) { "Failed to find car by id" }
+                logger.e(e) { "Failed to find car by id='$id'" }
                 _carDetailState.update { CarDetailUiState.Error }
             }
         }
@@ -91,16 +92,16 @@ class CarViewModel(private val carsRepository: CarsRepository) : ViewModel() {
                 images = imagesToSave.ifEmpty { setOfNotNull(CarItem.EmptyImage) },
                 imageUrl = imagesToSave.firstOrNull() ?: CarItem.EmptyImage,
             )
-            logger.i("Final car: $carToSave")
+            logger.v { "Final car: $carToSave" }
             viewModelScope.launch {
                 try {
                     val newCarState = if (carsRepository.exist(carToSave.id)) {
-                        logger.i("The car exist")
+                        logger.d("The car exist, updating it")
                         carsRepository.update(carToSave)
                     } else {
                         carsRepository.insert(carToSave)
                     }
-                    logger.d("New car state: $newCarState")
+                    logger.v { "New car state: $newCarState" }
                     _carDetailState.update { CarDetailUiState.Success(newCarState) }
                 } catch (e: Exception) {
                     currentCoroutineContext().ensureActive()
