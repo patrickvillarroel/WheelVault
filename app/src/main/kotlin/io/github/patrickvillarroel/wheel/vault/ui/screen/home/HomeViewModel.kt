@@ -35,10 +35,11 @@ class HomeViewModel(
     val recentCarImages = _recentCarImages.asStateFlow()
 
     fun fetchAllBrands(force: Boolean = false) {
-        logger.d { "Fetching all brands images" }
+        logger.v { "Fetching all brands images" }
         viewModelScope.launch {
             try {
                 val result = brandRepository.fetchAllImages(force)
+                logger.d { "Fetched ${result.size} brands images" }
                 _brandsImages.update { result }
             } catch (e: Exception) {
                 currentCoroutineContext().ensureActive()
@@ -55,12 +56,13 @@ class HomeViewModel(
             return
         }
 
-        logger.d { "Fetching all car images" }
+        logger.v { "Fetching all car images" }
         viewModelScope.launch {
             try {
                 // TODO paginar
                 // TODO use force param when SyncMediator is implemented
                 val result = carsRepository.fetchAllImage(orderAsc = false)
+                logger.d { "Fetched ${result.size} car images" }
                 _recentCarImages.update { result }
             } catch (e: Exception) {
                 currentCoroutineContext().ensureActive()
@@ -77,12 +79,12 @@ class HomeViewModel(
             logger.d { "Skipping load news, current have ${snapshotState.size} news" }
             return
         }
-        logger.i("Fetching news...")
+        logger.d("Fetching news...")
 
         viewModelScope.launch {
             try {
                 val videos = getVideosNewsUseCase.getVideos()
-                logger.i { "Fetched ${videos.size} news" }
+                logger.d { "Fetched ${videos.size} news" }
                 _news.update { videos }
             } catch (e: Exception) {
                 currentCoroutineContext().ensureActive()
