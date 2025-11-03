@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -41,6 +42,8 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.component.RaceDivider
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.VideoCardPreview
 import io.github.patrickvillarroel.wheel.vault.ui.screen.items
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.uuid.Uuid
 
 /**
@@ -59,6 +62,7 @@ fun HomeContent(
 ) {
     val layoutDirection = LocalLayoutDirection.current
     var isRefreshing by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         modifier = modifier,
@@ -70,7 +74,10 @@ fun HomeContent(
                 onRefresh = {
                     isRefreshing = true
                     info.onRefresh()
-                    isRefreshing = false
+                    coroutineScope.launch {
+                        delay(800)
+                        isRefreshing = false
+                    }
                 },
                 Modifier.fillMaxSize().padding(
                     start = paddingValues.calculateStartPadding(layoutDirection),
