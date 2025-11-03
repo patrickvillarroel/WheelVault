@@ -14,6 +14,7 @@ fun BrandObj.toDomain(image: Any) = Brand(
     image = image,
     contentDescription = "Logo of $name", // TODO use i18n
     id = this.id!!,
+    createdAt = createdAt,
 )
 
 inline fun BrandObj.toDomain(image: (BrandObj) -> Any): Brand {

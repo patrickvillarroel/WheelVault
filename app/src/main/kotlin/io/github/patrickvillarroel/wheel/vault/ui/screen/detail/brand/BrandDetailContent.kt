@@ -29,6 +29,8 @@ import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.CarItemCard
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
+import kotlin.time.Clock
+import kotlin.uuid.Uuid
 
 @Composable
 fun BrandDetailContent(
@@ -114,6 +116,8 @@ private fun BrandPreview() {
                                 "En 1968, los coches de metal de Hot Wheels se diseñaron para revolucionar el mundo de los coches de juguete con el objetivo de ofrecer un diseño más detallado y un mejor rendimiento que los de la competencia. Cinco décadas más tarde, Hot Wheels es número 1 en ventas de juguetes en el mundo.\nHot Wheels se ha convertido en un referente tanto de la cultura automovilística como de la popular gracias a los eventos en directo, como el HW Legends Tour, a los eventos deportivos HW Superchargers y a las atracciones de los parques temáticos, así como a sus colaboraciones con algunas de las marcas más conocidas.",
                                 image = R.drawable.hot_wheels_logo_black,
                                 contentDescription = "Hot Wheels Logo",
+                                id = Uuid.random(),
+                                createdAt = Clock.System.now(),
                             ),
                             carCollection = listOf(
                                 CarItem(

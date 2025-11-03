@@ -3,6 +3,7 @@ package io.github.patrickvillarroel.wheel.vault.data.entity
 import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.domain.model.VideoNews
+import kotlin.time.Instant
 import kotlin.uuid.Uuid
 
 fun BrandEntity.toDomain(image: Any) = Brand(
@@ -10,13 +11,15 @@ fun BrandEntity.toDomain(image: Any) = Brand(
     name = this.name,
     description = this.description,
     image = image,
-    contentDescription = "Cover image for ${this.name}",
+    contentDescription = "Logo of ${this.name}",
+    createdAt = this.createdAt?.let { Instant.fromEpochMilliseconds(it) },
 )
 
 fun Brand.toEntity() = BrandEntity(
     id = this.id.toString(),
     name = this.name,
     description = this.description,
+    createdAt = this.createdAt?.toEpochMilliseconds(),
 )
 
 fun CarEntity.toDomain(images: Set<Any>) = CarItem(

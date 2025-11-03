@@ -4,6 +4,7 @@ package io.github.patrickvillarroel.wheel.vault.data.objects
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -14,7 +15,7 @@ class BrandObj(
     val name: String,
     val description: String,
     @SerialName("created_at")
-    val createdAt: String? = null,
+    val createdAt: Instant? = null,
 ) {
     companion object {
         const val TABLE = "brands"
