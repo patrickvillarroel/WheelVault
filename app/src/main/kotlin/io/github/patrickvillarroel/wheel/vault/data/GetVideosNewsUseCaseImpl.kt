@@ -1,26 +1,33 @@
 package io.github.patrickvillarroel.wheel.vault.data
 
-import android.content.Context
-import coil3.request.ImageRequest
-import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.postgrest.from
-import io.github.jan.supabase.postgrest.query.Order
-import io.github.jan.supabase.storage.authenticatedStorageItem
-import io.github.patrickvillarroel.wheel.vault.data.objects.VideoObj
-import io.github.patrickvillarroel.wheel.vault.data.objects.toDomain
+import io.github.patrickvillarroel.wheel.vault.data.datasource.image.ImageDownloadHelper
+import io.github.patrickvillarroel.wheel.vault.data.datasource.room.GetVideoNewsRoomDataSource
+import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.GetVideoNewsSupabaseDataSource
 import io.github.patrickvillarroel.wheel.vault.domain.model.VideoNews
 import io.github.patrickvillarroel.wheel.vault.domain.usecase.GetVideosNewsUseCase
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalUuidApi::class)
-class GetVideosNewsUseCaseImpl(private val supabase: SupabaseClient, private val context: Context) :
-    GetVideosNewsUseCase {
-    override suspend fun getVideos(): List<VideoNews> = supabase.from(VideoObj.TABLE).select {
-        order("created_at", Order.DESCENDING)
-    }.decodeList<VideoObj>().map { it.toDomain(fetchImage(it.id)) }
+class GetVideosNewsUseCaseImpl(
+    private val room: GetVideoNewsRoomDataSource,
+    private val supabase: GetVideoNewsSupabaseDataSource,
+    private val imageDownloadHelper: ImageDownloadHelper,
+) : GetVideosNewsUseCase {
+    override suspend fun getVideos(forceRefresh: Boolean): List<VideoNews> = SyncMediator.fetchList(
+        forceRefresh = forceRefresh,
+        localFetch = { room.getVideos(forceRefresh) },
+        remoteFetch = { supabase.getVideos(forceRefresh) },
+        saveRemote = { videos ->
+            launch {
+                val images = videos.associate { videoNews ->
+                    videoNews.id to imageDownloadHelper.downloadImage(supabase.buildStorageItem(videoNews.id))
+                }.filterValuesNotNull()
+                room.save(videos, images)
+            }
+        },
+    )
 
-    private fun fetchImage(id: Uuid, contentType: String = "png") = ImageRequest.Builder(context)
-        .data(authenticatedStorageItem(VideoObj.BUCKET, "$id.$contentType"))
-        .build()
+    @Suppress("UNCHECKED_CAST")
+    private fun <K, V> Map<K, V?>.filterValuesNotNull(): Map<K, V> = this.filterValues { value ->
+        value != null
+    } as Map<K, V>
 }
