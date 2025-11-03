@@ -24,51 +24,15 @@ class CarViewModel(private val carsRepository: CarsRepository) : ViewModel() {
     companion object {
         private val logger = Logger.withTag("Car VM")
     }
-    private val _carsState = MutableStateFlow<CarsUiState>(CarsUiState.Loading)
-    val carsState = _carsState.asStateFlow()
-
     private val _carDetailState = MutableStateFlow<CarDetailUiState>(CarDetailUiState.Idle)
     val carDetailState = _carDetailState.asStateFlow()
 
-    init {
-        fetchAll()
-    }
-
-    fun fetchAll(force: Boolean = false) {
-        val shouldFetch = force ||
-            carsState.value is CarsUiState.Error ||
-            carsState.value is CarsUiState.Loading
-
-        if (shouldFetch) {
-            _carsState.update { CarsUiState.Loading }
-            viewModelScope.launch {
-                try {
-                    val result = carsRepository.fetchAll(orderAsc = false)
-                    _carsState.update { CarsUiState.Success(result) }
-                } catch (e: Exception) {
-                    logger.e(e) { "Failed to fetch cars" }
-                    _carsState.update { CarsUiState.Error }
-                }
-            }
-        }
-    }
-
     fun findById(id: Uuid, force: Boolean = false) {
-        val localMatch = (carsState.value as? CarsUiState.Success)
-            ?.cars
-            ?.firstOrNull { it.id == id }
-
-        if (localMatch != null && !force) {
-            logger.v { "Found car with id='${localMatch.id}' in local state." }
-            _carDetailState.update { CarDetailUiState.Success(localMatch) }
-            return
-        }
-
         _carDetailState.update { CarDetailUiState.Loading }
-
         viewModelScope.launch {
             try {
                 logger.d { "Going to find car by id $id" }
+                // TODO pass force param to fetch
                 val car = carsRepository.fetch(id)
                 if (car != null) {
                     logger.i { "Found car by id $id. $car" }
@@ -138,25 +102,6 @@ class CarViewModel(private val carsRepository: CarsRepository) : ViewModel() {
                     }
                     logger.d("New car state: $newCarState")
                     _carDetailState.update { CarDetailUiState.Success(newCarState) }
-
-                    // Update the car in the main list as well
-                    _carsState.update { currentState ->
-                        if (currentState is CarsUiState.Success) {
-                            val carExists = currentState.cars.any { it.id == newCarState.id }
-                            val updatedCars = if (carExists) {
-                                // Update existing car
-                                currentState.cars.map {
-                                    if (it.id == newCarState.id) newCarState else it
-                                }
-                            } else {
-                                // Add new car to the beginning of the list
-                                listOf(newCarState) + currentState.cars
-                            }
-                            CarsUiState.Success(updatedCars)
-                        } else {
-                            currentState
-                        }
-                    }
                 } catch (e: Exception) {
                     currentCoroutineContext().ensureActive()
                     logger.e("Failed to save car in database", e)
@@ -177,14 +122,6 @@ class CarViewModel(private val carsRepository: CarsRepository) : ViewModel() {
                     logger.e("Failed to delete car")
                     _carDetailState.update { CarDetailUiState.Error }
                     return@launch
-                }
-                // Update main list
-                _carsState.update { currentState ->
-                    if (currentState is CarsUiState.Success) {
-                        CarsUiState.Success(currentState.cars.filterNot { it.id == car.id })
-                    } else {
-                        currentState
-                    }
                 }
                 // Update detail view if it was the deleted car
                 if ((_carDetailState.value as? CarDetailUiState.Success)?.car?.id == car.id) {
@@ -218,16 +155,6 @@ class CarViewModel(private val carsRepository: CarsRepository) : ViewModel() {
                             currentState // No change if not the detailed car or not in success state
                         }
                     }
-                    _carsState.update { currentCarsState ->
-                        if (currentCarsState is CarsUiState.Success) {
-                            val updatedCars = currentCarsState.cars.map {
-                                if (it.id == updatedCar.id) updatedCar else it
-                            }
-                            CarsUiState.Success(updatedCars)
-                        } else {
-                            currentCarsState
-                        }
-                    }
                 } else {
                     logger.e(
                         "Failed to toggle trade availability, repository returned null for car ID: ${carToUpdate.id}",
@@ -252,15 +179,6 @@ class CarViewModel(private val carsRepository: CarsRepository) : ViewModel() {
                 _carDetailState.update { CarDetailUiState.Error }
             }
         }
-    }
-
-    sealed interface CarsUiState {
-        data object Loading : CarsUiState
-
-        @Immutable
-        data class Success(@Stable val cars: List<CarItem>) : CarsUiState
-
-        data object Error : CarsUiState
     }
 
     sealed interface CarDetailUiState {
