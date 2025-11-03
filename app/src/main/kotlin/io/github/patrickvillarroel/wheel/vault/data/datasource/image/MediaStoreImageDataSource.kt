@@ -3,28 +3,26 @@ package io.github.patrickvillarroel.wheel.vault.data.datasource.image
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
-import android.net.Uri
 import android.provider.MediaStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Deprecated("This class is not tested, can produce errors")
 class MediaStoreImageDataSource(private val context: Context) : ImageDataSource {
-    override suspend fun saveImage(name: String, bytes: ByteArray): Uri? = withContext(Dispatchers.IO) {
-        val values = ContentValues(2).apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, name)
-            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyApp")
-        }
+    override suspend fun saveImage(name: String, bytes: ByteArray) {
+        withContext(Dispatchers.IO) {
+            val values = ContentValues(2).apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME, name)
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyApp")
+            }
 
-        val resolver = context.contentResolver
-        val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
-
-        uri?.let {
-            resolver.openOutputStream(it)?.use { stream ->
-                stream.write(bytes)
+            val resolver = context.contentResolver
+            resolver?.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)?.let { uri ->
+                resolver.openOutputStream(uri)?.use { stream ->
+                    stream.write(bytes)
+                }
             }
         }
-        uri
     }
 
     override suspend fun loadImage(name: String): ByteArray? {

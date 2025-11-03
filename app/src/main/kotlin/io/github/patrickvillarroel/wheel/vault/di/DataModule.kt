@@ -9,14 +9,13 @@ import io.github.patrickvillarroel.wheel.vault.data.UpdateOnboardingStateUseCase
 import io.github.patrickvillarroel.wheel.vault.data.UpdateOnboardingStateUseCaseImpl.Companion.dataStore
 import io.github.patrickvillarroel.wheel.vault.data.datasource.image.CacheImageDataSource
 import io.github.patrickvillarroel.wheel.vault.data.datasource.image.ImageDownloadHelper
-import io.github.patrickvillarroel.wheel.vault.data.datasource.image.ImageRepository
-import io.github.patrickvillarroel.wheel.vault.data.datasource.image.MediaStoreImageDataSource
 import io.github.patrickvillarroel.wheel.vault.data.datasource.room.AppDatabase
 import io.github.patrickvillarroel.wheel.vault.data.datasource.room.BrandRoomDataSource
 import io.github.patrickvillarroel.wheel.vault.data.datasource.room.CarRoomDataSource
-import io.github.patrickvillarroel.wheel.vault.data.datasource.room.NewsRoomDataSource
+import io.github.patrickvillarroel.wheel.vault.data.datasource.room.GetVideoNewsRoomDataSource
 import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.BrandSupabaseDataSource
 import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.CarSupabaseDataSource
+import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.GetVideoNewsSupabaseDataSource
 import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.TradeSupabaseDataSource
 import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
 import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
@@ -52,8 +51,8 @@ val dataModule = module {
     }
 
     factory { CacheImageDataSource(androidContext()) }
-    factory { MediaStoreImageDataSource(androidContext()) }
-    factory { ImageRepository(get(), get()) }
+    // factory { MediaStoreImageDataSource(androidContext()) }
+    // factory { ImageRepository(get(), get()) }
 
     factory { ImageDownloadHelper(get(), get<SupabaseClient>().storage) }
 
@@ -66,7 +65,6 @@ val dataModule = module {
 
     factory { BrandRoomDataSource(get<AppDatabase>().brandDao(), get()) }
     factory { CarRoomDataSource(get<AppDatabase>().carDao(), get()) }
-    factory { NewsRoomDataSource(get<AppDatabase>().newsDao()) }
     // TODO change to impl when sync mediator and room is ready
     factory<BrandRepository> { BrandSupabaseDataSource(get(), androidContext()) }
     // factory<BrandRepository> { BrandRepositoryImpl(get(), get(), get(), get()) }
@@ -77,5 +75,8 @@ val dataModule = module {
     factory<TradeRepository> { TradeSupabaseDataSource(get(), get()) }
 
     factory<UpdateOnboardingStateUseCase> { UpdateOnboardingStateUseCaseImpl(get()) }
-    factory<GetVideosNewsUseCase> { GetVideosNewsUseCaseImpl(get(), get()) }
+
+    factory { GetVideoNewsSupabaseDataSource(get(), androidContext()) }
+    factory { GetVideoNewsRoomDataSource(get<AppDatabase>().newsDao(), get()) }
+    factory<GetVideosNewsUseCase> { GetVideosNewsUseCaseImpl(get(), get(), get()) }
 }
