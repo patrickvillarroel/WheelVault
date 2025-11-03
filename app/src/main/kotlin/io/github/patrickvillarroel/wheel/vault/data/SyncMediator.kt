@@ -7,11 +7,11 @@ import kotlin.contracts.contract
 
 object SyncMediator {
     @JvmStatic
-    suspend fun <T : Any> fetch(
+    suspend fun <T> fetch(
         forceRefresh: Boolean = false,
         localFetch: suspend () -> T?,
         remoteFetch: suspend () -> T?,
-        saveRemote: suspend CoroutineScope.(data: @JvmSuppressWildcards T?) -> Unit,
+        saveRemote: suspend CoroutineScope.(data: T) -> Unit,
     ): T? {
         contract {
             callsInPlace(localFetch, InvocationKind.AT_MOST_ONCE)
@@ -20,15 +20,19 @@ object SyncMediator {
         }
         return if (forceRefresh) {
             val remoteData = remoteFetch()
-            coroutineScope {
-                saveRemote(remoteData)
+            if (remoteData != null) {
+                coroutineScope {
+                    saveRemote(remoteData)
+                }
             }
             remoteData
         } else {
             localFetch() ?: run {
                 val remoteData = remoteFetch()
-                coroutineScope {
-                    saveRemote(remoteData)
+                if (remoteData != null) {
+                    coroutineScope {
+                        saveRemote(remoteData)
+                    }
                 }
                 remoteData
             }
@@ -36,11 +40,11 @@ object SyncMediator {
     }
 
     @JvmStatic
-    suspend fun <T : Any> fetchList(
+    suspend fun <T> fetchList(
         forceRefresh: Boolean = false,
         localFetch: suspend () -> List<T>,
         remoteFetch: suspend () -> List<T>,
-        saveRemote: suspend CoroutineScope.(data: List<@JvmSuppressWildcards T>) -> Unit,
+        saveRemote: suspend CoroutineScope.(data: List<T>) -> Unit,
     ): List<T> {
         contract {
             callsInPlace(localFetch, InvocationKind.AT_MOST_ONCE)
@@ -57,8 +61,42 @@ object SyncMediator {
             val localData = localFetch()
             localData.ifEmpty {
                 val remoteData = remoteFetch()
-                coroutineScope {
-                    saveRemote(remoteData)
+                if (remoteData.isNotEmpty()) {
+                    coroutineScope {
+                        saveRemote(remoteData)
+                    }
+                }
+                remoteData
+            }
+        }
+    }
+
+    @JvmStatic
+    suspend fun <K, V> fetchMap(
+        forceRefresh: Boolean = false,
+        localFetch: suspend () -> Map<K, V>,
+        remoteFetch: suspend () -> Map<K, V>,
+        saveRemote: suspend CoroutineScope.(data: Map<K, V>) -> Unit,
+    ): Map<K, V> {
+        contract {
+            callsInPlace(localFetch, InvocationKind.AT_MOST_ONCE)
+            callsInPlace(remoteFetch, InvocationKind.AT_MOST_ONCE)
+            callsInPlace(saveRemote, InvocationKind.AT_MOST_ONCE)
+        }
+        return if (forceRefresh) {
+            val remoteData = remoteFetch()
+            coroutineScope {
+                saveRemote(remoteData)
+            }
+            remoteData
+        } else {
+            val localData = localFetch()
+            localData.ifEmpty {
+                val remoteData = remoteFetch()
+                if (remoteData.isNotEmpty()) {
+                    coroutineScope {
+                        saveRemote(remoteData)
+                    }
                 }
                 remoteData
             }
