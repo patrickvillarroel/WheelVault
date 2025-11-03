@@ -20,12 +20,23 @@ class BrandRepositoryImpl(
     private val room: BrandRoomDataSource,
     private val imageHelper: ImageDownloadHelper,
 ) : BrandRepository {
+    // TODO brand FTS is not ready yet
     override suspend fun search(query: String): List<Brand> = supabase.search(query)
+
     override suspend fun fetchAllNames(forceRefresh: Boolean): List<String> = SyncMediator.fetchList(
         forceRefresh = forceRefresh,
         localFetch = { room.fetchAllNames() },
         remoteFetch = { room.fetchAllNames() },
-        saveRemote = {
+        saveRemote = { _ ->
+            /* TODO */
+        },
+    )
+
+    override suspend fun fetchAllImages(forceRefresh: Boolean): Map<Uuid, Any> = SyncMediator.fetchMap(
+        forceRefresh = forceRefresh,
+        localFetch = { room.fetchAllImages(forceRefresh) },
+        remoteFetch = { supabase.fetchAllImages(forceRefresh) },
+        saveRemote = { _ ->
             /* TODO */
         },
     )
@@ -55,14 +66,25 @@ class BrandRepositoryImpl(
         localFetch = { room.fetch(id, forceRefresh) },
         remoteFetch = { supabase.fetch(id, forceRefresh) },
         saveRemote = { brand ->
-            if (brand == null) return@fetch
-            launch {
-                room.save(brand, imageHelper.downloadImage(supabase.buildImageRequest(brand.id)))
-            }
+            launch { room.save(brand, imageHelper.downloadImage(supabase.buildImageRequest(brand.id))) }
         },
     )
 
-    override suspend fun fetchByName(name: String): Brand? = supabase.fetchByName(name)
+    override suspend fun fetchByName(name: String): Brand? = SyncMediator.fetch(
+        forceRefresh = false,
+        localFetch = { room.fetchByName(name) },
+        remoteFetch = { supabase.fetchByName(name) },
+        saveRemote = { _ ->
+            /* TODO */
+        },
+    )
 
-    override suspend fun fetchByDescription(description: String): Brand? = supabase.fetchByDescription(description)
+    override suspend fun fetchByDescription(description: String): Brand? = SyncMediator.fetch(
+        forceRefresh = false,
+        localFetch = { room.fetchByDescription(description) },
+        remoteFetch = { supabase.fetchByDescription(description) },
+        saveRemote = { _ ->
+            /* TODO */
+        },
+    )
 }
