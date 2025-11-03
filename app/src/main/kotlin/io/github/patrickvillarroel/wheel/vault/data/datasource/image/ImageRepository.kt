@@ -9,10 +9,11 @@ class ImageRepository(private val cache: CacheImageDataSource, private val media
         return if (persist) mediaStore.saveImage(name, bytes) else cacheUri
     }
 
-    suspend fun loadImage(name: String): ByteArray? = cache.loadImage(name) ?: mediaStore.loadImage(name)?.also {
-        // refrescar cache para accesos rápidos posteriores
-        cache.saveImage(name, it)
-    }
+    suspend fun loadImage(name: String): ByteArray? =
+        cache.loadImage(name) ?: mediaStore.loadImage(name)?.also { bytes ->
+            // refrescar cache para accesos rápidos posteriores
+            cache.saveImage(name, bytes)
+        }
 
     suspend fun deleteImage(name: String, persist: Boolean = false): Boolean {
         val cacheDelete = cache.deleteImage(name)
