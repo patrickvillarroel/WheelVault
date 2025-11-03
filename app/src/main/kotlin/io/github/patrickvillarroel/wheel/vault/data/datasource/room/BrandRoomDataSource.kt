@@ -1,5 +1,6 @@
 package io.github.patrickvillarroel.wheel.vault.data.datasource.room
 
+import co.touchlab.kermit.Logger
 import io.github.patrickvillarroel.wheel.vault.data.dao.BrandDao
 import io.github.patrickvillarroel.wheel.vault.data.datasource.image.ImageRepository
 import io.github.patrickvillarroel.wheel.vault.data.entity.toDomain
@@ -36,14 +37,23 @@ class BrandRoomDataSource(private val dao: BrandDao, private val imageRepository
         }
 
     suspend fun save(brand: Brand, image: ByteArray?) {
+        logger.d { "Saving brand to room with id='${brand.id}'" }
         dao.insertBrand(brand.toEntity())
-        if (image != null) imageRepository.saveImage(brand.id.toString() + ".png", image)
+        if (image != null) {
+            logger.d { "Saving image of brand with id='${brand.id}' as png image" }
+            imageRepository.saveImage(brand.id.toString() + ".png", image)
+        }
     }
 
     suspend fun saveAll(brands: List<Brand>, images: List<ByteArray>) {
+        logger.d { "Saving ${brands.size} brands to room" }
         dao.insertAllBrands(brands.map { it.toEntity() })
         brands.zip(images).forEach { (brand, image) ->
             imageRepository.saveImage(brand.id.toString(), image)
         }
+    }
+
+    companion object {
+        private val logger = Logger.withTag("BrandRoomDataSource")
     }
 }
