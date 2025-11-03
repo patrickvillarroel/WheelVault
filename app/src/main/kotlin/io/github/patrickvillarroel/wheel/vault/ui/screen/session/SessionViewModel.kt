@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-data class SessionViewModel(private val supabase: SupabaseClient) : ViewModel() {
+class SessionViewModel(private val supabase: SupabaseClient) : ViewModel() {
     val session = supabase.auth.sessionStatus.map {
         when (it) {
             SessionStatus.Initializing -> SessionUiStatus.Initializing
@@ -19,7 +19,8 @@ data class SessionViewModel(private val supabase: SupabaseClient) : ViewModel() 
             is SessionStatus.NotAuthenticated -> SessionUiStatus.NotAuthenticated
             is SessionStatus.RefreshFailure -> SessionUiStatus.RefreshFailure
         }
-    }.distinctUntilChanged().stateIn(viewModelScope, SharingStarted.Eagerly, SessionUiStatus.Initializing)
+    }.distinctUntilChanged()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, SessionUiStatus.Initializing)
 
     val currentUser = supabase.auth.sessionStatus.map {
         when (it) {
