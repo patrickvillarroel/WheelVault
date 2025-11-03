@@ -6,33 +6,41 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.CarViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarErrorScreen
+import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.selection.ExchangeCarSelectionViewModel.CarsUiState.Error
+import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.selection.ExchangeCarSelectionViewModel.CarsUiState.Loading
+import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.selection.ExchangeCarSelectionViewModel.CarsUiState.Success
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun ExchangeCarSelectionScreen(
     onCarClick: (CarItem) -> Unit,
     modifier: Modifier = Modifier,
-    carViewModel: CarViewModel = koinViewModel(),
+    viewModel: ExchangeCarSelectionViewModel = koinViewModel(),
 ) {
     // TODO connect exchange VM with cars available for exchange
-    val car by carViewModel.carsState.collectAsStateWithLifecycle()
+    val car by viewModel.carsState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchAll()
+    }
 
     AnimatedContent(car) { state ->
         when (state) {
-            CarViewModel.CarsUiState.Loading -> Scaffold(
+            Loading -> Scaffold(
                 Modifier.fillMaxSize(),
             ) {
                 LoadingIndicator(Modifier.padding(it).fillMaxSize())
             }
 
-            CarViewModel.CarsUiState.Error -> CarErrorScreen(CarViewModel.CarDetailUiState.Error)
-            is CarViewModel.CarsUiState.Success -> ExchangeCarSelection(
+            Error -> CarErrorScreen(CarViewModel.CarDetailUiState.Error)
+            is Success -> ExchangeCarSelection(
                 state.cars,
                 onCarClick = onCarClick,
                 modifier = modifier,
