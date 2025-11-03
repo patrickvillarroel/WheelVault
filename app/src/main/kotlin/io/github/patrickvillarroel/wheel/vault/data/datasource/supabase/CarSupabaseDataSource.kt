@@ -97,6 +97,24 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
         return cars.map { car -> car.toDomain(imagesCars[car.id] ?: setOf(CarItem.EmptyImage)) }
     }
 
+    override suspend fun fetchAllImage(limit: Int, orderAsc: Boolean): Map<Uuid, Any> {
+        val carsId = supabase.from(CarObj.TABLE).select(Columns.list("id")) {
+            filter {
+                eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
+            }
+            limit(limit.toLong())
+            if (orderAsc) {
+                order("created_at", Order.ASCENDING)
+            } else {
+                order("created_at", Order.DESCENDING)
+            }
+        }.decodeList<Map<String, Uuid>>().flatMap { it.values }
+        val imagesCars = fetchAllImages(carsId)
+            .groupBy { it.first }
+            .mapValues { (_, list) -> list.map { it.second }.toSet().ifEmpty { setOf(CarItem.EmptyImage) }.first() }
+        return imagesCars
+    }
+
     override suspend fun fetch(id: Uuid): CarItem? = supabase.from(CarObj.TABLE)
         .select {
             filter { eq("id", id) }

@@ -13,6 +13,9 @@ class CarRepositoryImpl(private val supabase: CarSupabaseDataSource) : CarsRepos
     override suspend fun fetchAll(isFavorite: Boolean, limit: Int, orderAsc: Boolean): List<CarItem> =
         supabase.fetchAll(isFavorite, limit, orderAsc)
 
+    override suspend fun fetchAllImage(limit: Int, orderAsc: Boolean): Map<Uuid, Any> =
+        supabase.fetchAllImage(limit, orderAsc)
+
     override suspend fun fetch(id: Uuid): CarItem? = supabase.fetch(id)
 
     override suspend fun fetchByModel(model: String, isFavorite: Boolean) = supabase.fetchByModel(model, isFavorite)

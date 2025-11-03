@@ -33,6 +33,10 @@ class CarRoomDataSource(private val dao: CarDao, private val imageRepository: Im
         }
     }
 
+    override suspend fun fetchAllImage(limit: Int, orderAsc: Boolean): Map<Uuid, Any> {
+        TODO()
+    }
+
     // TODO fix this method
     override suspend fun fetch(id: Uuid): CarItem? = dao.fetchById(id.toString())?.let { entity ->
         entity.toDomain(setOf(imageRepository.loadImage(entity.idRemote) ?: CarItem.EmptyImage))
