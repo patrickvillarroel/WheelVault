@@ -14,8 +14,6 @@ import io.github.jan.supabase.storage.authenticatedStorageItem
 import io.github.jan.supabase.storage.storage
 import io.github.patrickvillarroel.wheel.vault.data.objects.CarImagesObj
 import io.github.patrickvillarroel.wheel.vault.data.objects.CarObj
-import io.github.patrickvillarroel.wheel.vault.data.objects.toDomain
-import io.github.patrickvillarroel.wheel.vault.data.objects.toObject
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
 import io.ktor.http.ContentType
@@ -29,11 +27,8 @@ import coil3.PlatformContext as CoilContext
 
 class CarSupabaseDataSource(private val supabase: SupabaseClient, private val context: CoilContext) :
     CarsRepository {
-    companion object {
-        private val logger = Logger.withTag("Cars Supabase DataSource")
-    }
     override suspend fun exist(id: Uuid): Boolean {
-        val count = supabase.from(CarObj.TABLE).select {
+        val count = supabase.from(TABLE).select {
             filter {
                 eq("user_id", supabase.auth.currentUserOrNull()!!.id)
                 eq("id", id)
@@ -51,12 +46,12 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
 
     override suspend fun search(query: String, isFavorite: Boolean): List<CarItem> {
         val cars = supabase
-            .from(CarObj.TABLE)
+            .from(TABLE)
             .select {
                 filter {
-                    eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
+                    eq(USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
                     textSearch(
-                        CarObj.FULL_TEXT_SEARCH_FIELD,
+                        FULL_TEXT_SEARCH_FIELD,
                         query,
                         textSearchType = TextSearchType.PLAINTO,
                     )
@@ -77,9 +72,9 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
     }
 
     override suspend fun fetchAll(isFavorite: Boolean, limit: Int, orderAsc: Boolean): List<CarItem> {
-        val cars = supabase.from(CarObj.TABLE).select {
+        val cars = supabase.from(TABLE).select {
             filter {
-                eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
+                eq(USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
                 if (isFavorite) eq("isFavorite", true)
             }
             limit(limit.toLong())
@@ -98,9 +93,9 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
     }
 
     override suspend fun fetchAllImage(limit: Int, orderAsc: Boolean): Map<Uuid, Any> {
-        val carsId = supabase.from(CarObj.TABLE).select(Columns.list("id")) {
+        val carsId = supabase.from(TABLE).select(Columns.list("id")) {
             filter {
-                eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
+                eq(USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
             }
             limit(limit.toLong())
             if (orderAsc) {
@@ -115,7 +110,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
         return imagesCars
     }
 
-    override suspend fun fetch(id: Uuid): CarItem? = supabase.from(CarObj.TABLE)
+    override suspend fun fetch(id: Uuid): CarItem? = supabase.from(TABLE)
         .select {
             filter { eq("id", id) }
             order("created_at", Order.DESCENDING)
@@ -138,10 +133,10 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
     private suspend fun <T : Any> fetchByField(field: String, value: T, isFavorite: Boolean): List<CarItem> {
         val cars =
             supabase
-                .from(CarObj.TABLE)
+                .from(TABLE)
                 .select {
                     filter {
-                        eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
+                        eq(USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
                         if (value is String) {
                             ilike(field, "%$value%")
                         } else {
@@ -177,11 +172,11 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
         countByField("category", category, isFavorite)
 
     private suspend fun <T : Any> countByField(field: String?, value: T?, isFavorite: Boolean): Int = supabase
-        .from(CarObj.TABLE)
+        .from(TABLE)
         .select {
             count(count = Count.EXACT)
             filter {
-                eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
+                eq(USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
                 if (field != null && value != null) eq(field, value)
                 if (isFavorite) eq("isFavorite", true)
             }
@@ -191,8 +186,8 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
 
     override suspend fun insert(car: CarItem): CarItem {
         logger.i { "Inserting car $car" }
-        val carObject = supabase.from(CarObj.TABLE)
-            .insert(car.toObject().copy(id = null)) {
+        val carObject = supabase.from(TABLE)
+            .insert(car.toObject()) {
                 select()
             }.decodeSingleOrNull<CarObj>() ?: error("Car not found after insert it")
 
@@ -215,11 +210,11 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
     }
 
     override suspend fun update(car: CarItem): CarItem {
-        val updated = supabase.from(CarObj.TABLE)
+        val updated = supabase.from(TABLE)
             .update(car.toObject()) {
                 filter {
                     eq("id", car.id)
-                    eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
+                    eq(USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
                 }
                 select()
             }
@@ -248,31 +243,31 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
     }
 
     override suspend fun delete(car: CarItem): Boolean {
-        supabase.from(CarObj.TABLE).delete {
+        supabase.from(TABLE).delete {
             filter {
                 eq("id", car.id)
-                eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
+                eq(USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
             }
         }
 
         val currentUserId = supabase.auth.currentUserOrNull()!!.id
-        val imagePaths = supabase.storage.from(CarObj.BUCKET_IMAGES)
+        val imagePaths = supabase.storage.from(BUCKET_IMAGES)
             .list("$currentUserId/${car.id}")
             .map { "$currentUserId/${car.id}/${it.name}" }
 
         if (imagePaths.isNotEmpty()) {
-            supabase.storage.from(CarObj.BUCKET_IMAGES).delete(imagePaths)
+            supabase.storage.from(BUCKET_IMAGES).delete(imagePaths)
         }
 
         return true
     }
 
     override suspend fun setAvailableForTrade(carId: Uuid, isAvailable: Boolean): CarItem? {
-        val updatedCarObj = supabase.from(CarObj.TABLE)
+        val updatedCarObj = supabase.from(TABLE)
             .update(mapOf("available_for_trade" to isAvailable)) {
                 filter {
                     eq("id", carId)
-                    eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
+                    eq(USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
                 }
                 select()
             }
@@ -284,11 +279,11 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
     }
 
     suspend fun getCarsForTrade(): List<CarItem> {
-        val cars = supabase.from(CarObj.TABLE)
+        val cars = supabase.from(TABLE)
             .select {
                 filter {
                     eq("available_for_trade", true)
-                    neq(CarObj.USER_ID_FIELD, Uuid.parse(supabase.auth.currentUserOrNull()?.id ?: return emptyList()))
+                    neq(USER_ID_FIELD, Uuid.parse(supabase.auth.currentUserOrNull()?.id ?: return emptyList()))
                 }
                 order("updated_at", Order.DESCENDING)
             }.decodeList<CarObj>()
@@ -310,7 +305,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
             val path = image.values
             if (path.isEmpty()) return@mapNotNull null
             ImageRequest.Builder(context)
-                .data(authenticatedStorageItem(CarObj.BUCKET_IMAGES, path.first()))
+                .data(authenticatedStorageItem(BUCKET_IMAGES, path.first()))
                 .build()
         }.toSet()
 
@@ -325,7 +320,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
             val path = image["storage_path"] ?: return@mapNotNull null
 
             carId to ImageRequest.Builder(context)
-                .data(authenticatedStorageItem(CarObj.BUCKET_IMAGES, path))
+                .data(authenticatedStorageItem(BUCKET_IMAGES, path))
                 .build()
         }
 
@@ -340,7 +335,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
                 val path = "$userId/$carId/$imageId.webp"
 
                 try {
-                    supabase.storage.from(CarObj.BUCKET_IMAGES).upload(path, bytes) {
+                    supabase.storage.from(BUCKET_IMAGES).upload(path, bytes) {
                         upsert = true
                         contentType = ContentType.Image.WEBP
                     }
@@ -376,8 +371,43 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
 
         response.map { storagePath ->
             ImageRequest.Builder(context)
-                .data(authenticatedStorageItem(CarObj.BUCKET_IMAGES, storagePath))
+                .data(authenticatedStorageItem(BUCKET_IMAGES, storagePath))
                 .build()
         }.toSet()
+    }
+
+    companion object {
+        private const val TABLE = "cars"
+        private const val BUCKET_IMAGES = "cars-images"
+        private const val USER_ID_FIELD = "user_id"
+        private const val FULL_TEXT_SEARCH_FIELD = "document_with_weights"
+        private val logger = Logger.withTag("Cars Supabase DataSource")
+
+        private fun CarItem.toObject() = CarObj(
+            id = this.id,
+            model = this.model,
+            year = this.year,
+            brand = this.brand,
+            manufacturer = this.manufacturer,
+            category = this.category,
+            description = this.description,
+            quantity = this.quantity,
+            isFavorite = this.isFavorite,
+            availableForTrade = this.availableForTrade,
+        )
+
+        private fun CarObj.toDomain(images: Set<Any>) = CarItem(
+            id = this.id!!,
+            model = this.model,
+            year = this.year,
+            brand = this.brand,
+            manufacturer = this.manufacturer,
+            category = this.category,
+            description = this.description,
+            quantity = this.quantity,
+            isFavorite = this.isFavorite,
+            availableForTrade = this.availableForTrade,
+            images = images,
+        )
     }
 }

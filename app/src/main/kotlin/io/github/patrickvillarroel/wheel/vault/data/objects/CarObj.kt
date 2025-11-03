@@ -9,7 +9,7 @@ import kotlin.uuid.Uuid
 
 /** A car object of PostgresSQL from Supabase */
 @Serializable
-data class CarObj(
+class CarObj(
     val model: String,
     val year: Int,
     val brand: String,
@@ -21,11 +21,4 @@ data class CarObj(
     val id: Uuid? = null,
     @SerialName("available_for_trade")
     val availableForTrade: Boolean = false,
-) {
-    companion object {
-        const val TABLE = "cars"
-        const val BUCKET_IMAGES = "cars-images"
-        const val USER_ID_FIELD = "user_id"
-        const val FULL_TEXT_SEARCH_FIELD = "document_with_weights"
-    }
-}
+)
