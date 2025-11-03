@@ -13,7 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.patrickvillarroel.wheel.vault.ui.screen.CarViewModel
-import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarDetailCallbacks
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarErrorScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.ExchangeViewModel
 import org.koin.compose.viewmodel.koinViewModel
@@ -25,6 +25,7 @@ fun ExchangeCarDetailScreen(
     animatedVisibilityScope: AnimatedVisibilityScope,
     carId: Uuid,
     onExchangeCarClick: () -> Unit,
+    headerBackCallbacks: HeaderBackCallbacks,
     modifier: Modifier = Modifier,
     carViewModel: CarViewModel = koinViewModel(),
     exchangeViewModel: ExchangeViewModel = koinViewModel(),
@@ -49,7 +50,7 @@ fun ExchangeCarDetailScreen(
                     animatedVisibilityScope = animatedVisibilityScope,
                     carDetail = state.car,
                     requestText = "Busco porsche rallyE color verde, si es STH mejor.",
-                    callbacks = CarDetailCallbacks.default(state.car),
+                    callbacks = headerBackCallbacks,
                     onExchangeClick = {
                         exchangeViewModel.exchangeCar(state.car)
                         onExchangeCarClick()

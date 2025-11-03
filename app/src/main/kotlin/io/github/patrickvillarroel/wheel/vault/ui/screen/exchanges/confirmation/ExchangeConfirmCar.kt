@@ -41,16 +41,16 @@ import coil3.compose.AsyncImage
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BackTextButton
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuHeader
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarDetail
-import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarDetailCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.component.ConfirmationDialog
 
 @Composable
 fun ExchangeConfirmCar(
     offeredCar: CarItem,
     requestedCar: CarItem,
-    callbacks: CarDetailCallbacks,
+    callbacks: HeaderBackCallbacks,
     onAcceptClick: () -> Unit,
     onCancelClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -62,8 +62,8 @@ fun ExchangeConfirmCar(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            MenuHeader(callbacks.headersBackCallbacks) {
-                BackTextButton(onBack = callbacks.headersBackCallbacks.onBackClick)
+            MenuHeader(callbacks) {
+                BackTextButton(onBack = callbacks.onBackClick)
             }
         },
         floatingActionButton = {
@@ -311,7 +311,7 @@ private fun ExchangeConfirmCarPreview() {
         description = "Requested car description",
         category = "Requested car category",
     )
-    val callbacks = CarDetailCallbacks.default(offeredCar)
+    val callbacks = HeaderBackCallbacks.default
 
     ExchangeConfirmCar(
         offeredCar = offeredCar,

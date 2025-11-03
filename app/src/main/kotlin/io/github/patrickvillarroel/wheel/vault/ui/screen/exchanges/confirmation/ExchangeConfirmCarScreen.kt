@@ -28,7 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.ui.screen.CarViewModel
-import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarDetailCallbacks
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarErrorScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.ExchangeViewModel
 import org.koin.compose.viewmodel.koinViewModel
@@ -37,9 +37,9 @@ import kotlin.uuid.Uuid
 @Composable
 fun ExchangeConfirmCarScreen(
     requestCarId: Uuid,
+    headerBackCallbacks: HeaderBackCallbacks,
     modifier: Modifier = Modifier,
     exchangeViewModel: ExchangeViewModel = koinViewModel(),
-    onNavigateBack: () -> Unit = {},
 ) {
     val exchangeConfirmState by exchangeViewModel.exchangeConfirmState.collectAsState()
 
@@ -53,14 +53,14 @@ fun ExchangeConfirmCarScreen(
                 state.offeredCar,
                 state.requestedCar,
                 modifier = modifier,
-                callbacks = CarDetailCallbacks.default(state.offeredCar),
+                callbacks = headerBackCallbacks,
                 onAcceptClick = { exchangeViewModel.acceptExchange(state.offeredCar, state.requestedCar) },
                 onCancelClick = { exchangeViewModel.rejectExchange(state.offeredCar, state.requestedCar) },
             )
 
             ExchangeViewModel.ExchangeConfirmUiState.Accepted -> ExchangeResultScreen(
                 isAccepted = true,
-                onNavigateBack = onNavigateBack,
+                onNavigateBack = headerBackCallbacks.onBackClick,
                 modifier = modifier,
             )
             ExchangeViewModel.ExchangeConfirmUiState.Error -> CarErrorScreen(CarViewModel.CarDetailUiState.Error)
@@ -71,7 +71,7 @@ fun ExchangeConfirmCarScreen(
             }
             ExchangeViewModel.ExchangeConfirmUiState.Rejected -> ExchangeResultScreen(
                 isAccepted = false,
-                onNavigateBack = onNavigateBack,
+                onNavigateBack = headerBackCallbacks.onBackClick,
                 modifier = modifier,
             )
         }

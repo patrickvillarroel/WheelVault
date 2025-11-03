@@ -30,10 +30,10 @@ import androidx.compose.ui.unit.dp
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BackTextButton
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeroImageCarousel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuHeader
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarDetail
-import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarDetailCallbacks
 
 @Composable
 fun ExchangeCarDetailContent(
@@ -41,15 +41,15 @@ fun ExchangeCarDetailContent(
     animatedVisibilityScope: AnimatedVisibilityScope,
     carDetail: CarItem,
     requestText: String,
-    callbacks: CarDetailCallbacks,
+    callbacks: HeaderBackCallbacks,
     onExchangeClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            MenuHeader(callbacks.headersBackCallbacks) {
-                BackTextButton(onBack = callbacks.headersBackCallbacks.onBackClick)
+            MenuHeader(callbacks) {
+                BackTextButton(onBack = callbacks.onBackClick)
             }
         },
         floatingActionButton = {
@@ -149,7 +149,7 @@ private fun ExchangeCarDetailContentPreview() {
         brand = "Toyota",
         images = setOf(CarItem.EmptyImage),
     )
-    val callbacks = CarDetailCallbacks.default(carDetail)
+    val callbacks = HeaderBackCallbacks.default
 
     SharedTransitionScope {
         AnimatedVisibility(true) {

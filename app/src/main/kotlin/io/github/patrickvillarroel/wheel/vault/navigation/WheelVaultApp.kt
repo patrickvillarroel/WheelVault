@@ -322,6 +322,14 @@ fun WheelVaultApp(
                         animatedVisibilityScope = this,
                         carId = key.id,
                         onExchangeCarClick = { backStack += NavigationKeys.ExchangeCarSelection },
+                        headerBackCallbacks = HeaderBackCallbacks(
+                            onProfileClick = { backStack += NavigationKeys.Profile },
+                            onBackClick = { backStack.removeLastOrNull() },
+                            onGarageClick = { backStack += NavigationKeys.Garage() },
+                            onFavoritesClick = { backStack += NavigationKeys.Garage(favorites = true) },
+                            onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
+                            onExchangesClick = {},
+                        ),
                     )
                 }
 
@@ -347,6 +355,14 @@ fun WheelVaultApp(
                         animatedVisibilityScope = this,
                         carId = key.id,
                         onExchangeTemporalClick = { backStack += NavigationKeys.ExchangeConfirmation(it) },
+                        headerCallbacks = HeaderBackCallbacks(
+                            onProfileClick = { backStack += NavigationKeys.Profile },
+                            onBackClick = { backStack.removeLastOrNull() },
+                            onGarageClick = { backStack += NavigationKeys.Garage() },
+                            onFavoritesClick = { backStack += NavigationKeys.Garage(favorites = true) },
+                            onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
+                            onExchangesClick = {},
+                        ),
                     )
                 }
 
@@ -356,7 +372,17 @@ fun WheelVaultApp(
                             "Exchanges not available and reached in navigation routes. Confirm of CarId='${key.id}'"
                         }
                     }
-                    ExchangeConfirmCarScreen(key.id)
+                    ExchangeConfirmCarScreen(
+                        requestCarId = key.id,
+                        headerBackCallbacks = HeaderBackCallbacks(
+                            onProfileClick = { backStack += NavigationKeys.Profile },
+                            onBackClick = { backStack.removeLastOrNull() },
+                            onGarageClick = { backStack += NavigationKeys.Garage() },
+                            onFavoritesClick = { backStack += NavigationKeys.Garage(favorites = true) },
+                            onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
+                            onExchangesClick = {},
+                        ),
+                    )
                 }
             }
         }
