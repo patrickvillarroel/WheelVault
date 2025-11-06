@@ -90,7 +90,7 @@ test-junit = "4.13.2"
 androidx-room = "2.8.3"
 
 # https://github.com/supabase-community/supabase-kt/releases
-supabase-kt = "3.2.5"
+supabase-kt = "3.2.6"
 
 # https://github.com/mockk/mockk/releases
 mockk = "1.14.6"
