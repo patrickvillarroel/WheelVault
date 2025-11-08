@@ -5,8 +5,6 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,7 +16,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -53,7 +50,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 fun GarageContent(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    uiState: GarageViewModel.GarageUiState,
     carsPaged: LazyPagingItems<CarItem>,
     topBarState: GarageTopBarState,
     searchQuery: String,
@@ -84,84 +80,82 @@ fun GarageContent(
         },
     ) { paddingValues ->
         with(sharedTransitionScope) {
-            when (uiState) {
-                is GarageViewModel.GarageUiState.Success ->
-                    PullToRefreshBox(
-                        isRefreshing,
-                        onRefresh = {
-                            isRefreshing = true
-                            carsPaged.refresh()
-                            callbacks.onRefresh()
-                            isRefreshing = false
-                        },
-                        Modifier.fillMaxSize().padding(paddingValues),
-                    ) {
-                        LazyColumn(Modifier.fillMaxSize().padding(start = 15.dp, end = 15.dp)) {
-                            if (carsPaged.loadState.refresh == LoadState.Loading) {
-                                item { CircularProgressIndicator(modifier = Modifier.fillMaxSize().wrapContentSize()) }
-                            }
+            PullToRefreshBox(
+                isRefreshing,
+                onRefresh = {
+                    isRefreshing = true
+                    carsPaged.refresh()
+                    callbacks.onRefresh()
+                    isRefreshing = false
+                },
+                Modifier.fillMaxSize().padding(paddingValues),
+            ) {
+                LazyColumn(Modifier.fillMaxSize().padding(start = 15.dp, end = 15.dp)) {
+                    if (carsPaged.loadState.refresh == LoadState.Loading) {
+                        item { CircularProgressIndicator(modifier = Modifier.fillMaxSize().wrapContentSize()) }
+                    }
 
-                            item {
+                    item {
+                        Text(
+                            stringResource(R.string.garage),
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(top = 15.dp, start = 15.dp, bottom = 5.dp),
+                        )
+                    }
+                    items(carsPaged, key = { it.id }) { item ->
+                        CarItemCard(
+                            carItem = item,
+                            onClick = { callbacks.onCarClick(item) },
+                            onFavoriteToggle = { callbacks.onToggleFavorite(item, it) },
+                            modifier = Modifier
+                                .padding(3.dp)
+                                .sharedBounds(
+                                    rememberSharedContentState("car-${item.id}"),
+                                    animatedVisibilityScope,
+                                ),
+                        )
+                    }
+
+                    if (carsPaged.loadState.hasError || carsPaged.itemCount == 0) {
+                        item {
+                            val message = if (carsPaged.loadState.hasError) {
+                                stringResource(R.string.error_loading_of, stringResource(R.string.cars))
+                            } else {
+                                stringResource(R.string.cars_not_found)
+                            }
+                            Image(
+                                painterResource(
+                                    if (carsPaged.loadState.hasError) {
+                                        R.drawable.error
+                                    } else {
+                                        R.drawable.no_data
+                                    },
+                                ),
+                                stringResource(R.string.cars_not_found),
+                                Modifier.padding(16.dp).fillMaxWidth(0.8f),
+                            )
+                            if (carsPaged.loadState.hasError) {
                                 Text(
-                                    stringResource(R.string.garage),
-                                    style = MaterialTheme.typography.headlineMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    modifier = Modifier.padding(top = 15.dp, start = 15.dp, bottom = 5.dp),
+                                    message,
+                                    color = MaterialTheme.colorScheme.error,
                                 )
-                            }
-                            items(carsPaged, key = { it.id }) { item ->
-                                CarItemCard(
-                                    carItem = item,
-                                    onClick = { callbacks.onCarClick(item) },
-                                    onFavoriteToggle = { callbacks.onToggleFavorite(item, it) },
-                                    modifier = Modifier
-                                        .padding(3.dp)
-                                        .sharedBounds(
-                                            rememberSharedContentState("car-${item.id}"),
-                                            animatedVisibilityScope,
-                                        ),
-                                )
-                            }
-
-                            if (carsPaged.loadState.append == LoadState.Loading) {
-                                item {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .wrapContentWidth(Alignment.CenterHorizontally),
-                                    )
-                                }
+                            } else {
+                                Text(message)
                             }
                         }
                     }
 
-                GarageViewModel.GarageUiState.Error, is GarageViewModel.GarageUiState.Empty -> Column(
-                    Modifier.padding(paddingValues).fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                ) {
-                    Image(
-                        painterResource(
-                            if (uiState is GarageViewModel.GarageUiState.Error) {
-                                R.drawable.error
-                            } else {
-                                R.drawable.no_data
-                            },
-                        ),
-                        null,
-                        Modifier.padding(16.dp).fillMaxWidth(0.8f),
-                    )
-                    if (uiState is GarageViewModel.GarageUiState.Error) {
-                        Text(
-                            stringResource(R.string.error_loading_of, stringResource(R.string.cars)),
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    } else {
-                        Text(stringResource(R.string.cars_not_found))
+                    if (carsPaged.loadState.append == LoadState.Loading) {
+                        item {
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentWidth(Alignment.CenterHorizontally),
+                            )
+                        }
                     }
                 }
-
-                GarageViewModel.GarageUiState.Loading -> LoadingIndicator(Modifier.padding(paddingValues).fillMaxSize())
             }
         }
     }
@@ -197,7 +191,6 @@ private fun GaragePreview() {
                 GarageContent(
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
-                    uiState = GarageViewModel.GarageUiState.Success(emptyList()),
                     carsPaged = carsPaged,
                     topBarState = GarageTopBarState.DEFAULT,
                     searchQuery = "",
