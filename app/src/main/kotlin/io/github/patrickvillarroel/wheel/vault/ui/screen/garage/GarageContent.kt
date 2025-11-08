@@ -10,10 +10,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LoadingIndicator
@@ -95,6 +97,10 @@ fun GarageContent(
                         Modifier.fillMaxSize().padding(paddingValues),
                     ) {
                         LazyColumn(Modifier.fillMaxSize().padding(start = 15.dp, end = 15.dp)) {
+                            if (carsPaged.loadState.refresh == LoadState.Loading) {
+                                item { CircularProgressIndicator(modifier = Modifier.fillMaxSize().wrapContentSize()) }
+                            }
+
                             item {
                                 Text(
                                     stringResource(R.string.garage),
@@ -115,6 +121,16 @@ fun GarageContent(
                                             animatedVisibilityScope,
                                         ),
                                 )
+                            }
+
+                            if (carsPaged.loadState.append == LoadState.Loading) {
+                                item {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .wrapContentWidth(Alignment.CenterHorizontally),
+                                    )
+                                }
                             }
                         }
                     }
