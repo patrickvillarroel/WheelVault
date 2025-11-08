@@ -15,6 +15,8 @@ import io.github.jan.supabase.storage.storage
 import io.github.patrickvillarroel.wheel.vault.data.objects.CarImagesObj
 import io.github.patrickvillarroel.wheel.vault.data.objects.CarObj
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
+import io.github.patrickvillarroel.wheel.vault.domain.model.Page
+import io.github.patrickvillarroel.wheel.vault.domain.model.PagedSource
 import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
 import io.ktor.http.ContentType
 import kotlinx.coroutines.async
@@ -111,13 +113,20 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
     }
 
     override suspend fun fetch(id: Uuid): CarItem? = supabase.from(TABLE)
+        .select {
+            filter { eq("id", id) }
+            order("created_at", Order.DESCENDING)
+        }.decodeSingleOrNull<CarObj>()?.toDomain(
+            fetchAllImages(id).ifEmpty { setOf(CarItem.EmptyImage) },
+        )
+
     override fun fetchAllPaged(isFavorite: Boolean, orderAsc: Boolean): PagedSource<Int, CarItem> =
         PagedSource { key, size ->
             val offset = key ?: 0
 
-            val cars = supabase.from(CarObj.TABLE).select {
+            val cars = supabase.from(TABLE).select {
                 filter {
-                    eq(CarObj.USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
+                    eq(USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
                     if (isFavorite) {
                         CarObj::isFavorite eq true
                     }
@@ -142,14 +151,6 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
 
             Page(data = data, prevKey = prevKey, nextKey = nextKey)
         }
-
-    override suspend fun fetch(id: Uuid): CarItem? = supabase.from(CarObj.TABLE)
-        .select {
-            filter { eq("id", id) }
-            order("created_at", Order.DESCENDING)
-        }.decodeSingleOrNull<CarObj>()?.toDomain(
-            fetchAllImages(id).ifEmpty { setOf(CarItem.EmptyImage) },
-        )
 
     override suspend fun fetchByModel(model: String, isFavorite: Boolean) = fetchByField("model", model, isFavorite)
 
