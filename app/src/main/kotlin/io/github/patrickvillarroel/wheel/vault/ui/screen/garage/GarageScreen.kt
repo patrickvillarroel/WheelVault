@@ -29,7 +29,6 @@ fun GarageScreen(
     brandViewModel: BrandViewModel = koinViewModel(),
 ) {
     val brandsNames by brandViewModel.brandsNames.collectAsStateWithLifecycle()
-    val carState by viewModel.garageState.collectAsStateWithLifecycle()
     val carsPaged = viewModel.carsPaged.collectAsLazyPagingItems()
     var uiState by rememberSaveable { mutableStateOf(GarageTopBarState.DEFAULT) }
     var searchQuery by rememberSaveable { mutableStateOf(query.trim()) }
@@ -38,19 +37,15 @@ fun GarageScreen(
         brandViewModel.fetchNames()
     }
 
+    // Update filters when query or favorites change - pagination will automatically refresh
     LaunchedEffect(query, favorites) {
-        when {
-            favorites && query.isBlank() -> viewModel.fetchFavorites()
-            favorites && query.isNotBlank() -> viewModel.search(query, true)
-            !favorites && query.isBlank() -> viewModel.fetchAll(true)
-            !favorites && query.isNotBlank() -> viewModel.search(query)
-        }
+        viewModel.setSearchQuery(query.takeIf { it.isNotBlank() })
+        viewModel.setFavoriteFilter(favorites)
     }
 
     GarageContent(
         sharedTransitionScope = sharedTransitionScope,
         animatedVisibilityScope = animatedVisibilityScope,
-        uiState = carState,
         carsPaged = carsPaged,
         topBarState = uiState,
         searchQuery = searchQuery,
@@ -61,7 +56,7 @@ fun GarageScreen(
                 searchQuery = it
             },
             onSearchClick = {
-                viewModel.search(searchQuery)
+                viewModel.setSearchQuery(searchQuery)
             },
             onAddClick = callbacks.onAddClick,
             onCarClick = { callbacks.onCarClick(it.id) },
@@ -69,32 +64,32 @@ fun GarageScreen(
                 carViewModel.save(car.copy(isFavorite = isFavorite))
             },
             onRefresh = {
-                viewModel.fetchAll(true)
+                carsPaged.refresh()
                 brandViewModel.fetchNames(true)
             },
             onUiStateChange = { uiState = it },
             headersCallbacks = HeaderCallbacks(
                 onProfileClick = callbacks.onProfileClick,
                 onGarageClick = {
-                    viewModel.fetchAll(true)
+                    viewModel.clearFilters()
                 },
                 onFavoritesClick = {
-                    viewModel.fetchFavorites()
+                    viewModel.setFavoriteFilter(true)
                 },
                 onStatisticsClick = {},
                 onExchangesClick = callbacks.onExchangesClick,
             ),
             onFilterByBrand = {
-                viewModel.filterByManufacturer(it)
+                viewModel.setManufacturerFilter(it)
             },
             onFilterByFavorite = {
-                if (it) viewModel.fetchFavorites() else viewModel.fetchAll(true)
+                viewModel.setFavoriteFilter(it)
             },
             onSortByRecent = {
-                viewModel.fetchAll(force = true, orderAsc = false)
+                viewModel.setSortOrder(orderAsc = false)
             },
             onSortByLast = {
-                viewModel.fetchAll(force = true, orderAsc = true)
+                viewModel.setSortOrder(orderAsc = true)
             },
         ),
         modifier = modifier,
