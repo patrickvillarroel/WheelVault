@@ -77,6 +77,9 @@ ktlint-compose-rules = "0.4.27"
 # https://github.com/jlleitschuh/ktlint-gradle/releases
 ktlint-plugin = "13.1.0"
 
+# https://developer.android.com/jetpack/androidx/releases/paging
+androidx-paging = "3.4.0-alpha04"
+
 # https://developer.android.com/develop/ui/compose/bom/bom-mapping
 compose-bom = "2025.10.01"
 
@@ -195,6 +198,10 @@ androidx-credentials-play-services-auth = { group = "androidx.credentials", name
 # media3
 androidx-media3-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "androidx-media3" }
 androidx-media3-ui-compose = { group = "androidx.media3", name = "media3-ui-compose", version.ref = "androidx-media3" }
+
+# paging3
+androidx-paging3-common = { group = "androidx.paging", name = "paging-common", version.ref = "androidx-paging" }
+androidx-paging3-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "androidx-paging" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-agp" }
