@@ -10,6 +10,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.collectAsLazyPagingItems
 import io.github.patrickvillarroel.wheel.vault.ui.screen.BrandViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.CarViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderCallbacks
@@ -29,6 +30,7 @@ fun GarageScreen(
 ) {
     val brandsNames by brandViewModel.brandsNames.collectAsStateWithLifecycle()
     val carState by viewModel.garageState.collectAsStateWithLifecycle()
+    val carsPaged = viewModel.carsPaged.collectAsLazyPagingItems()
     var uiState by rememberSaveable { mutableStateOf(GarageTopBarState.DEFAULT) }
     var searchQuery by rememberSaveable { mutableStateOf(query.trim()) }
 
@@ -49,6 +51,7 @@ fun GarageScreen(
         sharedTransitionScope = sharedTransitionScope,
         animatedVisibilityScope = animatedVisibilityScope,
         uiState = carState,
+        carsPaged = carsPaged,
         topBarState = uiState,
         searchQuery = searchQuery,
         manufacturerList = brandsNames,

@@ -34,17 +34,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
+import androidx.paging.LoadStates
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.BrandViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.CarItemCard
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
+import io.github.patrickvillarroel.wheel.vault.ui.util.items
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun GarageContent(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
     uiState: GarageViewModel.GarageUiState,
+    carsPaged: LazyPagingItems<CarItem>,
     topBarState: GarageTopBarState,
     searchQuery: String,
     manufacturerList: List<String>,
@@ -80,12 +88,12 @@ fun GarageContent(
                         isRefreshing,
                         onRefresh = {
                             isRefreshing = true
+                            carsPaged.refresh()
                             callbacks.onRefresh()
                             isRefreshing = false
                         },
                         Modifier.fillMaxSize().padding(paddingValues),
                     ) {
-                        val carResults = uiState.cars
                         LazyColumn(Modifier.fillMaxSize().padding(start = 15.dp, end = 15.dp)) {
                             item {
                                 Text(
@@ -95,7 +103,7 @@ fun GarageContent(
                                     modifier = Modifier.padding(top = 15.dp, start = 15.dp, bottom = 5.dp),
                                 )
                             }
-                            items(carResults, key = { it.id }) { item ->
+                            items(carsPaged, key = { it.id }) { item ->
                                 CarItemCard(
                                     carItem = item,
                                     onClick = { callbacks.onCarClick(item) },
@@ -146,25 +154,35 @@ fun GarageContent(
 @Preview(showSystemUi = true)
 @Composable
 private fun GaragePreview() {
+    val pagingData = PagingData.from(
+        data = List(10) {
+            CarItem(
+                model = "Ford Mustang GTD",
+                year = 2025,
+                manufacturer = "HotWheels",
+                quantity = 2,
+                imageUrl =
+                "https://tse1.mm.bing.net/th/id/OIP.zfsbW7lEIwYgeUt7Fd1knwHaHg?rs=1&pid=ImgDetMain&o=7&rm=3",
+                isFavorite = true,
+            )
+        },
+        sourceLoadStates = LoadStates(
+            refresh = LoadState.NotLoading(endOfPaginationReached = false),
+            prepend = LoadState.NotLoading(endOfPaginationReached = true),
+            append = LoadState.NotLoading(endOfPaginationReached = false),
+        ),
+    )
+    val fakeFlow = MutableStateFlow(pagingData)
+    val carsPaged = fakeFlow.collectAsLazyPagingItems()
+
     WheelVaultTheme {
         SharedTransitionLayout {
             AnimatedVisibility(true) {
                 GarageContent(
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
-                    uiState = GarageViewModel.GarageUiState.Success(
-                        List(10) {
-                            CarItem(
-                                model = "Ford Mustang GTD",
-                                year = 2025,
-                                manufacturer = "HotWheels",
-                                quantity = 2,
-                                imageUrl =
-                                "https://tse1.mm.bing.net/th/id/OIP.zfsbW7lEIwYgeUt7Fd1knwHaHg?rs=1&pid=ImgDetMain&o=7&rm=3",
-                                isFavorite = true,
-                            )
-                        },
-                    ),
+                    uiState = GarageViewModel.GarageUiState.Success(emptyList()),
+                    carsPaged = carsPaged,
                     topBarState = GarageTopBarState.DEFAULT,
                     searchQuery = "",
                     manufacturerList = BrandViewModel.manufacturerList,
