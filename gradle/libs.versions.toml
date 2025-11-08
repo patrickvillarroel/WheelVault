@@ -54,7 +54,7 @@ kotest = "6.0.4"
 kotlin = "2.2.21"
 
 # https://github.com/google/ksp/releases
-kotlin-ksp = "2.3.0"
+kotlin-ksp = "2.3.2"
 
 # https://github.com/Kotlin/kotlinx.serialization/releases
 kotlin-serialization = "1.9.0"
