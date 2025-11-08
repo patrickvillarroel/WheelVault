@@ -4,7 +4,11 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import co.touchlab.kermit.Logger
+import io.github.patrickvillarroel.wheel.vault.data.paging.asPagingSource
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
 import kotlinx.coroutines.currentCoroutineContext
@@ -21,6 +25,9 @@ class GarageViewModel(private val carsRepository: CarsRepository) : ViewModel() 
 
     private val _garageState = MutableStateFlow<GarageUiState>(GarageUiState.Loading)
     val garageState = _garageState.asStateFlow()
+    val carsPaged = Pager(config = PagingConfig(10, initialLoadSize = 10)) {
+        carsRepository.fetchAllPaged().asPagingSource()
+    }.flow.cachedIn(viewModelScope)
 
     fun fetchAll(force: Boolean = false, orderAsc: Boolean = false) {
         val shouldFetch = force ||
