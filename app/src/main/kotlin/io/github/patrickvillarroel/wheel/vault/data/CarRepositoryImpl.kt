@@ -2,6 +2,7 @@ package io.github.patrickvillarroel.wheel.vault.data
 
 import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.CarSupabaseDataSource
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
+import io.github.patrickvillarroel.wheel.vault.domain.model.PagedSource
 import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
 import kotlin.uuid.Uuid
 
@@ -15,6 +16,9 @@ class CarRepositoryImpl(private val supabase: CarSupabaseDataSource) : CarsRepos
 
     override suspend fun fetchAllImage(limit: Int, orderAsc: Boolean): Map<Uuid, Any> =
         supabase.fetchAllImage(limit, orderAsc)
+
+    override fun fetchAllPaged(isFavorite: Boolean, orderAsc: Boolean): PagedSource<Int, CarItem> =
+        supabase.fetchAllPaged(isFavorite, orderAsc)
 
     override suspend fun fetch(id: Uuid): CarItem? = supabase.fetch(id)
 

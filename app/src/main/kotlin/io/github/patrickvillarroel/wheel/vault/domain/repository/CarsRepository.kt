@@ -1,6 +1,7 @@
 package io.github.patrickvillarroel.wheel.vault.domain.repository
 
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
+import io.github.patrickvillarroel.wheel.vault.domain.model.PagedSource
 import kotlin.uuid.Uuid
 
 /**
@@ -14,6 +15,8 @@ interface CarsRepository {
 
     suspend fun fetchAll(isFavorite: Boolean = false, limit: Int = 10, orderAsc: Boolean = true): List<CarItem>
     suspend fun fetchAllImage(limit: Int = 10, orderAsc: Boolean = true): Map<Uuid, Any>
+
+    fun fetchAllPaged(isFavorite: Boolean = false, orderAsc: Boolean = true): PagedSource<Int, CarItem>
     suspend fun fetch(id: Uuid): CarItem?
     suspend fun fetchByModel(model: String, isFavorite: Boolean = false): List<CarItem>
     suspend fun fetchByYear(year: Int, isFavorite: Boolean = false): List<CarItem>

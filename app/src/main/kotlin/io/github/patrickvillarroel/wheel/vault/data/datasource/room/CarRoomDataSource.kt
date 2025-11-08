@@ -5,6 +5,7 @@ import io.github.patrickvillarroel.wheel.vault.data.datasource.image.ImageReposi
 import io.github.patrickvillarroel.wheel.vault.data.entity.toDomain
 import io.github.patrickvillarroel.wheel.vault.data.entity.toEntity
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
+import io.github.patrickvillarroel.wheel.vault.domain.model.PagedSource
 import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
 import kotlin.uuid.Uuid
 
@@ -35,6 +36,10 @@ class CarRoomDataSource(private val dao: CarDao, private val imageRepository: Im
 
     override suspend fun fetchAllImage(limit: Int, orderAsc: Boolean): Map<Uuid, Any> {
         TODO()
+    }
+
+    override fun fetchAllPaged(isFavorite: Boolean, orderAsc: Boolean): PagedSource<Int, CarItem> {
+        TODO("Not yet implemented")
     }
 
     // TODO fix this method
