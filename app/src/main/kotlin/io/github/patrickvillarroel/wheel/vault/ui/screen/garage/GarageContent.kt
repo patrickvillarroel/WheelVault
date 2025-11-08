@@ -5,6 +5,8 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -119,29 +121,35 @@ fun GarageContent(
 
                     if (carsPaged.loadState.hasError || carsPaged.itemCount == 0) {
                         item {
-                            val message = if (carsPaged.loadState.hasError) {
-                                stringResource(R.string.error_loading_of, stringResource(R.string.cars))
-                            } else {
-                                stringResource(R.string.cars_not_found)
-                            }
-                            Image(
-                                painterResource(
-                                    if (carsPaged.loadState.hasError) {
-                                        R.drawable.error
-                                    } else {
-                                        R.drawable.no_data
-                                    },
-                                ),
-                                stringResource(R.string.cars_not_found),
-                                Modifier.padding(16.dp).fillMaxWidth(0.8f),
-                            )
-                            if (carsPaged.loadState.hasError) {
-                                Text(
-                                    message,
-                                    color = MaterialTheme.colorScheme.error,
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
+                            ) {
+                                val message = if (carsPaged.loadState.hasError) {
+                                    stringResource(R.string.error_loading_of, stringResource(R.string.cars))
+                                } else {
+                                    stringResource(R.string.cars_not_found)
+                                }
+                                Image(
+                                    painterResource(
+                                        if (carsPaged.loadState.hasError) {
+                                            R.drawable.error
+                                        } else {
+                                            R.drawable.no_data
+                                        },
+                                    ),
+                                    stringResource(R.string.cars_not_found),
+                                    Modifier.padding(16.dp).fillMaxWidth(0.8f),
                                 )
-                            } else {
-                                Text(message)
+                                if (carsPaged.loadState.hasError) {
+                                    Text(
+                                        message,
+                                        color = MaterialTheme.colorScheme.error,
+                                    )
+                                } else {
+                                    Text(message)
+                                }
                             }
                         }
                     }
