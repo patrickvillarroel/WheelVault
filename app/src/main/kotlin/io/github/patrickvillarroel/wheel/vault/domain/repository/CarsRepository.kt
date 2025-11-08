@@ -17,6 +17,12 @@ interface CarsRepository {
     suspend fun fetchAllImage(limit: Int = 10, orderAsc: Boolean = true): Map<Uuid, Any>
 
     fun fetchAllPaged(isFavorite: Boolean = false, orderAsc: Boolean = true): PagedSource<Int, CarItem>
+    fun fetchPagedWithFilters(
+        query: String? = null,
+        manufacturer: String? = null,
+        isFavorite: Boolean = false,
+        orderAsc: Boolean = false
+    ): PagedSource<Int, CarItem>
     suspend fun fetch(id: Uuid): CarItem?
     suspend fun fetchByModel(model: String, isFavorite: Boolean = false): List<CarItem>
     suspend fun fetchByYear(year: Int, isFavorite: Boolean = false): List<CarItem>

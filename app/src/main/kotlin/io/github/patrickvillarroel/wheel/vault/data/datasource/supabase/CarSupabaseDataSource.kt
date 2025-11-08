@@ -152,6 +152,59 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
             Page(data = data, prevKey = prevKey, nextKey = nextKey)
         }
 
+    override fun fetchPagedWithFilters(
+        query: String?,
+        manufacturer: String?,
+        isFavorite: Boolean,
+        orderAsc: Boolean
+    ): PagedSource<Int, CarItem> = PagedSource { key, size ->
+        val offset = key ?: 0
+        val currentUserId = supabase.auth.currentUserOrNull()!!.id
+
+        val cars = supabase.from(TABLE).select {
+            filter {
+                eq(USER_ID_FIELD, currentUserId)
+
+                // Apply search query filter
+                if (!query.isNullOrBlank()) {
+                    textSearch(
+                        FULL_TEXT_SEARCH_FIELD,
+                        query,
+                        textSearchType = TextSearchType.PLAINTO,
+                    )
+                }
+
+                // Apply manufacturer filter
+                if (!manufacturer.isNullOrBlank()) {
+                    ilike("manufacturer", "%$manufacturer%")
+                }
+
+                // Apply favorites filter
+                if (isFavorite) {
+                    eq("isFavorite", true)
+                }
+            }
+            limit(size.toLong())
+            range(offset.toLong(), (offset + size - 1).toLong())
+            if (orderAsc) {
+                order("created_at", Order.ASCENDING)
+            } else {
+                order("created_at", Order.DESCENDING)
+            }
+        }.decodeList<CarObj>()
+
+        val imagesCars = fetchAllImages(cars.mapNotNull { it.id })
+            .groupBy { it.first }
+            .mapValues { (_, list) -> list.map { it.second }.toSet().ifEmpty { setOf(CarItem.EmptyImage) } }
+
+        val data = cars.map { car -> car.toDomain(imagesCars[car.id] ?: setOf(CarItem.EmptyImage)) }
+
+        val nextKey = if (data.size < size) null else offset + size
+        val prevKey = if (offset == 0) null else maxOf(offset - size, 0)
+
+        Page(data = data, prevKey = prevKey, nextKey = nextKey)
+    }
+
     override suspend fun fetchByModel(model: String, isFavorite: Boolean) = fetchByField("model", model, isFavorite)
 
     override suspend fun fetchByYear(year: Int, isFavorite: Boolean) = fetchByField("year", year, isFavorite)

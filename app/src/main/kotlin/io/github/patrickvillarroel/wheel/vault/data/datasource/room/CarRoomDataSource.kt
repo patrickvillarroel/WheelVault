@@ -42,6 +42,15 @@ class CarRoomDataSource(private val dao: CarDao, private val imageRepository: Im
         TODO("Not yet implemented")
     }
 
+    override fun fetchPagedWithFilters(
+        query: String?,
+        manufacturer: String?,
+        isFavorite: Boolean,
+        orderAsc: Boolean,
+    ): PagedSource<Int, CarItem> {
+        TODO("Not yet implemented")
+    }
+
     // TODO fix this method
     override suspend fun fetch(id: Uuid): CarItem? = dao.fetchById(id.toString())?.let { entity ->
         entity.toDomain(setOf(imageRepository.loadImage(entity.idRemote) ?: CarItem.EmptyImage))
