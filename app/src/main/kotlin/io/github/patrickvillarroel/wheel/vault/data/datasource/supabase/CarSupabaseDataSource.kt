@@ -140,16 +140,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
                 }
             }.decodeList<CarObj>()
 
-            val imagesCars = fetchAllImages(cars.mapNotNull { it.id })
-                .groupBy { it.first }
-                .mapValues { (_, list) -> list.map { it.second }.toSet().ifEmpty { setOf(CarItem.EmptyImage) } }
-
-            val data = cars.map { car -> car.toDomain(imagesCars[car.id] ?: setOf(CarItem.EmptyImage)) }
-
-            val nextKey = if (data.size < size) null else offset + size
-            val prevKey = if (offset == 0) null else maxOf(offset - size, 0)
-
-            Page(data = data, prevKey = prevKey, nextKey = nextKey)
+            buildPageWithImages(cars, offset, size)
         }
 
     override fun fetchPagedWithFilters(
@@ -193,6 +184,10 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
             }
         }.decodeList<CarObj>()
 
+        buildPageWithImages(cars, offset, size)
+    }
+
+    private suspend fun buildPageWithImages(cars: List<CarObj>, offset: Int, size: Int): Page<Int, CarItem> {
         val imagesCars = fetchAllImages(cars.mapNotNull { it.id })
             .groupBy { it.first }
             .mapValues { (_, list) -> list.map { it.second }.toSet().ifEmpty { setOf(CarItem.EmptyImage) } }
@@ -202,7 +197,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
         val nextKey = if (data.size < size) null else offset + size
         val prevKey = if (offset == 0) null else maxOf(offset - size, 0)
 
-        Page(data = data, prevKey = prevKey, nextKey = nextKey)
+        return Page(data = data, prevKey = prevKey, nextKey = nextKey)
     }
 
     override suspend fun fetchByModel(model: String, isFavorite: Boolean) = fetchByField("model", model, isFavorite)
