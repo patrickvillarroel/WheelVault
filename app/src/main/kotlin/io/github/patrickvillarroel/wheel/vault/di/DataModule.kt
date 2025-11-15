@@ -25,18 +25,23 @@ import io.github.patrickvillarroel.wheel.vault.domain.usecase.UpdateOnboardingSt
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.BodyProgress
+import io.ktor.client.plugins.HttpRedirect
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.addDefaultResponseValidation
+import io.ktor.client.plugins.cache.HttpCache
+import io.ktor.client.plugins.cache.storage.FileStorage
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
+import org.koin.dsl.onClose
 import kotlin.time.Duration.Companion.seconds
 
 val dataModule = module {
-    factory {
+    single {
         HttpClient(CIO) {
             install(BodyProgress)
+            install(HttpRedirect)
             install(ContentNegotiation)
             install(HttpTimeout) {
                 requestTimeoutMillis = 60.seconds.inWholeMilliseconds
@@ -45,11 +50,16 @@ val dataModule = module {
                 maxRetries = 3
                 exponentialDelay()
             }
+            install(HttpCache) {
+                publicStorage(FileStorage(androidContext().cacheDir.resolve("ktor_public_cache")))
+                privateStorage(FileStorage(androidContext().cacheDir.resolve("ktor_private_cache")))
+            }
             addDefaultResponseValidation()
             expectSuccess = true
         }
-    }
+    } onClose { httpClient -> httpClient?.close() }
 
+    // TODO can be a good o bad idea use coil3 disk cache as local data source of images
     factory { CacheImageDataSource(androidContext()) }
     // factory { MediaStoreImageDataSource(androidContext()) }
     // factory { ImageRepository(get(), get()) }
