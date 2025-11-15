@@ -47,9 +47,17 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "SUPABASE_URL", "\"${env.SUPABASE_URL.value}\"")
-        buildConfigField("String", "SUPABASE_ANON_KEY", "\"${env.SUPABASE_ANON_KEY.value}\"")
-        buildConfigField("String", "SUPABASE_WEB_KEY", "\"${env.SUPABASE_WEB_KEY.value}\"")
+        val supabaseUrl = env.fetch("SUPABASE_URL", "")
+        val supabaseAnonKey = env.fetch("SUPABASE_ANON_KEY", "")
+        val supabaseWebKey = env.fetch("SUPABASE_WEB_KEY", "")
+
+        if (supabaseUrl.isEmpty() || supabaseAnonKey.isEmpty() || supabaseWebKey.isEmpty()) {
+            logger.lifecycle("The project not configure the .env with keys for supabase, the connection going to fails")
+        }
+
+        buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
+        buildConfigField("String", "SUPABASE_WEB_KEY", "\"$supabaseWebKey\"")
         // flavor (variant) only this going to have trading enabled
         buildConfigField("boolean", "ENABLE_TRADING", env.fetch("ENABLE_TRADING", "false"))
     }
