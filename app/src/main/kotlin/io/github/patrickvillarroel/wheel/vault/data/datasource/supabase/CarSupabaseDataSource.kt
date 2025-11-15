@@ -156,7 +156,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
         query: String?,
         manufacturer: String?,
         isFavorite: Boolean,
-        orderAsc: Boolean
+        orderAsc: Boolean,
     ): PagedSource<Int, CarItem> = PagedSource { key, size ->
         val offset = key ?: 0
         val currentUserId = supabase.auth.currentUserOrNull()!!.id

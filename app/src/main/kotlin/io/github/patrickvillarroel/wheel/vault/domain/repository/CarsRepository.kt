@@ -21,7 +21,7 @@ interface CarsRepository {
         query: String? = null,
         manufacturer: String? = null,
         isFavorite: Boolean = false,
-        orderAsc: Boolean = false
+        orderAsc: Boolean = false,
     ): PagedSource<Int, CarItem>
     suspend fun fetch(id: Uuid): CarItem?
     suspend fun fetchByModel(model: String, isFavorite: Boolean = false): List<CarItem>

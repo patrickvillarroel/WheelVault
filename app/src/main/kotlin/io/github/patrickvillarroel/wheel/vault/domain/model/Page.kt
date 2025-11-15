@@ -14,8 +14,4 @@ import androidx.compose.runtime.Stable
  */
 @Immutable
 @Stable
-data class Page<out Key : Any, out Value : Any>(
-    val data: List<Value>,
-    val prevKey: Key?,
-    val nextKey: Key?,
-)
+data class Page<out Key : Any, out Value : Any>(val data: List<Value>, val prevKey: Key?, val nextKey: Key?)
