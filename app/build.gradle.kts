@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "io.github.patrickvillarroel"
-version = "0.2.7"
+version = "0.3.0"
 
 kotlin {
     compilerOptions {
@@ -38,7 +38,7 @@ android {
         applicationId = "$group.wheel.vault"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 10
+        versionCode = 11
         versionName = version.toString()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -122,6 +122,7 @@ dependencies {
 
     implementation(libs.coil.compose)
     implementation(libs.coil.ktor3)
+    implementation(libs.coil.network.cache.control)
 
     implementation(platform(libs.supabase.bom))
     implementation(libs.supabase.compose.auth.ui)
