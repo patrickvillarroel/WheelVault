@@ -3,6 +3,7 @@ package io.github.patrickvillarroel.wheel.vault.di
 import androidx.room.Room
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.storage.storage
+import io.github.patrickvillarroel.wheel.vault.BuildConfig
 import io.github.patrickvillarroel.wheel.vault.data.CarRepositoryImpl
 import io.github.patrickvillarroel.wheel.vault.data.GetVideosNewsUseCaseImpl
 import io.github.patrickvillarroel.wheel.vault.data.UpdateOnboardingStateUseCaseImpl
@@ -32,10 +33,13 @@ import io.ktor.client.plugins.addDefaultResponseValidation
 import io.ktor.client.plugins.cache.HttpCache
 import io.ktor.client.plugins.cache.storage.FileStorage
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.logging.Logging
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import org.koin.dsl.onClose
 import kotlin.time.Duration.Companion.seconds
+import co.touchlab.kermit.Logger as KermitLogger
+import io.ktor.client.plugins.logging.Logger as KtorLogger
 
 val dataModule = module {
     single {
@@ -53,6 +57,16 @@ val dataModule = module {
             install(HttpCache) {
                 publicStorage(FileStorage(androidContext().cacheDir.resolve("ktor_public_cache")))
                 privateStorage(FileStorage(androidContext().cacheDir.resolve("ktor_private_cache")))
+            }
+            if (BuildConfig.DEBUG) {
+                install(Logging) {
+                    logger = object : KtorLogger {
+                        override fun log(message: String) {
+                            // verbose level
+                            KermitLogger.v("HttpClient") { message }
+                        }
+                    }
+                }
             }
             addDefaultResponseValidation()
             expectSuccess = true

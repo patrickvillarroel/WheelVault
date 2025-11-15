@@ -110,6 +110,7 @@ kotest-assertions-core = { group = "io.kotest", name = "kotest-assertions-core",
 
 # ktor
 ktor-client-engine-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
+ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
 
 # others
 #konsist = { group = "com.lemonappdev", name = "konsist", version.ref = "konsist" }

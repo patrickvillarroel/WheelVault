@@ -97,6 +97,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.kotlinx.serialization)
     implementation(libs.ktor.client.engine.cio)
+    implementation(libs.ktor.client.logging)
 
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.runtime)
