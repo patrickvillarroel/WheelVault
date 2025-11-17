@@ -41,7 +41,7 @@ jobs:
 
       - name: Decode Keystore
         run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > release.keystore
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > app/release.keystore
 
       - name: Create .env file
         run: |
@@ -50,7 +50,8 @@ jobs:
           echo "SUPABASE_WEB_KEY=${{ secrets.SUPABASE_WEB_KEY }}" >> .env
 
       - name: Build Signed APK
-        run: ./gradlew --no-daemon assembleRelease \
+        run: |
+          ./gradlew --no-daemon assembleRelease \
           -Pandroid.injected.signing.store.file=release.keystore \
           -Pandroid.injected.signing.store.password=${{ secrets.ANDROID_KEYSTORE_PASSWORD }} \
           -Pandroid.injected.signing.key.alias=${{ secrets.ANDROID_KEY_ALIAS }} \
