@@ -15,6 +15,7 @@ interface CarsRepository {
 
     suspend fun fetchAll(isFavorite: Boolean = false, limit: Int = 10, orderAsc: Boolean = true): List<CarItem>
     suspend fun fetchAllImage(limit: Int = 10, orderAsc: Boolean = true): Map<Uuid, Any>
+    fun fetchAllImagePaged(orderAsc: Boolean): PagedSource<Int, Pair<Uuid, Any>>
 
     fun fetchAllPaged(isFavorite: Boolean = false, orderAsc: Boolean = true): PagedSource<Int, CarItem>
     fun fetchPagedWithFilters(

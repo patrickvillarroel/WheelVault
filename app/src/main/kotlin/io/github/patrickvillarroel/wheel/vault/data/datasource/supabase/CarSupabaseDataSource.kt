@@ -112,6 +112,33 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
         return imagesCars
     }
 
+    override fun fetchAllImagePaged(orderAsc: Boolean): PagedSource<Int, Pair<Uuid, Any>> = PagedSource { key, size ->
+        val offset = key ?: 0
+
+        val carsId = supabase.from(TABLE).select(Columns.list("id")) {
+            filter {
+                eq(USER_ID_FIELD, supabase.auth.currentUserOrNull()!!.id)
+            }
+            limit(size.toLong())
+            range(offset.toLong(), (offset + size - 1).toLong())
+            if (orderAsc) {
+                order("created_at", Order.ASCENDING)
+            } else {
+                order("created_at", Order.DESCENDING)
+            }
+        }.decodeList<Map<String, Uuid>>().flatMap { it.values }
+
+        val imagesCars = fetchAllImages(carsId)
+            .groupBy { it.first }
+            .mapValues { (_, list) -> list.map { it.second }.toSet().ifEmpty { setOf(CarItem.EmptyImage) }.first() }
+            .toList()
+
+        val nextKey = if (carsId.size < size) null else offset + size
+        val prevKey = if (offset == 0) null else maxOf(offset - size, 0)
+
+        Page(data = imagesCars, prevKey = prevKey, nextKey = nextKey)
+    }
+
     override suspend fun fetch(id: Uuid): CarItem? = supabase.from(TABLE)
         .select {
             filter { eq("id", id) }

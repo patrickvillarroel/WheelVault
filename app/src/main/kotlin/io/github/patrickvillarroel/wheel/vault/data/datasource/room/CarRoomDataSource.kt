@@ -38,6 +38,10 @@ class CarRoomDataSource(private val dao: CarDao, private val imageRepository: Im
         TODO()
     }
 
+    override fun fetchAllImagePaged(orderAsc: Boolean): PagedSource<Int, Pair<Uuid, Any>> {
+        TODO("Not yet implemented")
+    }
+
     override fun fetchAllPaged(isFavorite: Boolean, orderAsc: Boolean): PagedSource<Int, CarItem> {
         TODO("Not yet implemented")
     }
