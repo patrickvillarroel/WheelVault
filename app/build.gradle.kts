@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "io.github.patrickvillarroel"
-version = "0.3.0"
+version = "0.4.0"
 
 kotlin {
     compilerOptions {
@@ -38,7 +38,7 @@ android {
         applicationId = "$group.wheel.vault"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 11
+        versionCode = 12
         versionName = version.toString()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
