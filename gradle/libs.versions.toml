@@ -51,9 +51,6 @@ google-mlkit-text-recognition = "16.0.1"
 # https://github.com/kotest/kotest/releases
 kotest = "6.0.4"
 
-# https://github.com/sergio-sastre/AndroidUiTestingUtils
-compose-screenshot-testing = "0.4.0"
-
 # https://github.com/JetBrains/kotlin/releases
 kotlin = "2.2.21"
 
@@ -182,9 +179,6 @@ androidx-test-espresso-core = { group = "androidx.test.espresso", name = "espres
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidx-activity-compose" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "google-fonts-compose" }
-
-# screenshot testing
-compose-screenshot-android = { group = "com.github.sergio-sastre.AndroidUiTestingUtils", name = "android-testify", version.ref = "compose-screenshot-testing" }
 
 # mockk
 mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
