@@ -58,13 +58,31 @@ android {
         buildConfigField("boolean", "ENABLE_TRADING", env.fetch("ENABLE_TRADING", "false"))
     }
 
+    signingConfigs {
+        if (System.getenv("KEYSTORE_FILE") != null) {
+            create("release") {
+                storeFile = file(System.getenv("KEYSTORE_FILE"))
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("KEY_ALIAS")
+                keyPassword = System.getenv("KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
             val doMinify = project.hasProperty("minify") && project.property("minify") == "true"
             val doShrink = project.hasProperty("shrink") && project.property("shrink") == "true"
+            val signingKey = signingConfigs.findByName("release")
 
             isMinifyEnabled = doMinify
             isShrinkResources = doShrink
+            if (signingKey != null) {
+                signingConfig = signingKey
+            }
+            if ((doMinify || doShrink) && signingKey == null) {
+                logger.warn("Minify release without a signing key, this will fail in runtime")
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",

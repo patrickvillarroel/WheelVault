@@ -41,7 +41,7 @@ jobs:
 
       - name: Decode Keystore
         run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > app/release.keystore
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > release.keystore
 
       - name: Create .env file
         run: |
@@ -51,13 +51,12 @@ jobs:
 
       - name: Build Signed APK
         run: |
-          ./gradlew --no-daemon assembleRelease \
-          -Pandroid.injected.signing.store.file=release.keystore \
-          -Pandroid.injected.signing.store.password=${{ secrets.ANDROID_KEYSTORE_PASSWORD }} \
-          -Pandroid.injected.signing.key.alias=${{ secrets.ANDROID_KEY_ALIAS }} \
-          -Pandroid.injected.signing.key.password=${{ secrets.ANDROID_KEY_PASSWORD }} \
-          -Pminify=true \
-          -Pshrink=true
+          export KEYSTORE_FILE=$PWD/release.keystore
+          export KEYSTORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          export KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}
+          export KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}
+
+          ./gradlew assembleRelease -Pminify=true -Pshrink=true
 
       - name: Save APK artifact
         uses: actions/upload-artifact@v5
