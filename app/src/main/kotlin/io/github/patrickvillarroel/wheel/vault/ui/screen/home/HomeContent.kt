@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -34,15 +33,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
+import androidx.paging.LoadStates
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.VideoNews
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BrandCard
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.CarCard
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.RaceDivider
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.VideoCardPreview
-import io.github.patrickvillarroel.wheel.vault.ui.screen.items
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
+import io.github.patrickvillarroel.wheel.vault.ui.util.items
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlin.uuid.Uuid
 
@@ -54,9 +59,9 @@ import kotlin.uuid.Uuid
 fun HomeContent(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    brands: Map<Uuid, Any>,
-    news: List<VideoNews>,
-    recentCars: Map<Uuid, Any>,
+    brands: LazyPagingItems<Pair<Uuid, Any>>,
+    news: LazyPagingItems<VideoNews>,
+    recentCars: LazyPagingItems<Pair<Uuid, Any>>,
     info: HomeCallbacks,
     modifier: Modifier = Modifier,
 ) {
@@ -129,13 +134,14 @@ fun HomeContent(
                     }
 
                     item {
-                        if (recentCars.isEmpty()) {
+                        if (recentCars.itemCount == 0) {
                             Image(
                                 painterResource(R.drawable.baner_add_car),
                                 stringResource(R.string.add_car),
                                 Modifier.fillMaxWidth().clickable(onClick = info.onAddClick),
                             )
                         }
+
                         LazyRow(
                             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -184,24 +190,57 @@ fun HomeContent(
 @PreviewLightDark
 @Composable
 private fun HomeContentPreview() {
+    val pagingData = PagingData.from(
+        data = List(10) {
+            VideoNews(
+                thumbnail = R.drawable.thumbnail_example,
+                id = Uuid.random(),
+                name = "Example",
+                link = "Example",
+                description = "A video of hot wheels events.",
+                createdAt = null,
+            )
+        },
+        sourceLoadStates = LoadStates(
+            refresh = LoadState.NotLoading(endOfPaginationReached = false),
+            prepend = LoadState.NotLoading(endOfPaginationReached = true),
+            append = LoadState.NotLoading(endOfPaginationReached = false),
+        ),
+    )
+    val fakeFlow = MutableStateFlow(pagingData)
+    val newsPaged = fakeFlow.collectAsLazyPagingItems()
+
+    val pagingDataBrands = PagingData.from<Pair<Uuid, Any>>(
+        List(10) { Uuid.random() to R.drawable.hot_wheels_logo_black },
+        sourceLoadStates = LoadStates(
+            refresh = LoadState.NotLoading(endOfPaginationReached = false),
+            prepend = LoadState.NotLoading(endOfPaginationReached = true),
+            append = LoadState.NotLoading(endOfPaginationReached = false),
+        ),
+    )
+    val fakeFlowBrands = MutableStateFlow(pagingDataBrands)
+    val brandsPaged = fakeFlowBrands.collectAsLazyPagingItems()
+
+    val pagingDataCars = PagingData.from<Pair<Uuid, Any>>(
+        List(10) { Uuid.random() to R.drawable.batman_car },
+        sourceLoadStates = LoadStates(
+            refresh = LoadState.NotLoading(endOfPaginationReached = false),
+            prepend = LoadState.NotLoading(endOfPaginationReached = true),
+            append = LoadState.NotLoading(endOfPaginationReached = false),
+        ),
+    )
+    val fakeFlowCars = MutableStateFlow(pagingDataCars)
+    val carsPaged = fakeFlowCars.collectAsLazyPagingItems()
+
     SharedTransitionLayout {
         AnimatedVisibility(true) {
             WheelVaultTheme {
                 HomeContent(
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
-                    brands = List(10) { Uuid.random() to R.drawable.hot_wheels_logo_black }.toMap(),
-                    news = List(10) {
-                        VideoNews(
-                            thumbnail = R.drawable.thumbnail_example,
-                            id = Uuid.random(),
-                            name = "Example",
-                            link = "Example",
-                            description = "A video of hot wheels events.",
-                            createdAt = null,
-                        )
-                    },
-                    recentCars = List(10) { Uuid.random() to R.drawable.batman_car }.toMap(),
+                    brands = brandsPaged,
+                    news = newsPaged,
+                    recentCars = carsPaged,
                     info = HomeCallbacks.default,
                 )
             }
@@ -213,15 +252,45 @@ private fun HomeContentPreview() {
 @PreviewLightDark
 @Composable
 private fun HomeNoContentPreview() {
+    val pagingData = PagingData.empty<VideoNews>(
+        LoadStates(
+            refresh = LoadState.NotLoading(endOfPaginationReached = false),
+            prepend = LoadState.NotLoading(endOfPaginationReached = true),
+            append = LoadState.NotLoading(endOfPaginationReached = false),
+        ),
+    )
+    val fakeFlow = MutableStateFlow(pagingData)
+    val newsPaged = fakeFlow.collectAsLazyPagingItems()
+
+    val pagingDataBrands = PagingData.empty<Pair<Uuid, Any>>(
+        LoadStates(
+            refresh = LoadState.NotLoading(endOfPaginationReached = false),
+            prepend = LoadState.NotLoading(endOfPaginationReached = true),
+            append = LoadState.NotLoading(endOfPaginationReached = false),
+        ),
+    )
+    val fakeFlowBrands = MutableStateFlow(pagingDataBrands)
+    val brandsPaged = fakeFlowBrands.collectAsLazyPagingItems()
+
+    val pagingDataCars = PagingData.empty<Pair<Uuid, Any>>(
+        LoadStates(
+            refresh = LoadState.NotLoading(endOfPaginationReached = false),
+            prepend = LoadState.NotLoading(endOfPaginationReached = true),
+            append = LoadState.NotLoading(endOfPaginationReached = false),
+        ),
+    )
+    val fakeFlowCars = MutableStateFlow(pagingDataCars)
+    val carsPaged = fakeFlowCars.collectAsLazyPagingItems()
+
     SharedTransitionLayout {
         AnimatedVisibility(true) {
             WheelVaultTheme {
                 HomeContent(
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
-                    brands = emptyMap(),
-                    news = emptyList(),
-                    recentCars = emptyMap(),
+                    brands = brandsPaged,
+                    news = newsPaged,
+                    recentCars = carsPaged,
                     info = HomeCallbacks.default,
                 )
             }
