@@ -48,7 +48,7 @@ google-identity-googleid = "1.1.1"
 google-mlkit-text-recognition = "16.0.1"
 
 # https://github.com/kotest/kotest/releases
-kotest = "6.0.4"
+kotest = "6.0.5"
 
 # https://github.com/JetBrains/kotlin/releases
 kotlin = "2.2.21"
