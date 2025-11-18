@@ -33,7 +33,9 @@ import io.ktor.client.plugins.addDefaultResponseValidation
 import io.ktor.client.plugins.cache.HttpCache
 import io.ktor.client.plugins.cache.storage.FileStorage
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.logging.LoggingFormat
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import org.koin.dsl.onClose
@@ -60,6 +62,8 @@ val dataModule = module {
             }
             if (BuildConfig.DEBUG) {
                 install(Logging) {
+                    level = LogLevel.INFO
+                    format = LoggingFormat.OkHttp
                     logger = object : KtorLogger {
                         override fun log(message: String) {
                             // verbose level
