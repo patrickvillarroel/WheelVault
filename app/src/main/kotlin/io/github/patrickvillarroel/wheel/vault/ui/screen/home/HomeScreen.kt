@@ -4,12 +4,10 @@ import android.content.Intent
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.collectAsLazyPagingItems
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -21,15 +19,9 @@ fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
-    val brands by viewModel.brandsImages.collectAsStateWithLifecycle()
-    val recentCars by viewModel.recentCarImages.collectAsStateWithLifecycle()
-    val news by viewModel.news.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        viewModel.fetchAllBrands()
-        viewModel.fetchNews()
-        viewModel.fetchAllCarImages()
-    }
+    val brands = viewModel.brandsImages.collectAsLazyPagingItems()
+    val recentCars = viewModel.recentCarImages.collectAsLazyPagingItems()
+    val news = viewModel.news.collectAsLazyPagingItems()
 
     HomeContent(
         sharedTransitionScope = sharedTransitionScope,
@@ -55,9 +47,9 @@ fun HomeScreen(
             },
             onCarClick = callbacks.onCarClick,
             onRefresh = {
-                viewModel.fetchAllBrands(true)
-                viewModel.fetchNews(true)
-                viewModel.fetchAllCarImages(true)
+                brands.refresh()
+                recentCars.refresh()
+                news.refresh()
             },
             headersCallbacks = callbacks.headerCallbacks,
         ),
