@@ -60,8 +60,11 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
-            isShrinkResources = false
+            val doMinify = project.hasProperty("minify") && project.property("minify") == "true"
+            val doShrink = project.hasProperty("shrink") && project.property("shrink") == "true"
+
+            isMinifyEnabled = doMinify
+            isShrinkResources = doShrink
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
