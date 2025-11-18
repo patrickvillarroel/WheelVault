@@ -5,6 +5,7 @@ import io.github.patrickvillarroel.wheel.vault.data.datasource.image.ImageReposi
 import io.github.patrickvillarroel.wheel.vault.data.datasource.room.BrandRoomDataSource
 import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.BrandSupabaseDataSource
 import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
+import io.github.patrickvillarroel.wheel.vault.domain.model.PagedSource
 import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -49,6 +50,10 @@ class BrandRepositoryImpl(
             }
         },
     )
+
+    override fun fetchAllImagesPaged(): PagedSource<Int, Pair<Uuid, Any>> {
+        TODO("Not yet implemented")
+    }
 
     override suspend fun fetchAll(forceRefresh: Boolean): List<Brand> = SyncMediator.fetchList(
         localFetch = { room.fetchAll(forceRefresh) },

@@ -6,6 +6,7 @@ import io.github.patrickvillarroel.wheel.vault.data.datasource.image.ImageReposi
 import io.github.patrickvillarroel.wheel.vault.data.entity.toDomain
 import io.github.patrickvillarroel.wheel.vault.data.entity.toEntity
 import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
+import io.github.patrickvillarroel.wheel.vault.domain.model.PagedSource
 import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
 import kotlin.uuid.Uuid
 
@@ -25,6 +26,10 @@ class BrandRoomDataSource(private val dao: BrandDao, private val imageRepository
     override suspend fun fetchAllNames(forceRefresh: Boolean): List<String> = dao.fetchAllNames()
     override suspend fun fetchAllImages(forceRefresh: Boolean): Map<Uuid, Any> = dao.fetchAllIds().associate { id ->
         Uuid.parse(id) to (imageRepository.loadImage("$id.png")?.first() ?: Brand.DEFAULT_IMAGE)
+    }
+
+    override fun fetchAllImagesPaged(): PagedSource<Int, Pair<Uuid, Any>> {
+        TODO("Not yet implemented")
     }
 
     override suspend fun fetchByName(name: String): Brand? = dao.fetchByName(name)?.let { brandEntity ->

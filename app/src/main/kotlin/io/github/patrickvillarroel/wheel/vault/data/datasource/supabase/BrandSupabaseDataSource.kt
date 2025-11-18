@@ -9,6 +9,8 @@ import io.github.jan.supabase.storage.authenticatedStorageItem
 import io.github.patrickvillarroel.wheel.vault.data.objects.BrandObj
 import io.github.patrickvillarroel.wheel.vault.data.objects.toDomain
 import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
+import io.github.patrickvillarroel.wheel.vault.domain.model.Page
+import io.github.patrickvillarroel.wheel.vault.domain.model.PagedSource
 import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
 import kotlin.uuid.Uuid
 import coil3.PlatformContext as CoilContext
@@ -36,6 +38,24 @@ class BrandSupabaseDataSource(private val supabase: SupabaseClient, private val 
         }.decodeList<Map<String, Uuid>>()
             .flatMap { it.values }
             .associateWith { fetchImage(it) }
+
+    override fun fetchAllImagesPaged(): PagedSource<Int, Pair<Uuid, Any>> = PagedSource { key, size ->
+        val offset = key ?: 0
+
+        val data = supabase.from(BrandObj.TABLE).select(Columns.list("id")) {
+            order("created_at", Order.DESCENDING)
+            limit(size.toLong())
+            range(offset.toLong(), (offset + size - 1).toLong())
+        }.decodeList<Map<String, Uuid>>()
+            .flatMap { it.values }
+            .associateWith { fetchImage(it) }
+            .toList()
+
+        val nextKey = if (data.size < size) null else offset + size
+        val prevKey = if (offset == 0) null else maxOf(offset - size, 0)
+
+        Page(data = data, prevKey = prevKey, nextKey = nextKey)
+    }
 
     override suspend fun fetchAll(forceRefresh: Boolean): List<Brand> = supabase.from(BrandObj.TABLE).select {
         order("created_at", Order.DESCENDING)
