@@ -11,6 +11,9 @@ interface NewsDao {
     @Query("SELECT * FROM news ORDER BY created_at DESC")
     suspend fun fetchAll(): List<NewsEntity>
 
+    @Query("SELECT * FROM news ORDER BY created_at DESC LIMIT :limit OFFSET :offset")
+    suspend fun fetchAll(limit: Int, offset: Int): List<NewsEntity>
+
     @Query("SELECT * FROM news WHERE id = :id LIMIT 1")
     suspend fun fetch(id: String): NewsEntity?
 

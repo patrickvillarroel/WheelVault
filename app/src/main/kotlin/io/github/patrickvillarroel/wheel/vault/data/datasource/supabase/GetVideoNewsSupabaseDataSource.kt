@@ -6,6 +6,8 @@ import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.storage.authenticatedStorageItem
 import io.github.patrickvillarroel.wheel.vault.data.objects.VideoObj
+import io.github.patrickvillarroel.wheel.vault.domain.model.Page
+import io.github.patrickvillarroel.wheel.vault.domain.model.PagedSource
 import io.github.patrickvillarroel.wheel.vault.domain.model.VideoNews
 import io.github.patrickvillarroel.wheel.vault.domain.usecase.GetVideosNewsUseCase
 import kotlin.uuid.Uuid
@@ -16,6 +18,21 @@ class GetVideoNewsSupabaseDataSource(private val supabase: SupabaseClient, priva
     override suspend fun getVideos(forceRefresh: Boolean): List<VideoNews> = supabase.from(TABLE).select {
         order("created_at", Order.DESCENDING)
     }.decodeList<VideoObj>().map { it.toDomain(buildImageRequest(it.id)) }
+
+    override fun getVideosPaged(): PagedSource<Int, VideoNews> = PagedSource { key, size ->
+        val offset = key ?: 0
+
+        val data = supabase.from(TABLE).select {
+            order("created_at", Order.DESCENDING)
+            limit(size.toLong())
+            range(offset.toLong(), (offset + size - 1).toLong())
+        }.decodeList<VideoObj>().map { v -> v.toDomain(buildImageRequest(v.id)) }
+
+        val nextKey = if (data.size < size) null else offset + size
+        val prevKey = if (offset == 0) null else maxOf(offset - size, 0)
+
+        Page(data = data, prevKey = prevKey, nextKey = nextKey)
+    }
 
     private fun buildImageRequest(id: Uuid, contentType: String = "png") = ImageRequest.Builder(context)
         .data(buildStorageItem(id, contentType))
