@@ -7,7 +7,7 @@ android-minSdk = "26"
 android-targetSdk = "36"
 
 # https://developer.android.com/jetpack/androidx/releases/activity
-androidx-activity-compose = "1.11.0"
+androidx-activity-compose = "1.12.0"
 
 # https://developer.android.com/jetpack/androidx/releases/camera
 androidx-camera = "1.5.1"
@@ -19,14 +19,13 @@ androidx-credentials = "1.5.0"
 androidx-datastore-preferences = "1.1.7"
 
 # https://developer.android.com/jetpack/androidx/releases/lifecycle
-androidx-lifecycle = "2.9.4"
-androidx-lifecycle-viewmodel-nav3 = "1.0.0-alpha04"
+androidx-lifecycle = "2.10.0"
 
 # https://github.com/androidx/media/blob/release/RELEASENOTES.md
 androidx-media3 = "1.8.0"
 
 # https://developer.android.com/jetpack/androidx/releases/navigation3
-androidx-navigation3 = "1.0.0-rc01"
+androidx-navigation3 = "1.0.0"
 
 # https://developer.android.com/jetpack/androidx/releases/test
 androidx-test-espresso-core = "3.7.0"
@@ -185,7 +184,7 @@ mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "moc
 mockk-agent = { group = "io.mockk", name = "mockk-agent", version.ref = "mockk" }
 
 # navigation 3
-androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "androidx-lifecycle-viewmodel-nav3" }
+androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "androidx-lifecycle" }
 androidx-navigation3-runtime = { group = "androidx.navigation3", name = "navigation3-runtime", version.ref = "androidx-navigation3" }
 androidx-navigation3-ui = { group = "androidx.navigation3", name = "navigation3-ui", version.ref = "androidx-navigation3" }
 # camera x
