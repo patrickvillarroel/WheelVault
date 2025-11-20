@@ -7,11 +7,16 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.paging.LoadState
+import androidx.paging.LoadStates
+import androidx.paging.PagingData
+import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.test.core.app.ApplicationProvider
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.VideoNews
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -27,30 +32,60 @@ class HomeContentTest {
     @Test
     fun homeContent_displaysAllSections() {
         // Given
-        val brands = mapOf(Uuid.random() to R.drawable.hot_wheels_logo_black)
-        val recentCars = mapOf(Uuid.random() to R.drawable.batman_car)
-        val news = listOf(
-            VideoNews(
-                id = Uuid.random(),
-                thumbnail = R.drawable.thumbnail_example,
-                name = "Test Video",
-                link = "https://example.com",
-                description = "Test description",
-                createdAt = null,
+        val brandsPagingData = PagingData.from<Pair<Uuid, Any>>(
+            data = listOf(Uuid.random() to R.drawable.hot_wheels_logo_black),
+            sourceLoadStates = LoadStates(
+                refresh = LoadState.NotLoading(endOfPaginationReached = false),
+                prepend = LoadState.NotLoading(endOfPaginationReached = true),
+                append = LoadState.NotLoading(endOfPaginationReached = false),
             ),
         )
+        val fakeFlowBrands = MutableStateFlow(brandsPagingData)
+
+        val carsPagingData = PagingData.from(
+            data = listOf<Pair<Uuid, Any>>(Uuid.random() to R.drawable.batman_car),
+            sourceLoadStates = LoadStates(
+                refresh = LoadState.NotLoading(endOfPaginationReached = false),
+                prepend = LoadState.NotLoading(endOfPaginationReached = true),
+                append = LoadState.NotLoading(endOfPaginationReached = false),
+            ),
+        )
+        val fakeFlowCars = MutableStateFlow(carsPagingData)
+
+        val newsPagingData = PagingData.from(
+            data = listOf(
+                VideoNews(
+                    id = Uuid.random(),
+                    thumbnail = R.drawable.thumbnail_example,
+                    name = "Test Video",
+                    link = "https://example.com",
+                    description = "Test description",
+                    createdAt = null,
+                ),
+            ),
+            sourceLoadStates = LoadStates(
+                refresh = LoadState.NotLoading(endOfPaginationReached = false),
+                prepend = LoadState.NotLoading(endOfPaginationReached = true),
+                append = LoadState.NotLoading(endOfPaginationReached = false),
+            ),
+        )
+        val fakeFlowNews = MutableStateFlow(newsPagingData)
 
         // When
         composeTestRule.setContent {
+            val brandsPaged = fakeFlowBrands.collectAsLazyPagingItems()
+            val newsPaged = fakeFlowNews.collectAsLazyPagingItems()
+            val carsPaged = fakeFlowCars.collectAsLazyPagingItems()
+
             SharedTransitionLayout {
                 AnimatedVisibility(true) {
                     WheelVaultTheme {
                         HomeContent(
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedVisibilityScope = this,
-                            brands = brands,
-                            news = news,
-                            recentCars = recentCars,
+                            brands = brandsPaged,
+                            news = newsPaged,
+                            recentCars = carsPaged,
                             info = HomeCallbacks.default,
                         )
                     }
@@ -71,20 +106,51 @@ class HomeContentTest {
     @Test
     fun homeContent_withEmptyCars_showsAddCarBanner() {
         // Given
-        val brands = mapOf(Uuid.random() to R.drawable.hot_wheels_logo_black)
-        val emptyRecentCars = emptyMap<Uuid, Any>()
+        val brandsPagingData = PagingData.from<Pair<Uuid, Any>>(
+            data = listOf(Uuid.random() to R.drawable.hot_wheels_logo_black),
+            sourceLoadStates = LoadStates(
+                refresh = LoadState.NotLoading(endOfPaginationReached = false),
+                prepend = LoadState.NotLoading(endOfPaginationReached = true),
+                append = LoadState.NotLoading(endOfPaginationReached = false),
+            ),
+        )
+        val fakeFlowBrands = MutableStateFlow(brandsPagingData)
+
+        val emptyCarsPagingData = PagingData.from<Pair<Uuid, Any>>(
+            data = emptyList(),
+            sourceLoadStates = LoadStates(
+                refresh = LoadState.NotLoading(endOfPaginationReached = true),
+                prepend = LoadState.NotLoading(endOfPaginationReached = true),
+                append = LoadState.NotLoading(endOfPaginationReached = true),
+            ),
+        )
+        val fakeFlowEmptyCars = MutableStateFlow(emptyCarsPagingData)
+
+        val emptyNewsPagingData = PagingData.from<VideoNews>(
+            data = emptyList(),
+            sourceLoadStates = LoadStates(
+                refresh = LoadState.NotLoading(endOfPaginationReached = true),
+                prepend = LoadState.NotLoading(endOfPaginationReached = true),
+                append = LoadState.NotLoading(endOfPaginationReached = true),
+            ),
+        )
+        val fakeFlowEmptyNews = MutableStateFlow(emptyNewsPagingData)
 
         // When
         composeTestRule.setContent {
+            val brandsPaged = fakeFlowBrands.collectAsLazyPagingItems()
+            val emptyCarsPaged = fakeFlowEmptyCars.collectAsLazyPagingItems()
+            val emptyNewsPaged = fakeFlowEmptyNews.collectAsLazyPagingItems()
+
             SharedTransitionLayout {
                 AnimatedVisibility(true) {
                     WheelVaultTheme {
                         HomeContent(
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedVisibilityScope = this,
-                            brands = brands,
-                            news = emptyList(),
-                            recentCars = emptyRecentCars,
+                            brands = brandsPaged,
+                            news = emptyNewsPaged,
+                            recentCars = emptyCarsPaged,
                             info = HomeCallbacks.default,
                         )
                     }
@@ -111,17 +177,40 @@ class HomeContentTest {
             headersCallbacks = HeaderCallbacks.default,
         )
 
+        val emptyPagingData = PagingData.from<Pair<Uuid, Any>>(
+            data = emptyList(),
+            sourceLoadStates = LoadStates(
+                refresh = LoadState.NotLoading(endOfPaginationReached = true),
+                prepend = LoadState.NotLoading(endOfPaginationReached = true),
+                append = LoadState.NotLoading(endOfPaginationReached = true),
+            ),
+        )
+        val fakeFlowEmpty = MutableStateFlow(emptyPagingData)
+
+        val emptyNewsPagingData = PagingData.from<VideoNews>(
+            data = emptyList(),
+            sourceLoadStates = LoadStates(
+                refresh = LoadState.NotLoading(endOfPaginationReached = true),
+                prepend = LoadState.NotLoading(endOfPaginationReached = true),
+                append = LoadState.NotLoading(endOfPaginationReached = true),
+            ),
+        )
+        val fakeFlowEmptyNews = MutableStateFlow(emptyNewsPagingData)
+
         // When
         composeTestRule.setContent {
+            val emptyPaged = fakeFlowEmpty.collectAsLazyPagingItems()
+            val emptyNewsPaged = fakeFlowEmptyNews.collectAsLazyPagingItems()
+
             SharedTransitionLayout {
                 AnimatedVisibility(true) {
                     WheelVaultTheme {
                         HomeContent(
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedVisibilityScope = this,
-                            brands = emptyMap(),
-                            news = emptyList(),
-                            recentCars = emptyMap(),
+                            brands = emptyPaged,
+                            news = emptyNewsPaged,
+                            recentCars = emptyPaged,
                             info = callbacks,
                         )
                     }
@@ -153,17 +242,40 @@ class HomeContentTest {
             headersCallbacks = HeaderCallbacks.default,
         )
 
+        val emptyPagingData = PagingData.from<Pair<Uuid, Any>>(
+            data = emptyList(),
+            sourceLoadStates = LoadStates(
+                refresh = LoadState.NotLoading(endOfPaginationReached = true),
+                prepend = LoadState.NotLoading(endOfPaginationReached = true),
+                append = LoadState.NotLoading(endOfPaginationReached = true),
+            ),
+        )
+        val fakeFlowEmpty = MutableStateFlow(emptyPagingData)
+
+        val emptyNewsPagingData = PagingData.from<VideoNews>(
+            data = emptyList(),
+            sourceLoadStates = LoadStates(
+                refresh = LoadState.NotLoading(endOfPaginationReached = true),
+                prepend = LoadState.NotLoading(endOfPaginationReached = true),
+                append = LoadState.NotLoading(endOfPaginationReached = true),
+            ),
+        )
+        val fakeFlowEmptyNews = MutableStateFlow(emptyNewsPagingData)
+
         // When
         composeTestRule.setContent {
+            val emptyPaged = fakeFlowEmpty.collectAsLazyPagingItems()
+            val emptyNewsPaged = fakeFlowEmptyNews.collectAsLazyPagingItems()
+
             SharedTransitionLayout {
                 AnimatedVisibility(true) {
                     WheelVaultTheme {
                         HomeContent(
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedVisibilityScope = this,
-                            brands = emptyMap(),
-                            news = emptyList(),
-                            recentCars = emptyMap(),
+                            brands = emptyPaged,
+                            news = emptyNewsPaged,
+                            recentCars = emptyPaged,
                             info = callbacks,
                         )
                     }
@@ -182,17 +294,41 @@ class HomeContentTest {
 
     @Test
     fun homeContent_withEmptyData_displaysCorrectly() {
+        // Given
+        val emptyPagingData = PagingData.from<Pair<Uuid, Any>>(
+            data = emptyList(),
+            sourceLoadStates = LoadStates(
+                refresh = LoadState.NotLoading(endOfPaginationReached = true),
+                prepend = LoadState.NotLoading(endOfPaginationReached = true),
+                append = LoadState.NotLoading(endOfPaginationReached = true),
+            ),
+        )
+        val fakeFlowEmpty = MutableStateFlow(emptyPagingData)
+
+        val emptyNewsPagingData = PagingData.from<VideoNews>(
+            data = emptyList(),
+            sourceLoadStates = LoadStates(
+                refresh = LoadState.NotLoading(endOfPaginationReached = true),
+                prepend = LoadState.NotLoading(endOfPaginationReached = true),
+                append = LoadState.NotLoading(endOfPaginationReached = true),
+            ),
+        )
+        val fakeFlowEmptyNews = MutableStateFlow(emptyNewsPagingData)
+
         // When
         composeTestRule.setContent {
+            val emptyPaged = fakeFlowEmpty.collectAsLazyPagingItems()
+            val emptyNewsPaged = fakeFlowEmptyNews.collectAsLazyPagingItems()
+
             SharedTransitionLayout {
                 AnimatedVisibility(true) {
                     WheelVaultTheme {
                         HomeContent(
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedVisibilityScope = this,
-                            brands = emptyMap(),
-                            news = emptyList(),
-                            recentCars = emptyMap(),
+                            brands = emptyPaged,
+                            news = emptyNewsPaged,
+                            recentCars = emptyPaged,
                             info = HomeCallbacks.default,
                         )
                     }
@@ -203,8 +339,10 @@ class HomeContentTest {
         // Then - Verify sections are still displayed even with empty data
         val brandsText = context.getString(R.string.brands)
         val recentlyAddedText = context.getString(R.string.recently_added)
+        val informationInterestText = context.getString(R.string.information_interest)
 
         composeTestRule.onNodeWithText(brandsText).assertIsDisplayed()
         composeTestRule.onNodeWithText(recentlyAddedText).assertIsDisplayed()
+        composeTestRule.onNodeWithText(informationInterestText).assertIsDisplayed()
     }
 }
