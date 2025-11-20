@@ -26,7 +26,7 @@ androidx-lifecycle-viewmodel-nav3 = "1.0.0-alpha04"
 androidx-media3 = "1.8.0"
 
 # https://developer.android.com/jetpack/androidx/releases/navigation3
-androidx-navigation3 = "1.0.0-rc01"
+androidx-navigation3 = "1.0.0"
 
 # https://developer.android.com/jetpack/androidx/releases/test
 androidx-test-espresso-core = "3.7.0"
