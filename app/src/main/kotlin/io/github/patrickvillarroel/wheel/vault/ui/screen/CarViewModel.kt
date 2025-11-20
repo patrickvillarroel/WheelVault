@@ -83,14 +83,13 @@ class CarViewModel(private val carsRepository: CarsRepository) : ViewModel() {
 
                     else -> null
                 }
-            }
-                .toSet()
+            }.toSet()
 
-            // If no real images, use empty set; the backend will handle the default image
-            val imagesToSave = pictures.ifEmpty { emptySet() }
+            // If no real images, the backend will handle the default image
+            val imagesToSave = pictures.ifEmpty { setOfNotNull(CarItem.EmptyImage) }
             val carToSave = car.copy(
-                images = imagesToSave.ifEmpty { setOfNotNull(CarItem.EmptyImage) },
-                imageUrl = imagesToSave.firstOrNull() ?: CarItem.EmptyImage,
+                images = imagesToSave,
+                imageUrl = imagesToSave.first(),
             )
             logger.v { "Final car: $carToSave" }
             viewModelScope.launch {
