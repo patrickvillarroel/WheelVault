@@ -72,7 +72,7 @@ ktor = "3.3.2"
 ktlint-core = "1.7.1"
 
 # https://github.com/mrmans0n/compose-rules/releases
-ktlint-compose-rules = "0.4.27"
+ktlint-compose-rules = "0.4.28"
 
 # https://github.com/jlleitschuh/ktlint-gradle/releases
 ktlint-plugin = "14.0.1"
