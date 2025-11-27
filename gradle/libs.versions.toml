@@ -66,7 +66,7 @@ koin-core = "4.1.1"
 # konsist = "0.17.3"
 
 # https://github.com/ktorio/ktor/releases
-ktor = "3.3.2"
+ktor = "3.3.3"
 
 # https://github.com/pinterest/ktlint/releases
 ktlint-core = "1.7.1"
