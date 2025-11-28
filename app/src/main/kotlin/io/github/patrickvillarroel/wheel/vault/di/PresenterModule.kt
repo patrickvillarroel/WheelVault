@@ -22,6 +22,7 @@ val presenterModule = module {
     viewModel { OnboardingViewModel(get()) }
     viewModel { HomeViewModel(get(), get(), get()) }
     viewModel { GarageViewModel(get()) }
-    viewModel { ExchangeViewModel(get(), get()) }
+    // ExchangeViewModel needs to be shared across navigation screens
+    single { ExchangeViewModel(get(), get()) }
     viewModel { ExchangeCarSelectionViewModel(get()) }
 }

@@ -23,8 +23,8 @@ fun ExchangeCarSelectionScreen(
     onCarClick: (CarItem) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ExchangeCarSelectionViewModel = koinViewModel(),
+    exchangeViewModel: io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.ExchangeViewModel = org.koin.compose.koinInject(),
 ) {
-    // TODO connect exchange VM with cars available for exchange
     val car by viewModel.carsState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
@@ -42,7 +42,12 @@ fun ExchangeCarSelectionScreen(
             Error -> CarErrorScreen(CarViewModel.CarDetailUiState.Error)
             is Success -> ExchangeCarSelection(
                 state.cars,
-                onCarClick = onCarClick,
+                onCarClick = { selectedCar ->
+                    // Seleccionar el auto del usuario para ofrecer
+                    exchangeViewModel.selectOwnCarForOffer(selectedCar)
+                    // Navegar a la siguiente pantalla
+                    onCarClick(selectedCar)
+                },
                 modifier = modifier,
             )
         }

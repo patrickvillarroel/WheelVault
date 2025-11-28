@@ -25,6 +25,9 @@ class TradeSupabaseDataSource(
         message: String?,
         expirationHours: Int,
     ): TradeProposal {
+        val currentUserId = supabase.auth.currentUserOrNull()?.id
+            ?: throw IllegalStateException("User not authenticated")
+
         // Obtener información del auto solicitado
         val requestedCar = supabase.from("cars")
             .select(Columns.list("user_id")) {
@@ -35,14 +38,18 @@ class TradeSupabaseDataSource(
             }
             .decodeSingle<Map<String, String>>()
 
+        val ownerId = requestedCar["user_id"]
+            ?: throw IllegalStateException("Could not find owner of requested car")
+
         val expiresAt = Clock.System.now() + expirationHours.hours
 
         val proposal = supabase.from("trade_proposals")
             .insert(
                 mapOf(
+                    "requester_id" to currentUserId,
+                    "owner_id" to ownerId,
                     "offered_car_id" to offeredCarId,
                     "requested_car_id" to requestedCarId,
-                    "owner_id" to requestedCar["user_id"],
                     "event_type" to "proposed",
                     "message" to message,
                     "expires_at" to expiresAt,
@@ -141,7 +148,8 @@ class TradeSupabaseDataSource(
         return history.map { it.toDomain() }
     }
 
-    override suspend fun getAvailableCarsForTrade(): List<CarItem> = carSupabaseDataSource.getCarsForTrade()
+    override suspend fun getAvailableCarsForTrade(): List<CarItem> =
+        carSupabaseDataSource.getCarsForTrade()
 
     override suspend fun getActiveTradesForCar(carId: Uuid): List<TradeProposal.CurrentTradeStatus> {
         val trades = supabase.from("current_trade_status")

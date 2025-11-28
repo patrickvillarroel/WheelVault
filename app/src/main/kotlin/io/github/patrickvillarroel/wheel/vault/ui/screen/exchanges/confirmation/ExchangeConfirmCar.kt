@@ -18,7 +18,22 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.ChangeCircle
 import androidx.compose.material.icons.filled.Sync
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SecondaryTabRow
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -54,7 +69,17 @@ fun ExchangeConfirmCar(
     onAcceptClick: () -> Unit,
     onCancelClick: () -> Unit,
     modifier: Modifier = Modifier,
+    message: String? = null,
+    isRespondingToOffer: Boolean = false,
 ) {
+    // Log para debugging
+    co.touchlab.kermit.Logger.withTag("ExchangeConfirmCar").d {
+        "offeredCar: id=${offeredCar.id}, brand=${offeredCar.brand}, model=${offeredCar.model}"
+    }
+    co.touchlab.kermit.Logger.withTag("ExchangeConfirmCar").d {
+        "requestedCar: id=${requestedCar.id}, brand=${requestedCar.brand}, model=${requestedCar.model}"
+    }
+
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showConfirmationDialog by remember { mutableStateOf(false) }
     val tabs = listOf(stringResource(R.string.offered_car), stringResource(R.string.requested_car))
@@ -68,8 +93,12 @@ fun ExchangeConfirmCar(
         },
         floatingActionButton = {
             ExchangeActionButtons(onAcceptClick = {
+                co.touchlab.kermit.Logger.withTag("ExchangeConfirmCar").d {
+                    "Accept clicked - showing confirmation dialog"
+                }
                 showConfirmationDialog = true
             }, onCancelClick = {
+                co.touchlab.kermit.Logger.withTag("ExchangeConfirmCar").d { "Cancel clicked" }
                 showConfirmationDialog = false
                 onCancelClick()
             })
@@ -91,6 +120,12 @@ fun ExchangeConfirmCar(
                 )
             }
 
+            if (!message.isNullOrBlank()) {
+                item {
+                    ExchangeMessageCard(message = message, Modifier.padding(vertical = 8.dp))
+                }
+            }
+
             item {
                 ExchangeTabs(
                     tabs = tabs,
@@ -99,8 +134,53 @@ fun ExchangeConfirmCar(
                 )
             }
 
-            val carToShow = if (selectedTabIndex == 0) offeredCar else requestedCar
-            CarDetail(carToShow)
+            // Usar AnimatedContent para cambiar entre los dos autos
+            item(key = "car_details_animated") {
+                androidx.compose.animation.AnimatedContent(
+                    targetState = selectedTabIndex,
+                    label = "car_details_transition",
+                ) { tabIndex ->
+                    val carToShow = if (tabIndex == 0) offeredCar else requestedCar
+                    co.touchlab.kermit.Logger.withTag("ExchangeConfirmCar").d {
+                        "Showing tab $tabIndex - car: id=${carToShow.id}, brand=${carToShow.brand}, model=${carToShow.model}"
+                    }
+                    Column {
+                        // Brand
+                        Text(stringResource(R.string.brand), style = MaterialTheme.typography.labelLarge)
+                        Text(carToShow.brand, style = MaterialTheme.typography.bodyLarge)
+                        HorizontalDivider(Modifier.padding(vertical = 8.dp))
+
+                        // Model
+                        Text(stringResource(R.string.model), style = MaterialTheme.typography.labelLarge)
+                        Text(carToShow.model, style = MaterialTheme.typography.bodyLarge)
+                        HorizontalDivider(Modifier.padding(vertical = 8.dp))
+
+                        // Year
+                        Text(stringResource(R.string.year), style = MaterialTheme.typography.labelLarge)
+                        Text(carToShow.year.toString(), style = MaterialTheme.typography.bodyLarge)
+                        HorizontalDivider(Modifier.padding(vertical = 8.dp))
+
+                        // Manufacturer
+                        Text(stringResource(R.string.manufacturer), style = MaterialTheme.typography.labelLarge)
+                        Text(carToShow.manufacturer, style = MaterialTheme.typography.bodyLarge)
+                        HorizontalDivider(Modifier.padding(vertical = 8.dp))
+
+                        // Description (optional)
+                        if (!carToShow.description.isNullOrBlank()) {
+                            Text(stringResource(R.string.description), style = MaterialTheme.typography.labelLarge)
+                            Text(carToShow.description, style = MaterialTheme.typography.bodyLarge)
+                            HorizontalDivider(Modifier.padding(vertical = 8.dp))
+                        }
+
+                        // Category (optional)
+                        if (!carToShow.category.isNullOrBlank()) {
+                            Text(stringResource(R.string.category), style = MaterialTheme.typography.labelLarge)
+                            Text(carToShow.category, style = MaterialTheme.typography.bodyLarge)
+                            HorizontalDivider(Modifier.padding(vertical = 8.dp))
+                        }
+                    }
+                }
+            }
 
             item {
                 Box(Modifier.height(100.dp))
@@ -108,15 +188,51 @@ fun ExchangeConfirmCar(
         }
         if (showConfirmationDialog) {
             ConfirmationDialog(
-                message = stringResource(id = R.string.exchange_accept_confirm_message),
+                message = stringResource(
+                    id = if (isRespondingToOffer) {
+                        R.string.exchange_accept_confirm_message
+                    } else {
+                        R.string.exchange_create_confirm_message
+                    },
+                ),
                 onDismissRequest = {
+                    co.touchlab.kermit.Logger.withTag("ExchangeConfirmCar").d { "Confirmation dialog dismissed" }
                     showConfirmationDialog = false
-                    onCancelClick()
                 },
                 onConfirm = {
+                    co.touchlab.kermit.Logger.withTag("ExchangeConfirmCar").d {
+                        "Confirmation dialog confirmed - calling onAcceptClick()"
+                    }
                     showConfirmationDialog = false
                     onAcceptClick()
                 },
+            )
+        }
+    }
+}
+
+@Composable
+private fun ExchangeMessageCard(message: String, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        ),
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.exchange_message_label),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+            )
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
             )
         }
     }
@@ -226,7 +342,10 @@ private fun ExchangeActionButtons(onAcceptClick: () -> Unit, onCancelClick: () -
         verticalAlignment = Alignment.CenterVertically,
     ) {
         ActionButton(
-            onClick = onCancelClick,
+            onClick = {
+                co.touchlab.kermit.Logger.withTag("ExchangeActionButtons").d { "Cancel button clicked" }
+                onCancelClick()
+            },
             icon = Icons.Filled.Cancel,
             text = stringResource(R.string.cancel),
             iconColor = Color.Black,
@@ -234,7 +353,10 @@ private fun ExchangeActionButtons(onAcceptClick: () -> Unit, onCancelClick: () -
         )
 
         ActionButton(
-            onClick = onAcceptClick,
+            onClick = {
+                co.touchlab.kermit.Logger.withTag("ExchangeActionButtons").d { "Accept/Confirm button clicked" }
+                onAcceptClick()
+            },
             icon = Icons.Filled.Sync,
             text = stringResource(R.string.confirm),
             iconColor = Color(0xFFE42E31),

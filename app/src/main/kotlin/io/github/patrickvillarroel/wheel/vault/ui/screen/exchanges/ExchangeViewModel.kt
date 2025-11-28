@@ -36,15 +36,26 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository, private va
     // To store the context of an existing trade being viewed/acted upon
     private var currentViewedTradeGroupId: Uuid? = null
 
+    // Pagination state
+    private var currentPage = 0
+    private val pageSize = 20
+    private var isLoadingMore = false
+    private var hasMorePages = true
+
     fun loadInitialData() {
+        currentPage = 0
+        hasMorePages = false // Deshabilitado por ahora hasta implementar paginación en backend
         _exchangeState.update { ExchangeUiState.Loading }
         viewModelScope.launch {
             try {
-                // Populate _exchangeUiState with cars user can see/interact with initially
-                // For example, cars available for others to request, or user's own cars.
-                // Using getAvailableCarsForTrade as a placeholder for general available cars.
                 val availableCars = tradeRepository.getAvailableCarsForTrade()
-                _exchangeState.update { ExchangeUiState.Success(availableCars) }
+                _exchangeState.update {
+                    ExchangeUiState.Success(
+                        cars = availableCars,
+                        isLoadingMore = false,
+                        hasMore = false, // Sin paginación por ahora
+                    )
+                }
             } catch (e: Exception) {
                 currentCoroutineContext().ensureActive()
                 logger.e("Error loading initial data", e)
@@ -53,30 +64,55 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository, private va
         }
     }
 
+    fun loadMoreCars() {
+        // TODO: Implementar cuando CarSupabaseDataSource soporte paginación
+        // Por ahora no hace nada
+    }
+
     /**
      * Call this when the user selects their own car they want to offer in a new trade.
+     * This updates both the internal state and the confirmation UI state if a requested car exists.
      */
     fun selectOwnCarForOffer(car: CarItem) {
+        logger.d { "selectOwnCarForOffer - car: ${car.id}, ${car.brand}, ${car.model}" }
         selectedOwnCarForOffer.update { car }
+
+        // Si ya hay un requestedCar en el estado, actualizar con el offeredCar
+        val currentState = _exchangeConfirmState.value
+        if (currentState is ExchangeConfirmUiState.WaitingConfirm) {
+            logger.d { "Updating WaitingConfirm state with offeredCar: ${car.id}" }
+            _exchangeConfirmState.update {
+                ExchangeConfirmUiState.WaitingConfirm(
+                    offeredCar = car,
+                    requestedCar = currentState.requestedCar,
+                    message = currentState.message,
+                )
+            }
+        }
     }
 
     /**
      * Called when a user wants to initiate a new trade for the [requestedCar].
-     * Assumes the user's car to offer has been selected via [selectOwnCarForOffer].
+     * The user's car to offer will be selected later via [selectOwnCarForOffer].
      * Sets up the confirmation screen for a *new* trade proposal.
      */
     fun exchangeCar(requestedCar: CarItem) {
+        logger.d { "exchangeCar - requestedCar: ${requestedCar.id}, ${requestedCar.brand}, ${requestedCar.model}" }
         val offeredCar = selectedOwnCarForOffer.value
-        if (offeredCar == null) {
-            _exchangeConfirmState.update { ExchangeConfirmUiState.Error }
-            return
-        }
+
+        // Si no hay offeredCar todavía, usar un placeholder temporal
+        // Se actualizará cuando el usuario seleccione su auto en ExchangeCarSelectionScreen
+        val carToUse = offeredCar ?: requestedCar // Temporal placeholder
+
         currentViewedTradeGroupId = null // Signal that this is for a new proposal
         _exchangeConfirmState.update {
             ExchangeConfirmUiState.WaitingConfirm(
-                offeredCar = offeredCar,
+                offeredCar = carToUse,
                 requestedCar = requestedCar,
             )
+        }
+        logger.d {
+            "exchangeCar - Set WaitingConfirm state. offeredCar=${carToUse.id}, requestedCar=${requestedCar.id}"
         }
     }
 
@@ -86,26 +122,47 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository, private va
      */
     fun confirmAndCreateTradeProposal(message: String? = null) {
         val currentState = _exchangeConfirmState.value
+        logger.d {
+            "confirmAndCreateTradeProposal - currentState: $currentState, tradeGroupId: $currentViewedTradeGroupId"
+        }
+
         if (currentState is ExchangeConfirmUiState.WaitingConfirm && currentViewedTradeGroupId == null) {
             _exchangeConfirmState.update { ExchangeConfirmUiState.Loading }
             viewModelScope.launch {
                 try {
-                    tradeRepository.createTradeProposal(
-                        offeredCarId = currentState.offeredCar.id,
-                        requestedCarId = currentState.requestedCar.id,
-                        message = message,
-                    )
-                    // Decide what state to go to: maybe clear confirm state, show a success message,
-                    // or refresh a list of active trades. For now, setting to Accepted as a generic success.
+                    logger.d {
+                        "Creating trade proposal: offered=${currentState.offeredCar.id}, requested=${currentState.requestedCar.id}"
+                    }
+
+                    // Usar withTimeout para evitar colgarse indefinidamente
+                    val result = kotlinx.coroutines.withTimeout(30000L) {
+                        // 30 segundos timeout
+                        tradeRepository.createTradeProposal(
+                            offeredCarId = currentState.offeredCar.id,
+                            requestedCarId = currentState.requestedCar.id,
+                            message = message,
+                        )
+                    }
+
+                    logger.d { "Trade proposal created successfully: ${result.id}" }
                     _exchangeConfirmState.update { ExchangeConfirmUiState.Accepted }
+                } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
+                    logger.e(e) { "Timeout creating trade proposal - took longer than 30 seconds" }
+                    _exchangeConfirmState.update { ExchangeConfirmUiState.Error }
+                } catch (e: IllegalStateException) {
+                    currentCoroutineContext().ensureActive()
+                    logger.e(e) { "IllegalState: ${e.message}" }
+                    _exchangeConfirmState.update { ExchangeConfirmUiState.Error }
                 } catch (e: Exception) {
                     currentCoroutineContext().ensureActive()
-                    logger.e("Error creating trade proposal", e)
+                    logger.e(e) { "Error creating trade proposal: ${e.message}" }
                     _exchangeConfirmState.update { ExchangeConfirmUiState.Error }
                 }
             }
         } else {
-            // Not in the correct state to create a proposal or it's for an existing trade
+            logger.e {
+                "Cannot create proposal - invalid state or existing trade. State: $currentState, TradeId: $currentViewedTradeGroupId"
+            }
             _exchangeConfirmState.update { ExchangeConfirmUiState.Error }
         }
     }
@@ -134,6 +191,7 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository, private va
                             ExchangeConfirmUiState.WaitingConfirm(
                                 offeredCar = offeredCarDetails,
                                 requestedCar = requestedCarDetails,
+                                message = relevantTrade.initialMessage,
                             )
                         }
                     } else {
@@ -211,7 +269,11 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository, private va
         data object Loading : ExchangeUiState
 
         @Immutable
-        data class Success(@Stable val cars: List<CarItem>) : ExchangeUiState
+        data class Success(
+            @Stable val cars: List<CarItem>,
+            val isLoadingMore: Boolean = false,
+            val hasMore: Boolean = true,
+        ) : ExchangeUiState
         data object Error : ExchangeUiState
     }
 
@@ -219,7 +281,8 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository, private va
         data object Loading : ExchangeConfirmUiState
 
         @Immutable
-        data class WaitingConfirm(val offeredCar: CarItem, val requestedCar: CarItem) : ExchangeConfirmUiState
+        data class WaitingConfirm(val offeredCar: CarItem, val requestedCar: CarItem, val message: String? = null) :
+            ExchangeConfirmUiState
         data object Accepted : ExchangeConfirmUiState
         data object Rejected : ExchangeConfirmUiState
         data object Error : ExchangeConfirmUiState

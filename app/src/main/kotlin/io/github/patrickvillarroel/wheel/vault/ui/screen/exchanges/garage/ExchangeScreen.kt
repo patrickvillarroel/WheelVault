@@ -43,6 +43,7 @@ fun ExchangeScreen(
         searchQuery = searchQuery,
         uiState = uiState,
         manufacturerList = brandsNames,
+        onLoadMore = { exchangeViewModel.loadMoreCars() },
         callbacks = GarageCallbacks(
             onHomeClick = callbacks.onHomeClick,
             onSearchQueryChange = {

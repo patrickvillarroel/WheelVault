@@ -28,10 +28,12 @@ class ExchangeCarSelectionViewModel(private val carsRepository: CarsRepository) 
             _carsState.update { CarsUiState.Loading }
             viewModelScope.launch {
                 try {
+                    // Obtener los autos del USUARIO para que seleccione cuál ofrecer
                     val result = carsRepository.fetchAll(orderAsc = false)
+                    logger.d { "Loaded ${result.size} user's cars for offering" }
                     _carsState.update { CarsUiState.Success(result) }
                 } catch (e: Exception) {
-                    logger.e(e) { "Failed to fetch cars" }
+                    logger.e(e) { "Failed to fetch user's cars" }
                     _carsState.update { CarsUiState.Error }
                 }
             }

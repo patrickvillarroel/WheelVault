@@ -45,6 +45,7 @@
     <string name="exchange_action">Intercambiar</string>
     <string name="exchange_confirmation_message">¿Esta seguro que desea poner este carrito en proceso de intercambio?\nCuando la transacción haya terminado será avisado.</string>
     <string name="exchange_accept_confirm_message">¿Esta seguro que desea aceptar el intercambio?\nCuando este haya terminado el carrito pasará a estar en su colección y perderá el ofrecido. Se le avisará al otro coleccionista sobre la transacción</string>
+    <string name="exchange_create_confirm_message">¿Confirmar propuesta de intercambio?\n\nEnviarás tu oferta al dueño del carrito. Te notificaremos cuando responda.</string>
     <string name="image_of">Imagen %1$d</string>
     <string name="image_extras">Imágenes extras</string>
     <string name="info_of">Info %1$s</string>
@@ -68,6 +69,7 @@
     <string name="manufacture_of">Fabricante: %1$s</string>
     <string name="menu">Menú</string>
     <string name="model">Modelo</string>
+    <string name="manufacturer">Fabricante</string>
     <string name="next">Siguiente</string>
     <string name="no_retry">Reintentar</string>
     <string name="recent">Recientes</string>
@@ -75,7 +77,7 @@
     <string name="register">Registrarse</string>
     <string name="register_action">Registrate</string>
     <string name="request">Requisito</string>
-    <string name="requested_car">Carrito Ofrecido</string>
+    <string name="requested_car">Carrito que Recibirás</string>
     <string name="request_permission">Dar permiso</string>
     <string name="search">Buscar</string>
     <string name="search_in_garage">Buscar en el garaje</string>
@@ -85,7 +87,7 @@
     <string name="skip">Omitir</string>
     <string name="take_picture">Capturar Imagen</string>
     <string name="offer_action">Ofrecer</string>
-    <string name="offered_car">Carrito Ofertado</string>
+    <string name="offered_car">Carrito que Ofreces</string>
     <string name="onboarding_step">Onboarding step %1$d</string>
     <string name="open_settings">Abrir configuración</string>
     <string name="password">contraseña</string>
@@ -108,4 +110,24 @@
     <string name="unmark_for_trading">Desmarcar para Intercambio</string>
     <string name="exchange_accepted_message">El intercambio ha sido aceptado exitosamente. El otro coleccionista será notificado.</string>
     <string name="exchange_rejected_message">El intercambio ha sido rechazado. El otro coleccionista será notificado.</string>
+    <string name="exchange_accepted_title">¡Intercambio Aceptado!</string>
+    <string name="exchange_rejected_title">Intercambio Rechazado</string>
+    <string name="exchange_message_label">Mensaje del intercambio:</string>
+    <string name="exchange_proposal_created">Propuesta de intercambio enviada exitosamente</string>
+    <string name="exchange_proposal_created_message">Tu propuesta ha sido enviada al coleccionista. Te notificaremos cuando responda.</string>
+    <string name="pending_exchanges">Intercambios Pendientes</string>
+    <string name="completed_exchanges">Intercambios Completados</string>
+    <string name="exchange_history">Historial de Intercambios</string>
+    <string name="no_pending_exchanges">No tienes intercambios pendientes</string>
+    <string name="no_completed_exchanges">No tienes intercambios completados</string>
+    <string name="received_proposals">Propuestas Recibidas</string>
+    <string name="sent_proposals">Propuestas Enviadas</string>
+    <string name="view_details">Ver Detalles</string>
+    <string name="accept_exchange">Aceptar Intercambio</string>
+    <string name="reject_exchange">Rechazar Intercambio</string>
+    <string name="exchange_status_proposed">Propuesto</string>
+    <string name="exchange_status_accepted">Aceptado</string>
+    <string name="exchange_status_rejected">Rechazado</string>
+    <string name="exchange_status_cancelled">Cancelado</string>
+    <string name="exchange_status_completed">Completado</string>
 </resources>

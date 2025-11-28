@@ -2,14 +2,27 @@ package io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.garage
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -47,6 +60,7 @@ fun ExchangeContent(
     searchQuery: String,
     manufacturerList: List<String>,
     callbacks: GarageCallbacks,
+    onLoadMore: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     var isRefreshing by remember { mutableStateOf(false) }
@@ -78,13 +92,16 @@ fun ExchangeContent(
                     Modifier.fillMaxSize().padding(paddingValues),
                 ) {
                     val carResults = state.cars
-                    Column(Modifier.fillMaxSize().padding(start = 15.dp, end = 15.dp)) {
+                    Column(Modifier.fillMaxSize()) {
+                        // Banner distintivo para exchanges
+                        ExchangeBanner(modifier = Modifier.padding(16.dp))
+
                         Text(
                             text = stringResource(R.string.exchange),
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.SemiBold,
                             modifier = Modifier
-                                .padding(top = 15.dp, start = 15.dp, bottom = 10.dp)
+                                .padding(top = 15.dp, start = 30.dp, bottom = 10.dp)
                                 .drawBehind {
                                     val underlineHeight = 1.dp.toPx()
                                     val y = size.height
@@ -99,16 +116,35 @@ fun ExchangeContent(
 
                         LazyVerticalGrid(
                             columns = GridCells.Fixed(2),
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.fillMaxSize().padding(start = 15.dp, end = 15.dp),
                             horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
                             verticalArrangement = Arrangement.spacedBy(10.dp),
                         ) {
                             items(carResults, key = { it.id }) { car ->
-                                CarNameCard(
+                                ExchangeCarCard(
                                     image = car.imageUrl,
                                     name = car.model,
                                     onClick = { callbacks.onCarClick(car) },
                                 )
+                            }
+
+                            // Load more indicator
+                            if (state.hasMore) {
+                                item {
+                                    Box(
+                                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        if (state.isLoadingMore) {
+                                            LoadingIndicator()
+                                        } else {
+                                            // Trigger load more when this item appears
+                                            androidx.compose.runtime.LaunchedEffect(Unit) {
+                                                onLoadMore()
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -134,6 +170,98 @@ fun ExchangeContent(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ExchangeBanner(modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+        ),
+        shape = RoundedCornerShape(12.dp),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                            RoundedCornerShape(12.dp),
+                        ),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.SwapHoriz,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(32.dp),
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column {
+                    Text(
+                        text = "Zona de Intercambios",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    )
+                    Text(
+                        text = "Autos disponibles para intercambiar",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExchangeCarCard(
+    image: Any?,
+    name: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    // Si image es null, usar un placeholder
+    val displayImage = image ?: R.drawable.batman_car
+
+    Card(
+        onClick = onClick,
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        Column {
+            CarNameCard(
+                image = displayImage,
+                name = name,
+                onClick = onClick,
+            )
+            // Indicador de que está disponible para intercambio
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(4.dp)
+                    .background(MaterialTheme.colorScheme.primary),
+            )
         }
     }
 }

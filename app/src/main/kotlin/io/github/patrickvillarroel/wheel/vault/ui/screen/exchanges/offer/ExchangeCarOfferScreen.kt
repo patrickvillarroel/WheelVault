@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -28,35 +27,36 @@ fun ExchangeCarOfferScreen(
     headerCallbacks: HeaderBackCallbacks,
     modifier: Modifier = Modifier,
     carViewModel: CarViewModel = koinViewModel(),
-    exchangeViewModel: ExchangeViewModel = koinViewModel(),
+    exchangeViewModel: ExchangeViewModel = org.koin.compose.koinInject(),
 ) {
-    // TODO connect new uiState when exchangeCar is confirmed, need to add loading and animation
-    val car by carViewModel.carDetailState.collectAsStateWithLifecycle()
+    // Obtener el estado del ViewModel
+    val exchangeConfirmState by exchangeViewModel.exchangeConfirmState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(carId) {
-        carViewModel.findById(carId)
-    }
-
-    AnimatedContent(car) { state ->
-        when (state) {
-            CarViewModel.CarDetailUiState.Idle, CarViewModel.CarDetailUiState.Loading -> Scaffold(
-                Modifier.fillMaxSize(),
-            ) {
-                LoadingIndicator(Modifier.padding(it).fillMaxSize())
+    // ExchangeCarOfferScreen muestra el auto que el usuario ACABA DE SELECCIONAR (offeredCar)
+    // para confirmar "¿Quieres ofrecer ESTE auto en intercambio?"
+    when (val state = exchangeConfirmState) {
+        is ExchangeViewModel.ExchangeConfirmUiState.WaitingConfirm -> {
+            co.touchlab.kermit.Logger.withTag("ExchangeCarOfferScreen").d {
+                "Showing offered car (the one user selected): ${state.offeredCar.id}, ${state.offeredCar.brand}, ${state.offeredCar.model}"
             }
-            CarViewModel.CarDetailUiState.NotFound, CarViewModel.CarDetailUiState.Error -> CarErrorScreen(state)
-            is CarViewModel.CarDetailUiState.Success -> {
-                ExchangeCarOffer(
-                    sharedTransitionScope = sharedTransitionScope,
-                    animatedVisibilityScope = animatedVisibilityScope,
-                    carDetail = state.car,
-                    callbacks = headerCallbacks,
-                    onExchangeClick = {
-                        onExchangeTemporalClick(state.car.id)
-                        exchangeViewModel.exchangeCar(state.car)
-                    },
-                    modifier = modifier,
-                )
+            ExchangeCarOffer(
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope,
+                carDetail = state.offeredCar,  // Mostrar el auto que el usuario OFRECE (el que acaba de seleccionar)
+                callbacks = headerCallbacks,
+                onExchangeClick = {
+                    co.touchlab.kermit.Logger.withTag("ExchangeCarOfferScreen").d {
+                        "onExchangeClick - Navigating to confirmation. Offered: ${state.offeredCar.id}, Requested: ${state.requestedCar.id}"
+                    }
+                    onExchangeTemporalClick(state.requestedCar.id)
+                },
+                modifier = modifier,
+            )
+        }
+        else -> {
+            // Si el estado no es WaitingConfirm, mostrar loading o error
+            Scaffold(Modifier.fillMaxSize()) {
+                LoadingIndicator(Modifier.padding(it).fillMaxSize())
             }
         }
     }

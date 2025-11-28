@@ -126,39 +126,10 @@ fun CarDetailContent(
                                 Text(stringResource(R.string.edit), fontWeight = FontWeight.SemiBold)
                             }
                             if (BuildConfig.ENABLE_TRADING) {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    OutlinedIconButton(
-                                        onClick = { callbacks.onToggleTradeAvailabilityClick() },
-                                        modifier = Modifier.size(65.dp),
-                                    ) {
-                                        Icon(
-                                            Icons.Filled.SwapHoriz,
-                                            contentDescription = if (carDetail.availableForTrade) {
-                                                stringResource(
-                                                    R.string.unmark_for_trading,
-                                                )
-                                            } else {
-                                                stringResource(R.string.mark_for_trading)
-                                            },
-                                            modifier = Modifier.size(32.dp),
-                                            tint = if (carDetail.availableForTrade) {
-                                                MaterialTheme.colorScheme.primary
-                                            } else {
-                                                Color.Gray
-                                            },
-                                        )
-                                    }
-                                    Text(
-                                        if (carDetail.availableForTrade) {
-                                            stringResource(
-                                                R.string.unmark_for_trading,
-                                            )
-                                        } else {
-                                            stringResource(R.string.mark_for_trading)
-                                        },
-                                        fontWeight = FontWeight.SemiBold,
-                                    )
-                                }
+                                TradeAvailabilityButton(
+                                    isAvailableForTrade = carDetail.availableForTrade,
+                                    onToggle = callbacks.onToggleTradeAvailabilityClick,
+                                )
                             }
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 OutlinedIconButton(

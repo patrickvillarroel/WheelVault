@@ -18,6 +18,8 @@ interface TradeRepository {
 
     suspend fun respondToTrade(tradeGroupId: Uuid, accept: Boolean, responseMessage: String? = null): TradeProposal
     suspend fun cancelTrade(tradeGroupId: Uuid): TradeProposal
+
+    /** Obtener intercambios activos */
     suspend fun getActiveTrades(): List<TradeProposal.CurrentTradeStatus>
 
     /** Obtener historial completo de un intercambio */
