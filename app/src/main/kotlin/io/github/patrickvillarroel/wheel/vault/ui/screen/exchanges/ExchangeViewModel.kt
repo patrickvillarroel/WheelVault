@@ -42,7 +42,13 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository, private va
     private var isLoadingMore = false
     private var hasMorePages = true
 
-    fun loadInitialData() {
+    fun loadInitialData(forceRefresh: Boolean = false) {
+        // No recargar si ya tenemos datos exitosos y no es refresh forzado
+        if (!forceRefresh && _exchangeState.value is ExchangeUiState.Success) {
+            logger.d { "Skipping reload - data already loaded" }
+            return
+        }
+
         currentPage = 0
         hasMorePages = false // Deshabilitado por ahora hasta implementar paginación en backend
         _exchangeState.update { ExchangeUiState.Loading }
@@ -148,15 +154,41 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository, private va
                     _exchangeConfirmState.update { ExchangeConfirmUiState.Accepted }
                 } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
                     logger.e(e) { "Timeout creating trade proposal - took longer than 30 seconds" }
-                    _exchangeConfirmState.update { ExchangeConfirmUiState.Error }
+                    _exchangeConfirmState.update {
+                        ExchangeConfirmUiState.ErrorWithMessage("La operación tardó demasiado. Intenta nuevamente.")
+                    }
                 } catch (e: IllegalStateException) {
                     currentCoroutineContext().ensureActive()
                     logger.e(e) { "IllegalState: ${e.message}" }
-                    _exchangeConfirmState.update { ExchangeConfirmUiState.Error }
+                    _exchangeConfirmState.update {
+                        ExchangeConfirmUiState.ErrorWithMessage(e.message ?: "Error al crear la propuesta")
+                    }
                 } catch (e: Exception) {
                     currentCoroutineContext().ensureActive()
                     logger.e(e) { "Error creating trade proposal: ${e.message}" }
-                    _exchangeConfirmState.update { ExchangeConfirmUiState.Error }
+                    logger.e(e) { "Full exception: $e" }
+                    logger.e(e) { "Exception class: ${e::class.simpleName}" }
+
+                    // Extraer mensaje de error específico
+                    val errorMessage = when {
+                        e.message?.contains("Ya existe una propuesta activa para estos autos") == true ->
+                            "Ya tienes una propuesta activa con estos mismos autos."
+                        e.message?.contains("Tu auto ya está en una propuesta activa") == true ->
+                            "Tu auto ya está en una propuesta activa. Espera a que se resuelva antes de crear otra."
+                        e.message?.contains("no está disponible para intercambio") == true ->
+                            e.message ?: "El auto solicitado no está disponible para intercambio."
+                        e.message?.contains("no existe o fue eliminado") == true ->
+                            e.message ?: "El auto solicitado no existe o fue eliminado."
+                        e.message?.contains("El auto solicitado ya está en una propuesta activa") == true ->
+                            "El auto que deseas ya está en una propuesta activa de otro usuario."
+                        e.message?.contains("not found") == true ->
+                            "El auto solicitado no está disponible para intercambio."
+                        e.message?.contains("Could not find owner") == true ->
+                            "No se pudo encontrar al propietario del auto solicitado."
+                        else -> "Error: ${e.message ?: "Error desconocido al crear la propuesta"}"
+                    }
+
+                    _exchangeConfirmState.update { ExchangeConfirmUiState.ErrorWithMessage(errorMessage) }
                 }
             }
         } else {
@@ -265,6 +297,17 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository, private va
         }
     }
 
+    /**
+     * Resets the exchange confirmation state to Loading.
+     * Call this when navigating away from the confirmation screen.
+     */
+    fun resetExchangeConfirmState() {
+        logger.d { "resetExchangeConfirmState - Resetting to Loading" }
+        _exchangeConfirmState.update { ExchangeConfirmUiState.Loading }
+        currentViewedTradeGroupId = null
+        selectedOwnCarForOffer.update { null }
+    }
+
     sealed interface ExchangeUiState {
         data object Loading : ExchangeUiState
 
@@ -286,5 +329,6 @@ class ExchangeViewModel(private val tradeRepository: TradeRepository, private va
         data object Accepted : ExchangeConfirmUiState
         data object Rejected : ExchangeConfirmUiState
         data object Error : ExchangeConfirmUiState
+        data class ErrorWithMessage(val errorMessage: String) : ExchangeConfirmUiState
     }
 }

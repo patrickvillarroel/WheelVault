@@ -31,10 +31,12 @@ fun GarageTopBar(
     topBar: GarageCallbacks.FilterBar,
     headersCallbacks: HeaderCallbacks,
     modifier: Modifier = Modifier,
+    showNotifications: Boolean = false,
 ) {
     MenuHeader(
         headerCallbacks = headersCallbacks,
         modifier = modifier,
+        showNotifications = showNotifications,
     ) {
         AnimatedContent(
             modifier = Modifier.padding(top = 40.dp),

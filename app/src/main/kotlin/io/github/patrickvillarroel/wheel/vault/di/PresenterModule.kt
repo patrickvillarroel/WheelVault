@@ -4,6 +4,8 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.BrandViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.CarViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.camera.CameraViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.ExchangeViewModel
+import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.notifications.ExchangeNotificationsViewModel
+import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.notifications.TradeProposalDetailViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.selection.ExchangeCarSelectionViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.home.HomeViewModel
@@ -24,5 +26,7 @@ val presenterModule = module {
     viewModel { GarageViewModel(get()) }
     // ExchangeViewModel needs to be shared across navigation screens
     single { ExchangeViewModel(get(), get()) }
-    viewModel { ExchangeCarSelectionViewModel(get()) }
+    viewModel { ExchangeCarSelectionViewModel(get(), get()) }
+    viewModel { ExchangeNotificationsViewModel(get(), get(), get()) }
+    viewModel { TradeProposalDetailViewModel(get(), get(), get()) }
 }

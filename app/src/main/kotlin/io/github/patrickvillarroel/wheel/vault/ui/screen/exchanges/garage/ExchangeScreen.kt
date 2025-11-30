@@ -33,7 +33,7 @@ fun ExchangeScreen(
     var topBarState by rememberSaveable { mutableStateOf(GarageTopBarState.DEFAULT) }
 
     LaunchedEffect(Unit) {
-        exchangeViewModel.loadInitialData()
+        exchangeViewModel.loadInitialData(forceRefresh = false)
         garageViewModel.fetchAll()
         brandViewModel.fetchNames()
     }
@@ -58,11 +58,19 @@ fun ExchangeScreen(
                 carViewModel.save(car.copy(isFavorite = isFavorite))
             },
             onRefresh = {
+                exchangeViewModel.loadInitialData(forceRefresh = true)
                 garageViewModel.fetchAll(true)
                 brandViewModel.fetchNames(true)
             },
             onUiStateChange = { topBarState = it },
-            headersCallbacks = HeaderCallbacks.default,
+            headersCallbacks = HeaderCallbacks(
+                onProfileClick = callbacks.onProfileClick,
+                onGarageClick = {},
+                onFavoritesClick = {},
+                onStatisticsClick = {},
+                onExchangesClick = callbacks.onExchangesClick,
+                onNotificationsClick = callbacks.onNotificationsClick,
+            ),
             onFilterByBrand = {
                 garageViewModel.filterByManufacturer(it)
             },

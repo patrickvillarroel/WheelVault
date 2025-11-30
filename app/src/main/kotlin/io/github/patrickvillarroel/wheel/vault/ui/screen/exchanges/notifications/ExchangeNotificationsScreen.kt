@@ -42,15 +42,17 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ExchangeNotificationsScreen(
     headerCallbacks: HeaderBackCallbacks,
-    onTradeClick: (TradeProposal.CurrentTradeStatus) -> Unit,
+    onTradeClick: (ExchangeNotificationsViewModel.TradeNotification) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ExchangeNotificationsViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.notificationsState.collectAsStateWithLifecycle()
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
+    var isRefreshing by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
 
+    // Solo cargar la primera vez, no en cada recomposición
     LaunchedEffect(Unit) {
-        viewModel.loadNotifications()
+        viewModel.loadNotifications(forceRefresh = false)
     }
 
     Scaffold(
@@ -108,17 +110,27 @@ fun ExchangeNotificationsScreen(
                                 modifier = Modifier.fillMaxSize(),
                             )
                         } else {
-                            LazyColumn(
-                                modifier = Modifier.fillMaxSize(),
-                                contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
-                                verticalArrangement = Arrangement.spacedBy(12.dp),
+                            androidx.compose.material3.pulltorefresh.PullToRefreshBox(
+                                isRefreshing = isRefreshing,
+                                onRefresh = {
+                                    isRefreshing = true
+                                    viewModel.loadNotifications(forceRefresh = true)
+                                    isRefreshing = false
+                                },
+                                modifier = Modifier.fillMaxSize()
                             ) {
-                                items(trades, key = { it.tradeGroupId.toString() }) { trade ->
-                                    TradeProposalCard(
-                                        trade = trade,
-                                        isReceived = selectedTabIndex == 0,
-                                        onClick = { onTradeClick(trade) },
-                                    )
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
+                                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                                ) {
+                                    items(trades, key = { it.trade.tradeGroupId.toString() }) { notification ->
+                                        TradeProposalCard(
+                                            notification = notification,
+                                            isReceived = selectedTabIndex == 0,
+                                            onClick = { onTradeClick(notification) },
+                                        )
+                                    }
                                 }
                             }
                         }

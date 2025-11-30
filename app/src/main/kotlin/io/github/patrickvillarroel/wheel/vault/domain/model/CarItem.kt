@@ -14,6 +14,7 @@ data class CarItem(
     val availableForTrade: Boolean = false,
     val description: String? = null,
     val category: String? = null,
+    val tradeMessage: String? = null,
     val imageUrl: Any = images.first(),
 ) {
     constructor(
@@ -54,6 +55,7 @@ data class CarItem(
         brand = brand,
         description = description,
         category = category,
+        tradeMessage = tradeMessage,
         images = images,
         isFavorite = isFavorite,
         availableForTrade = availableForTrade,
@@ -68,6 +70,7 @@ data class CarItem(
         val brand: String? = null,
         val description: String? = null,
         val category: String? = null,
+        val tradeMessage: String? = null,
         val images: Set<Any> = setOf(),
         val isFavorite: Boolean = false,
         val availableForTrade: Boolean? = null,
@@ -86,6 +89,7 @@ data class CarItem(
                 availableForTrade = availableForTrade ?: false,
                 description = this.description,
                 category = this.category,
+                tradeMessage = this.tradeMessage,
             )
         }
 
@@ -97,6 +101,7 @@ data class CarItem(
             brand = brand?.takeIf { it.isNotBlank() },
             description = description?.takeIf { it.isNotBlank() },
             category = category?.takeIf { it.isNotBlank() },
+            tradeMessage = tradeMessage?.takeIf { it.isNotBlank() },
             images = images.filterNot { it == EmptyImage }.takeIf { it.isNotEmpty() }?.toSet() ?: emptySet(),
             isFavorite = isFavorite,
             availableForTrade = availableForTrade,

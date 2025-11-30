@@ -307,6 +307,8 @@ fun WheelVaultApp(
                             onAddClick = { backStack += NavigationKeys.AddCamera },
                             onProfileClick = { backStack += NavigationKeys.Profile },
                             onExchangesClick = {},
+
+                            onNotificationsClick = { backStack += NavigationKeys.ExchangeNotifications },
                         ),
                     )
                 }
@@ -328,7 +330,8 @@ fun WheelVaultApp(
                             onGarageClick = { backStack += NavigationKeys.Garage() },
                             onFavoritesClick = { backStack += NavigationKeys.Garage(favorites = true) },
                             onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
-                            onExchangesClick = {},
+                            onExchangesClick = { backStack += NavigationKeys.Exchanges() },
+                            onNotificationsClick = { backStack += NavigationKeys.ExchangeNotifications },
                         ),
                     )
                 }
@@ -361,7 +364,8 @@ fun WheelVaultApp(
                             onGarageClick = { backStack += NavigationKeys.Garage() },
                             onFavoritesClick = { backStack += NavigationKeys.Garage(favorites = true) },
                             onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
-                            onExchangesClick = {},
+                            onExchangesClick = { backStack += NavigationKeys.Exchanges() },
+                            onNotificationsClick = { backStack += NavigationKeys.ExchangeNotifications },
                         ),
                     )
                 }
@@ -380,8 +384,52 @@ fun WheelVaultApp(
                             onGarageClick = { backStack += NavigationKeys.Garage() },
                             onFavoritesClick = { backStack += NavigationKeys.Garage(favorites = true) },
                             onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
+                            onExchangesClick = { backStack += NavigationKeys.Exchanges() },
+                            onNotificationsClick = { backStack += NavigationKeys.ExchangeNotifications },
+                        ),
+                    )
+                }
+
+                NavigationKeys.ExchangeNotifications -> route(key) {
+                    if (!BuildConfig.ENABLE_TRADING) {
+                        navigationLogger.e {
+                            "Exchanges not available and reached in navigation routes. Notifications"
+                        }
+                    }
+                    io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.notifications.ExchangeNotificationsScreen(
+                        headerCallbacks = HeaderBackCallbacks(
+                            onProfileClick = { backStack += NavigationKeys.Profile },
+                            onBackClick = { backStack.removeLastOrNull() },
+                            onGarageClick = { backStack += NavigationKeys.Garage() },
+                            onFavoritesClick = { backStack += NavigationKeys.Garage(favorites = true) },
+                            onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
                             onExchangesClick = {},
                         ),
+                        onTradeClick = { notification ->
+                            backStack += NavigationKeys.TradeProposalDetail(notification.trade.tradeGroupId)
+                        },
+                    )
+                }
+
+                is NavigationKeys.TradeProposalDetail -> route(key) {
+                    if (!BuildConfig.ENABLE_TRADING) {
+                        navigationLogger.e {
+                            "Exchanges not available and reached in navigation routes. Trade Detail: ${key.tradeGroupId}"
+                        }
+                    }
+                    io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.notifications.TradeProposalDetailScreen(
+                        tradeGroupId = key.tradeGroupId,
+                        headerCallbacks = HeaderBackCallbacks(
+                            onProfileClick = { backStack += NavigationKeys.Profile },
+                            onBackClick = { backStack.removeLastOrNull() },
+                            onGarageClick = { backStack += NavigationKeys.Garage() },
+                            onFavoritesClick = { backStack += NavigationKeys.Garage(favorites = true) },
+                            onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
+                            onExchangesClick = { backStack += NavigationKeys.Exchanges() },
+                        ),
+                        onTradeActionCompleted = {
+                            backStack.removeLastOrNull()
+                        },
                     )
                 }
             }

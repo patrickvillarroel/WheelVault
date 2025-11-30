@@ -10,12 +10,14 @@ open class HeaderMenuDropdownCallbacks(
     val onFavoritesClick: () -> Unit,
     val onStatisticsClick: () -> Unit,
     val onExchangesClick: () -> Unit,
+    val onNotificationsClick: () -> Unit = {},
 ) {
     protected constructor(copy: HeaderMenuDropdownCallbacks) : this(
         onGarageClick = copy.onGarageClick,
         onFavoritesClick = copy.onFavoritesClick,
         onStatisticsClick = copy.onStatisticsClick,
         onExchangesClick = copy.onExchangesClick,
+        onNotificationsClick = copy.onNotificationsClick,
     )
     companion object {
         @JvmField
@@ -24,6 +26,7 @@ open class HeaderMenuDropdownCallbacks(
             onFavoritesClick = {},
             onStatisticsClick = {},
             onExchangesClick = {},
+            onNotificationsClick = {},
         )
     }
 }
@@ -39,9 +42,10 @@ open class HeaderCallbacks private constructor(
         onFavoritesClick: () -> Unit,
         onStatisticsClick: () -> Unit,
         onExchangesClick: () -> Unit,
+        onNotificationsClick: () -> Unit = {},
     ) : this(
         onProfileClick,
-        HeaderMenuDropdownCallbacks(onGarageClick, onFavoritesClick, onStatisticsClick, onExchangesClick),
+        HeaderMenuDropdownCallbacks(onGarageClick, onFavoritesClick, onStatisticsClick, onExchangesClick, onNotificationsClick),
     )
 
     protected constructor(copy: HeaderCallbacks) : this(
@@ -50,6 +54,7 @@ open class HeaderCallbacks private constructor(
         onFavoritesClick = copy.onFavoritesClick,
         onStatisticsClick = copy.onStatisticsClick,
         onExchangesClick = copy.onExchangesClick,
+        onNotificationsClick = copy.onNotificationsClick,
     )
 
     companion object {
@@ -71,9 +76,10 @@ open class HeaderBackCallbacks private constructor(val onBackClick: () -> Unit, 
         onFavoritesClick: () -> Unit,
         onStatisticsClick: () -> Unit,
         onExchangesClick: () -> Unit,
+        onNotificationsClick: () -> Unit = {},
     ) : this(
         onBackClick,
-        HeaderCallbacks(onProfileClick, onGarageClick, onFavoritesClick, onStatisticsClick, onExchangesClick),
+        HeaderCallbacks(onProfileClick, onGarageClick, onFavoritesClick, onStatisticsClick, onExchangesClick, onNotificationsClick),
     )
     companion object {
         @JvmField
@@ -122,6 +128,11 @@ class InterceptedHeaderBackCallbacks(
     onExchangesClick = {
         val callback = original.onExchangesClick
         val name = "onExchangesClick"
+        specificInterceptors[name]?.intercept(name, callback) ?: interceptor.intercept(name, callback)
+    },
+    onNotificationsClick = {
+        val callback = original.onNotificationsClick
+        val name = "onNotificationsClick"
         specificInterceptors[name]?.intercept(name, callback) ?: interceptor.intercept(name, callback)
     },
 )

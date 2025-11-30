@@ -3,6 +3,7 @@ package io.github.patrickvillarroel.wheel.vault.ui.screen.component
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBar
@@ -19,6 +20,7 @@ import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 fun MenuButtonHeader(
     headerCallbacks: HeaderCallbacks,
     modifier: Modifier = Modifier,
+    showNotifications: Boolean = false,
     title: @Composable () -> Unit = {},
 ) {
     TopAppBar(
@@ -26,6 +28,15 @@ fun MenuButtonHeader(
         title = title,
         navigationIcon = { MenuDropDown(headerCallbacks) },
         actions = {
+            if (showNotifications) {
+                IconButton(onClick = headerCallbacks.onNotificationsClick) {
+                    Icon(
+                        Icons.Default.Notifications,
+                        contentDescription = stringResource(R.string.pending_exchanges),
+                        tint = Color.White,
+                    )
+                }
+            }
             IconButton(onClick = headerCallbacks.onProfileClick) {
                 Icon(
                     Icons.Default.AccountCircle,

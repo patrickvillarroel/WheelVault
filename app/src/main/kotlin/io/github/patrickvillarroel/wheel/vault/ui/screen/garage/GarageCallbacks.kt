@@ -81,6 +81,7 @@ class GarageCallbacks(
         val onCarClick: (Uuid) -> Unit,
         val onProfileClick: () -> Unit,
         val onExchangesClick: () -> Unit,
+        val onNotificationsClick: () -> Unit = {},
     ) {
         companion object {
             @JvmField
@@ -90,6 +91,7 @@ class GarageCallbacks(
                 onCarClick = {},
                 onProfileClick = {},
                 onExchangesClick = {},
+                onNotificationsClick = {},
             )
         }
     }

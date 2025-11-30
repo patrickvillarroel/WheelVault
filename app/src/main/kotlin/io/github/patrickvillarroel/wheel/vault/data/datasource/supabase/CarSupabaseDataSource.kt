@@ -503,6 +503,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
             quantity = this.quantity,
             isFavorite = this.isFavorite,
             availableForTrade = this.availableForTrade,
+            tradeMessage = this.tradeMessage,
         )
 
         private fun CarObj.toDomain(images: Set<Any>) = CarItem(
@@ -516,6 +517,7 @@ class CarSupabaseDataSource(private val supabase: SupabaseClient, private val co
             quantity = this.quantity,
             isFavorite = this.isFavorite,
             availableForTrade = this.availableForTrade,
+            tradeMessage = this.tradeMessage,
             images = images,
         )
     }

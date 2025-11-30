@@ -41,7 +41,8 @@ fun ExchangeCarSelectionScreen(
 
             Error -> CarErrorScreen(CarViewModel.CarDetailUiState.Error)
             is Success -> ExchangeCarSelection(
-                state.cars,
+                availableCars = state.availableCars,
+                carsInActiveTrades = state.carsInActiveTrades,
                 onCarClick = { selectedCar ->
                     // Seleccionar el auto del usuario para ofrecer
                     exchangeViewModel.selectOwnCarForOffer(selectedCar)

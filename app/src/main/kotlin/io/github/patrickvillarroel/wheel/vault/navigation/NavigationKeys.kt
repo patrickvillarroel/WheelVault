@@ -60,6 +60,14 @@ sealed class NavigationKeys : NavKey {
     @Serializable
     data class ExchangeConfirmation(val id: Uuid) : NavigationKeys()
 
+    /** Refers to [io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.notifications.ExchangeNotificationsScreen] */
+    @Serializable
+    data object ExchangeNotifications : NavigationKeys()
+
+    /** Refers to a received trade proposal detail screen */
+    @Serializable
+    data class TradeProposalDetail(val tradeGroupId: Uuid) : NavigationKeys()
+
     /** Refers to [io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.edit.CarEditScreen] */
     @Stable
     @Serializable

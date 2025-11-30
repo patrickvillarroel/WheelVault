@@ -1,11 +1,17 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.selection
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -14,8 +20,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -37,7 +46,12 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderCallbac
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuButtonHeader
 
 @Composable
-fun ExchangeCarSelection(carResults: List<CarItem>, onCarClick: (CarItem) -> Unit, modifier: Modifier = Modifier) {
+fun ExchangeCarSelection(
+    availableCars: List<CarItem>,
+    carsInActiveTrades: List<CarItem> = emptyList(),
+    onCarClick: (CarItem) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -45,17 +59,115 @@ fun ExchangeCarSelection(carResults: List<CarItem>, onCarClick: (CarItem) -> Uni
         },
     ) { paddingValues ->
         LazyColumn(Modifier.padding(paddingValues).fillMaxSize().padding(start = 15.dp, top = 7.dp, end = 15.dp)) {
-            items(carResults, key = { it.id }) { item ->
-                CarItemCard(
-                    carItem = item,
-                    onClick = { onCarClick(item) },
-                    onFavoriteToggle = {},
-                    modifier = Modifier.padding(3.dp),
-                    favoriteIcon = false,
-                )
+            // Sección de carros disponibles
+            if (availableCars.isNotEmpty()) {
+                item {
+                    Text(
+                        text = "Carros Disponibles",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 3.dp)
+                    )
+                }
+                items(availableCars, key = { it.id }) { item ->
+                    CarItemCard(
+                        carItem = item,
+                        onClick = { onCarClick(item) },
+                        onFavoriteToggle = {},
+                        modifier = Modifier.padding(3.dp),
+                        favoriteIcon = false,
+                    )
+                }
+            }
+
+            // Sección de carros ya en intercambios activos
+            if (carsInActiveTrades.isNotEmpty()) {
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Ya en Solicitud Activa",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.outline,
+                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 3.dp)
+                    )
+                }
+                items(carsInActiveTrades, key = { it.id }) { item ->
+                    Box {
+                        CarItemCard(
+                            carItem = item,
+                            onClick = { /* No action - bloqueado */ },
+                            onFavoriteToggle = {},
+                            modifier = Modifier.padding(3.dp),
+                            favoriteIcon = false,
+                        )
+                        // Overlay para indicar que está bloqueado
+                        Card(
+                            modifier = Modifier
+                                .padding(3.dp)
+                                .fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color.Black.copy(alpha = 0.5f)
+                            ),
+                            shape = RoundedCornerShape(20.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Lock,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Text(
+                                    text = " En solicitud activa",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Mensaje si no hay carros
+            if (availableCars.isEmpty() && carsInActiveTrades.isEmpty()) {
+                item {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "No tienes carros disponibles para intercambiar",
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                    }
+                }
             }
         }
     }
+}
+
+// Mantener compatibilidad con versión anterior
+@Composable
+fun ExchangeCarSelection(carResults: List<CarItem>, onCarClick: (CarItem) -> Unit, modifier: Modifier = Modifier) {
+    ExchangeCarSelection(
+        availableCars = carResults,
+        carsInActiveTrades = emptyList(),
+        onCarClick = onCarClick,
+        modifier = modifier
+    )
 }
 
 @Composable

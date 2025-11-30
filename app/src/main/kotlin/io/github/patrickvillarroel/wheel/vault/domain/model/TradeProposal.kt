@@ -48,7 +48,14 @@ data class TradeProposal(
         val lastMessage: String? = null,
         val proposedAt: Instant,
         val lastUpdated: Instant,
+        val originalExpiresAt: Instant? = null,
         val isActive: Boolean,
         val isSuccessful: Boolean,
-    )
+    ) {
+        val isExpired: Boolean
+            get() = effectiveStatus == "expired"
+
+        val isPending: Boolean
+            get() = effectiveStatus == "proposed" && isActive
+    }
 }

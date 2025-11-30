@@ -26,6 +26,7 @@ import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 fun MenuHeader(
     headerCallbacks: HeaderCallbacks,
     modifier: Modifier = Modifier,
+    showNotifications: Boolean = false,
     secondRow: @Composable BoxScope.() -> Unit = {},
 ) {
     Box(
@@ -42,7 +43,10 @@ fun MenuHeader(
                 ),
             ).windowInsetsPadding(WindowInsets.statusBars),
     ) {
-        MenuButtonHeader(headerCallbacks) {
+        MenuButtonHeader(
+            headerCallbacks = headerCallbacks,
+            showNotifications = showNotifications,
+        ) {
             Text(
                 stringResource(R.string.collectors_project),
                 textAlign = TextAlign.Center,

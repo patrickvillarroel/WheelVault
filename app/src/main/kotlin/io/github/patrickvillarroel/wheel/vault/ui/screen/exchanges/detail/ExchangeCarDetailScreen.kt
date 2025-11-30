@@ -49,7 +49,7 @@ fun ExchangeCarDetailScreen(
                     sharedTransitionScope = sharedTransitionScope,
                     animatedVisibilityScope = animatedVisibilityScope,
                     carDetail = state.car,
-                    requestText = "Busco porsche rallyE color verde, si es STH mejor.",
+                    requestText = state.car.tradeMessage ?: "",
                     callbacks = headerBackCallbacks,
                     onExchangeClick = {
                         exchangeViewModel.exchangeCar(state.car)

@@ -77,6 +77,7 @@ fun ExchangeContent(
                 topBar = callbacks.filterBar,
                 manufacturerList = manufacturerList,
                 headersCallbacks = callbacks.headersCallbacks,
+                showNotifications = true,
             )
         },
     ) { paddingValues ->

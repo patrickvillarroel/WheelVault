@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -100,6 +101,7 @@ fun ExchangeConfirmCarScreen(
                         } else {
                             co.touchlab.kermit.Logger.withTag("ExchangeConfirmCarScreen").d { "onCancelClick - Canceling new proposal" }
                             // Cancelando la creación de una propuesta nueva
+                            exchangeViewModel.resetExchangeConfirmState()
                             headerBackCallbacks.onBackClick()
                         }
                     },
@@ -108,10 +110,34 @@ fun ExchangeConfirmCarScreen(
 
             ExchangeViewModel.ExchangeConfirmUiState.Accepted -> ExchangeResultScreen(
                 isAccepted = true,
-                onNavigateBack = headerBackCallbacks.onBackClick,
+                onNavigateBack = {
+                    exchangeViewModel.resetExchangeConfirmState()
+                    headerBackCallbacks.onBackClick()
+                },
+                onViewNotifications = {
+                    exchangeViewModel.resetExchangeConfirmState()
+                    headerBackCallbacks.onNotificationsClick()
+                },
                 modifier = modifier,
             )
             ExchangeViewModel.ExchangeConfirmUiState.Error -> CarErrorScreen(CarViewModel.CarDetailUiState.Error)
+            is ExchangeViewModel.ExchangeConfirmUiState.ErrorWithMessage -> {
+                // Resetear inmediatamente cuando entramos al estado de error
+                androidx.compose.runtime.LaunchedEffect(Unit) {
+                    co.touchlab.kermit.Logger.withTag("ExchangeConfirmCarScreen").d {
+                        "Error state detected, resetting to allow navigation"
+                    }
+                }
+
+                ExchangeErrorScreen(
+                    errorMessage = state.errorMessage,
+                    onNavigateBack = {
+                        exchangeViewModel.resetExchangeConfirmState()
+                        headerBackCallbacks.onBackClick()
+                    },
+                    modifier = modifier,
+                )
+            }
             ExchangeViewModel.ExchangeConfirmUiState.Loading -> Scaffold(
                 Modifier.fillMaxSize(),
             ) {
@@ -119,7 +145,10 @@ fun ExchangeConfirmCarScreen(
             }
             ExchangeViewModel.ExchangeConfirmUiState.Rejected -> ExchangeResultScreen(
                 isAccepted = false,
-                onNavigateBack = headerBackCallbacks.onBackClick,
+                onNavigateBack = {
+                    exchangeViewModel.resetExchangeConfirmState()
+                    headerBackCallbacks.onBackClick()
+                },
                 modifier = modifier,
             )
         }
@@ -127,7 +156,12 @@ fun ExchangeConfirmCarScreen(
 }
 
 @Composable
-private fun ExchangeResultScreen(isAccepted: Boolean, onNavigateBack: () -> Unit, modifier: Modifier = Modifier) {
+private fun ExchangeResultScreen(
+    isAccepted: Boolean,
+    onNavigateBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    onViewNotifications: (() -> Unit)? = null
+) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
     ) { paddingValues ->
@@ -166,6 +200,71 @@ private fun ExchangeResultScreen(isAccepted: Boolean, onNavigateBack: () -> Unit
                     } else {
                         stringResource(R.string.exchange_rejected_message)
                     },
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                // Botón "Ver Notificaciones" solo cuando se acepta y está disponible
+                if (isAccepted && onViewNotifications != null) {
+                    Button(
+                        onClick = onViewNotifications,
+                        modifier = Modifier.padding(top = 16.dp).fillMaxWidth(0.8f),
+                    ) {
+                        Text(text = "Ver Notificaciones")
+                    }
+                }
+
+                Button(
+                    onClick = onNavigateBack,
+                    modifier = Modifier.padding(top = 8.dp).fillMaxWidth(0.8f),
+                    colors = if (isAccepted && onViewNotifications != null) {
+                        androidx.compose.material3.ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    } else {
+                        androidx.compose.material3.ButtonDefaults.buttonColors()
+                    }
+                ) {
+                    Text(text = stringResource(R.string.back))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExchangeErrorScreen(errorMessage: String, onNavigateBack: () -> Unit, modifier: Modifier = Modifier) {
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center,
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                modifier = Modifier.padding(32.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Cancel,
+                    contentDescription = "Error",
+                    tint = Color(0xFFFF9800),
+                    modifier = Modifier.size(120.dp),
+                )
+
+                Text(
+                    text = "Error en la propuesta",
+                    style = MaterialTheme.typography.headlineMedium,
+                    textAlign = TextAlign.Center,
+                )
+
+                Text(
+                    text = errorMessage,
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,

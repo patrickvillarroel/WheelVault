@@ -21,4 +21,6 @@ class CarObj(
     val id: Uuid? = null,
     @SerialName("available_for_trade")
     val availableForTrade: Boolean = false,
+    @SerialName("trade_message")
+    val tradeMessage: String? = null,
 )

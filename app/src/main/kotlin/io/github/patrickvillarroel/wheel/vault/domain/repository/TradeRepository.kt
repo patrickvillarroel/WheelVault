@@ -29,4 +29,7 @@ interface TradeRepository {
 
     /** Obtener propuestas de intercambio activas donde el carId es el solicitado o el ofrecido */
     suspend fun getActiveTradesForCar(carId: Uuid): List<TradeProposal.CurrentTradeStatus>
+
+    /** Obtener IDs de carros propios que ya están ofrecidos en solicitudes activas */
+    suspend fun getMyOfferedCarsInActiveTrades(): Set<Uuid>
 }
