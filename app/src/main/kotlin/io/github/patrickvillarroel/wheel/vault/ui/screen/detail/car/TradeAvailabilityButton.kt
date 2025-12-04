@@ -15,8 +15,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
@@ -35,11 +35,7 @@ import androidx.compose.ui.unit.dp
 import io.github.patrickvillarroel.wheel.vault.R
 
 @Composable
-fun TradeAvailabilityButton(
-    isAvailableForTrade: Boolean,
-    onToggle: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+fun TradeAvailabilityButton(isAvailableForTrade: Boolean, onToggle: () -> Unit, modifier: Modifier = Modifier) {
     val scale by animateFloatAsState(
         targetValue = if (isAvailableForTrade) 1.05f else 1f,
         animationSpec = tween(300),

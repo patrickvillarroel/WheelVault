@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import co.touchlab.kermit.Logger
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.ui.screen.CarViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
@@ -35,33 +37,35 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.ExchangeViewM
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.uuid.Uuid
 
+private val logger = Logger.withTag("ExchangeConfirmCarScreen")
+
 @Composable
 fun ExchangeConfirmCarScreen(
     requestCarId: Uuid,
     headerBackCallbacks: HeaderBackCallbacks,
     modifier: Modifier = Modifier,
     isRespondingToOffer: Boolean = false,
-    exchangeViewModel: ExchangeViewModel = org.koin.compose.koinInject(),
+    exchangeViewModel: ExchangeViewModel = koinViewModel(),
 ) {
     val exchangeConfirmState by exchangeViewModel.exchangeConfirmState.collectAsState()
 
     LaunchedEffect(requestCarId, isRespondingToOffer) {
-        co.touchlab.kermit.Logger.withTag("ExchangeConfirmCarScreen").d {
+        logger.d {
             "LaunchedEffect - requestCarId: $requestCarId, isRespondingToOffer: $isRespondingToOffer, currentState: $exchangeConfirmState"
         }
         // Solo cargar ofertas si estamos respondiendo a una existente
         if (isRespondingToOffer) {
-            co.touchlab.kermit.Logger.withTag("ExchangeConfirmCarScreen").d { "Calling offersOf($requestCarId)" }
+            logger.d { "Calling offersOf($requestCarId)" }
             exchangeViewModel.offersOf(requestCarId)
         } else {
-            co.touchlab.kermit.Logger.withTag("ExchangeConfirmCarScreen").d {
+            logger.d {
                 "Not responding to offer - state should already be configured. Current state: $exchangeConfirmState"
             }
         }
         // Si no, el estado ya fue configurado por exchangeCar()
         // PERO si por alguna razón no está configurado, mostramos error
         if (!isRespondingToOffer && exchangeConfirmState is ExchangeViewModel.ExchangeConfirmUiState.Loading) {
-            co.touchlab.kermit.Logger.withTag("ExchangeConfirmCarScreen").w {
+            logger.w {
                 "State is still Loading for new proposal - this may indicate an issue"
             }
         }
@@ -70,7 +74,7 @@ fun ExchangeConfirmCarScreen(
     AnimatedContent(exchangeConfirmState) { state ->
         when (state) {
             is ExchangeViewModel.ExchangeConfirmUiState.WaitingConfirm -> {
-                co.touchlab.kermit.Logger.withTag("ExchangeConfirmCarScreen").d {
+                logger.d {
                     "Showing WaitingConfirm - offeredCar: ${state.offeredCar.id}, requestedCar: ${state.requestedCar.id}, message: ${state.message}"
                 }
                 ExchangeConfirmCar(
@@ -82,24 +86,22 @@ fun ExchangeConfirmCarScreen(
                     isRespondingToOffer = isRespondingToOffer,
                     onAcceptClick = {
                         if (isRespondingToOffer) {
-                            co.touchlab.kermit.Logger.withTag("ExchangeConfirmCarScreen").d { "onAcceptClick - Accepting existing offer" }
+                            logger.d { "onAcceptClick - Accepting existing offer" }
                             // Respondiendo a una oferta existente
                             exchangeViewModel.acceptExchange(state.offeredCar, state.requestedCar)
                         } else {
-                            co.touchlab.kermit.Logger.withTag("ExchangeConfirmCarScreen").d {
-                                "onAcceptClick - Creating new proposal with message: ${state.message}"
-                            }
+                            logger.d { "onAcceptClick - Creating new proposal with message: ${state.message}" }
                             // Creando una nueva propuesta
                             exchangeViewModel.confirmAndCreateTradeProposal(state.message)
                         }
                     },
                     onCancelClick = {
                         if (isRespondingToOffer) {
-                            co.touchlab.kermit.Logger.withTag("ExchangeConfirmCarScreen").d { "onCancelClick - Rejecting existing offer" }
+                            logger.d { "onCancelClick - Rejecting existing offer" }
                             // Rechazando una oferta existente
                             exchangeViewModel.rejectExchange(state.offeredCar, state.requestedCar)
                         } else {
-                            co.touchlab.kermit.Logger.withTag("ExchangeConfirmCarScreen").d { "onCancelClick - Canceling new proposal" }
+                            logger.d { "onCancelClick - Canceling new proposal" }
                             // Cancelando la creación de una propuesta nueva
                             exchangeViewModel.resetExchangeConfirmState()
                             headerBackCallbacks.onBackClick()
@@ -120,13 +122,13 @@ fun ExchangeConfirmCarScreen(
                 },
                 modifier = modifier,
             )
+
             ExchangeViewModel.ExchangeConfirmUiState.Error -> CarErrorScreen(CarViewModel.CarDetailUiState.Error)
+
             is ExchangeViewModel.ExchangeConfirmUiState.ErrorWithMessage -> {
                 // Resetear inmediatamente cuando entramos al estado de error
-                androidx.compose.runtime.LaunchedEffect(Unit) {
-                    co.touchlab.kermit.Logger.withTag("ExchangeConfirmCarScreen").d {
-                        "Error state detected, resetting to allow navigation"
-                    }
+                LaunchedEffect(Unit) {
+                    logger.d { "Error state detected, resetting to allow navigation" }
                 }
 
                 ExchangeErrorScreen(
@@ -138,11 +140,13 @@ fun ExchangeConfirmCarScreen(
                     modifier = modifier,
                 )
             }
+
             ExchangeViewModel.ExchangeConfirmUiState.Loading -> Scaffold(
                 Modifier.fillMaxSize(),
-            ) {
-                LoadingIndicator(Modifier.padding(it).fillMaxSize())
+            ) { paddingValues ->
+                LoadingIndicator(Modifier.padding(paddingValues).fillMaxSize())
             }
+
             ExchangeViewModel.ExchangeConfirmUiState.Rejected -> ExchangeResultScreen(
                 isAccepted = false,
                 onNavigateBack = {
@@ -160,11 +164,9 @@ private fun ExchangeResultScreen(
     isAccepted: Boolean,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    onViewNotifications: (() -> Unit)? = null
+    onViewNotifications: (() -> Unit)? = null,
 ) {
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-    ) { paddingValues ->
+    Scaffold(modifier = modifier.fillMaxSize()) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -219,13 +221,13 @@ private fun ExchangeResultScreen(
                     onClick = onNavigateBack,
                     modifier = Modifier.padding(top = 8.dp).fillMaxWidth(0.8f),
                     colors = if (isAccepted && onViewNotifications != null) {
-                        androidx.compose.material3.ButtonDefaults.buttonColors(
+                        ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                         )
                     } else {
-                        androidx.compose.material3.ButtonDefaults.buttonColors()
-                    }
+                        ButtonDefaults.buttonColors()
+                    },
                 ) {
                     Text(text = stringResource(R.string.back))
                 }

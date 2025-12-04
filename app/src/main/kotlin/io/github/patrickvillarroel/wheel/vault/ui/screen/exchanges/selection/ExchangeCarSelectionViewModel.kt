@@ -37,7 +37,9 @@ class ExchangeCarSelectionViewModel(
                     // Obtener IDs de carros que ya están en solicitudes activas
                     val offeredCarsInActiveTrades = tradeRepository.getMyOfferedCarsInActiveTrades()
 
-                    logger.d { "Loaded ${allCars.size} user's cars, ${offeredCarsInActiveTrades.size} already in active trades" }
+                    logger.d {
+                        "Loaded ${allCars.size} user's cars, ${offeredCarsInActiveTrades.size} already in active trades"
+                    }
 
                     // Separar carros disponibles y no disponibles
                     val availableCars = allCars.filter { it.id !in offeredCarsInActiveTrades }
@@ -46,7 +48,7 @@ class ExchangeCarSelectionViewModel(
                     _carsState.update {
                         CarsUiState.Success(
                             availableCars = availableCars,
-                            carsInActiveTrades = unavailableCars
+                            carsInActiveTrades = unavailableCars,
                         )
                     }
                 } catch (e: Exception) {
@@ -63,7 +65,7 @@ class ExchangeCarSelectionViewModel(
         @Immutable
         data class Success(
             @Stable val availableCars: List<CarItem>,
-            @Stable val carsInActiveTrades: List<CarItem> = emptyList()
+            @Stable val carsInActiveTrades: List<CarItem> = emptyList(),
         ) : CarsUiState
 
         data object Error : CarsUiState

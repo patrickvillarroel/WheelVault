@@ -12,7 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,9 +40,9 @@ fun ExchangeCarOffer(
     onExchangeClick: (String?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var showBottomSheet by remember { mutableStateOf(false) }
-    var showConfirmationDialog by remember { mutableStateOf(false) }
-    var requisitoState: String? by remember { mutableStateOf(null) }
+    var showBottomSheet by rememberSaveable { mutableStateOf(false) }
+    var showConfirmationDialog by rememberSaveable { mutableStateOf(false) }
+    var requisitoState: String? by rememberSaveable { mutableStateOf(null) }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -53,7 +53,10 @@ fun ExchangeCarOffer(
         },
         floatingActionButton = {
             TextButton(
-                onClick = { showBottomSheet = true },
+                onClick = {
+                    @Suppress("ASSIGNED_VALUE_IS_NEVER_READ")
+                    showBottomSheet = true
+                },
                 elevation = ButtonDefaults.buttonElevation(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE42E31)),
             ) {
@@ -102,8 +105,12 @@ fun ExchangeCarOffer(
 
             if (showBottomSheet) {
                 AddRequirementBottomSheet(
-                    onDismiss = { showBottomSheet = false },
+                    onDismiss = {
+                        @Suppress("ASSIGNED_VALUE_IS_NEVER_READ")
+                        showBottomSheet = false
+                    },
                     onConfirm = { requisito ->
+                        @Suppress("ASSIGNED_VALUE_IS_NEVER_READ")
                         showBottomSheet = false
                         requisitoState = requisito.takeIf { it.isNotBlank() }
                         showConfirmationDialog = true
@@ -114,8 +121,12 @@ fun ExchangeCarOffer(
             if (showConfirmationDialog) {
                 ConfirmationDialog(
                     message = stringResource(id = R.string.exchange_confirmation_message),
-                    onDismissRequest = { showConfirmationDialog = false },
+                    onDismissRequest = {
+                        @Suppress("ASSIGNED_VALUE_IS_NEVER_READ")
+                        showConfirmationDialog = false
+                    },
                     onConfirm = {
+                        @Suppress("ASSIGNED_VALUE_IS_NEVER_READ")
                         showConfirmationDialog = false
                         onExchangeClick(requisitoState)
                     },
@@ -127,7 +138,7 @@ fun ExchangeCarOffer(
 
 @Composable
 private fun AddRequirementBottomSheet(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
-    var requisito by remember { mutableStateOf("") }
+    var requisito by rememberSaveable { mutableStateOf("") }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -225,17 +236,16 @@ private fun ExchangeCarDetailContentPreview() {
         brand = "Toyota",
         images = setOf(CarItem.EmptyImage),
     )
-    val callbacks = HeaderBackCallbacks.default
 
-    SharedTransitionScope {
+    SharedTransitionScope { modifier ->
         AnimatedVisibility(true) {
             ExchangeCarOffer(
                 sharedTransitionScope = this@SharedTransitionScope,
                 animatedVisibilityScope = this,
                 carDetail = carDetail,
-                callbacks = callbacks,
+                callbacks = HeaderBackCallbacks.default,
                 onExchangeClick = {},
-                modifier = it,
+                modifier = modifier,
             )
         }
     }

@@ -101,13 +101,11 @@ class TradeProposalDetailViewModel(
         }
     }
 
-    private fun getCurrentUserId(): String {
-        return supabaseClient.auth.currentUserOrNull()?.id ?: ""
-    }
+    private fun getCurrentUserId(): String = supabaseClient.auth.currentUserOrNull()?.id ?: ""
 
     enum class TradeAction {
         ACCEPTED,
-        REJECTED
+        REJECTED,
     }
 
     sealed interface TradeDetailUiState {

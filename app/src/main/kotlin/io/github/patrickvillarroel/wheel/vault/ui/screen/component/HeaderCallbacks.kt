@@ -2,7 +2,11 @@ package io.github.patrickvillarroel.wheel.vault.ui.screen.component
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import io.github.patrickvillarroel.wheel.vault.domain.model.VideoNews
 import io.github.patrickvillarroel.wheel.vault.util.CallbackInterceptor
+import kotlin.uuid.Uuid
+
+// TODO refactor to share only ONE header callbacks across all screens
 
 @Immutable
 open class HeaderMenuDropdownCallbacks(
@@ -10,7 +14,7 @@ open class HeaderMenuDropdownCallbacks(
     val onFavoritesClick: () -> Unit,
     val onStatisticsClick: () -> Unit,
     val onExchangesClick: () -> Unit,
-    val onNotificationsClick: () -> Unit = {},
+    val onNotificationsClick: () -> Unit,
 ) {
     protected constructor(copy: HeaderMenuDropdownCallbacks) : this(
         onGarageClick = copy.onGarageClick,
@@ -34,6 +38,7 @@ open class HeaderMenuDropdownCallbacks(
 @Immutable
 open class HeaderCallbacks private constructor(
     val onProfileClick: () -> Unit,
+    val onHomeClick: () -> Unit,
     dropdownCallbacks: HeaderMenuDropdownCallbacks,
 ) : HeaderMenuDropdownCallbacks(dropdownCallbacks) {
     constructor(
@@ -42,10 +47,18 @@ open class HeaderCallbacks private constructor(
         onFavoritesClick: () -> Unit,
         onStatisticsClick: () -> Unit,
         onExchangesClick: () -> Unit,
-        onNotificationsClick: () -> Unit = {},
+        onNotificationsClick: () -> Unit,
+        onHomeClick: () -> Unit,
     ) : this(
-        onProfileClick,
-        HeaderMenuDropdownCallbacks(onGarageClick, onFavoritesClick, onStatisticsClick, onExchangesClick, onNotificationsClick),
+        onProfileClick = onProfileClick,
+        onHomeClick = onHomeClick,
+        dropdownCallbacks = HeaderMenuDropdownCallbacks(
+            onGarageClick = onGarageClick,
+            onFavoritesClick = onFavoritesClick,
+            onStatisticsClick = onStatisticsClick,
+            onExchangesClick = onExchangesClick,
+            onNotificationsClick = onNotificationsClick,
+        ),
     )
 
     protected constructor(copy: HeaderCallbacks) : this(
@@ -55,12 +68,32 @@ open class HeaderCallbacks private constructor(
         onStatisticsClick = copy.onStatisticsClick,
         onExchangesClick = copy.onExchangesClick,
         onNotificationsClick = copy.onNotificationsClick,
+        onHomeClick = copy.onHomeClick,
+    )
+
+    fun copy(
+        onProfileClick: () -> Unit = this.onProfileClick,
+        onGarageClick: () -> Unit = this.onGarageClick,
+        onFavoritesClick: () -> Unit = this.onFavoritesClick,
+        onStatisticsClick: () -> Unit = this.onStatisticsClick,
+        onExchangesClick: () -> Unit = this.onExchangesClick,
+        onNotificationsClick: () -> Unit = this.onNotificationsClick,
+        onHomeClick: () -> Unit = this.onHomeClick,
+    ) = HeaderCallbacks(
+        onProfileClick = onProfileClick,
+        onGarageClick = onGarageClick,
+        onFavoritesClick = onFavoritesClick,
+        onStatisticsClick = onStatisticsClick,
+        onExchangesClick = onExchangesClick,
+        onNotificationsClick = onNotificationsClick,
+        onHomeClick = onHomeClick,
     )
 
     companion object {
         @JvmField
         val default = HeaderCallbacks(
             onProfileClick = {},
+            onHomeClick = {},
             dropdownCallbacks = HeaderMenuDropdownCallbacks.default,
         )
     }
@@ -76,16 +109,48 @@ open class HeaderBackCallbacks private constructor(val onBackClick: () -> Unit, 
         onFavoritesClick: () -> Unit,
         onStatisticsClick: () -> Unit,
         onExchangesClick: () -> Unit,
-        onNotificationsClick: () -> Unit = {},
+        onNotificationsClick: () -> Unit,
+        onHomeClick: () -> Unit,
     ) : this(
-        onBackClick,
-        HeaderCallbacks(onProfileClick, onGarageClick, onFavoritesClick, onStatisticsClick, onExchangesClick, onNotificationsClick),
+        onBackClick = onBackClick,
+        headerCallbacks = HeaderCallbacks(
+            onProfileClick = onProfileClick,
+            onGarageClick = onGarageClick,
+            onFavoritesClick = onFavoritesClick,
+            onStatisticsClick = onStatisticsClick,
+            onExchangesClick = onExchangesClick,
+            onNotificationsClick = onNotificationsClick,
+            onHomeClick = onHomeClick,
+        ),
     )
     companion object {
         @JvmField
         val default = HeaderBackCallbacks(
             onBackClick = {},
             headerCallbacks = HeaderCallbacks.default,
+        )
+    }
+}
+
+class HomeCallbacks(
+    val onAddClick: () -> Unit,
+    val onSearchClick: () -> Unit,
+    val onBrandClick: (Uuid) -> Unit,
+    val onNewsClick: (VideoNews) -> Unit,
+    val onCarClick: (Uuid) -> Unit,
+    val onRefresh: () -> Unit,
+    headersCallbacks: HeaderCallbacks,
+) : HeaderCallbacks(headersCallbacks) {
+    companion object {
+        @JvmField
+        val default = HomeCallbacks(
+            onAddClick = {},
+            onSearchClick = {},
+            onBrandClick = {},
+            onNewsClick = {},
+            onCarClick = {},
+            onRefresh = {},
+            headersCallbacks = HeaderCallbacks.default,
         )
     }
 }
@@ -133,6 +198,11 @@ class InterceptedHeaderBackCallbacks(
     onNotificationsClick = {
         val callback = original.onNotificationsClick
         val name = "onNotificationsClick"
+        specificInterceptors[name]?.intercept(name, callback) ?: interceptor.intercept(name, callback)
+    },
+    onHomeClick = {
+        val callback = original.onHomeClick
+        val name = "onHomeClick"
         specificInterceptors[name]?.intercept(name, callback) ?: interceptor.intercept(name, callback)
     },
 )

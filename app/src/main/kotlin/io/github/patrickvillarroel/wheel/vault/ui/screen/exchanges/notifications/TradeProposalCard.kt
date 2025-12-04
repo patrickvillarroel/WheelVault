@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,6 +31,8 @@ import coil3.compose.AsyncImage
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.domain.model.TradeProposal
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 @Composable
 fun TradeProposalCard(
@@ -84,7 +85,7 @@ fun TradeProposalCard(
                 CarThumbnailWithInfo(
                     car = notification.offeredCar,
                     label = "Ofrece",
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
 
                 Icon(
@@ -98,7 +99,7 @@ fun TradeProposalCard(
                 CarThumbnailWithInfo(
                     car = notification.requestedCar,
                     label = "Solicita",
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
             }
 
@@ -124,7 +125,7 @@ fun TradeProposalCard(
                 )
 
                 if (notification.trade.isPending && notification.trade.originalExpiresAt != null) {
-                    val now = kotlin.time.Clock.System.now()
+                    val now = Clock.System.now()
                     val timeLeft = notification.trade.originalExpiresAt - now
                     if (timeLeft.isPositive()) {
                         val hoursLeft = timeLeft.inWholeHours
@@ -146,21 +147,17 @@ fun TradeProposalCard(
 }
 
 @Composable
-private fun CarThumbnailWithInfo(
-    car: CarItem,
-    label: String,
-    modifier: Modifier = Modifier
-) {
+private fun CarThumbnailWithInfo(car: CarItem, label: String, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
         )
 
         Card(
@@ -188,14 +185,14 @@ private fun CarThumbnailWithInfo(
             fontWeight = FontWeight.Medium,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
         Text(
             text = car.year.toString(),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
@@ -203,18 +200,26 @@ private fun CarThumbnailWithInfo(
 @Composable
 private fun TradeStatusBadge(status: TradeProposal.TradeEventType) {
     val (text, color) = when (status) {
-        TradeProposal.TradeEventType.PROPOSED -> stringResource(R.string.exchange_status_proposed) to MaterialTheme.colorScheme.tertiary
-        TradeProposal.TradeEventType.ACCEPTED -> stringResource(R.string.exchange_status_accepted) to MaterialTheme.colorScheme.primary
-        TradeProposal.TradeEventType.REJECTED -> stringResource(R.string.exchange_status_rejected) to MaterialTheme.colorScheme.error
-        TradeProposal.TradeEventType.CANCELLED -> stringResource(R.string.exchange_status_cancelled) to MaterialTheme.colorScheme.outline
-        TradeProposal.TradeEventType.COMPLETED -> stringResource(R.string.exchange_status_completed) to MaterialTheme.colorScheme.primary
+        TradeProposal.TradeEventType.PROPOSED -> stringResource(R.string.exchange_status_proposed) to
+            MaterialTheme.colorScheme.tertiary
+
+        TradeProposal.TradeEventType.ACCEPTED -> stringResource(R.string.exchange_status_accepted) to
+            MaterialTheme.colorScheme.primary
+
+        TradeProposal.TradeEventType.REJECTED -> stringResource(R.string.exchange_status_rejected) to
+            MaterialTheme.colorScheme.error
+
+        TradeProposal.TradeEventType.CANCELLED -> stringResource(R.string.exchange_status_cancelled) to
+            MaterialTheme.colorScheme.outline
+
+        TradeProposal.TradeEventType.COMPLETED -> stringResource(R.string.exchange_status_completed) to
+            MaterialTheme.colorScheme.primary
+
         TradeProposal.TradeEventType.EXPIRED -> "Expirada" to MaterialTheme.colorScheme.error
     }
 
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = color.copy(alpha = 0.1f),
-        ),
+        colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.1f)),
     ) {
         Text(
             text = text,
@@ -226,7 +231,4 @@ private fun TradeStatusBadge(status: TradeProposal.TradeEventType) {
     }
 }
 
-private fun formatDate(instant: kotlin.time.Instant): String {
-    // Implementación simplificada - deberías usar una librería de formateo de fechas
-    return instant.toString().take(10)
-}
+private fun formatDate(instant: Instant): String = instant.toString().take(10)

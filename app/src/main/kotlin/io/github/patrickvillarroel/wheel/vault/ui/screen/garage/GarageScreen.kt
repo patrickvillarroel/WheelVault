@@ -52,8 +52,9 @@ fun GarageScreen(
         manufacturerList = brandsNames,
         callbacks = GarageCallbacks(
             onHomeClick = callbacks.onHomeClick,
-            onSearchQueryChange = {
-                searchQuery = it
+            onSearchQueryChange = { query ->
+                @Suppress("ASSIGNED_VALUE_IS_NEVER_READ")
+                searchQuery = query
             },
             onSearchClick = {
                 viewModel.setSearchQuery(searchQuery)
@@ -67,7 +68,10 @@ fun GarageScreen(
                 carsPaged.refresh()
                 brandViewModel.fetchNames(true)
             },
-            onUiStateChange = { uiState = it },
+            onUiStateChange = { newUiState ->
+                @Suppress("ASSIGNED_VALUE_IS_NEVER_READ")
+                uiState = newUiState
+            },
             headersCallbacks = HeaderCallbacks(
                 onProfileClick = callbacks.onProfileClick,
                 onGarageClick = {
@@ -78,12 +82,14 @@ fun GarageScreen(
                 },
                 onStatisticsClick = {},
                 onExchangesClick = callbacks.onExchangesClick,
+                onNotificationsClick = { callbacks.onNotificationsClick() },
+                onHomeClick = callbacks.onHomeClick,
             ),
-            onFilterByBrand = {
-                viewModel.setManufacturerFilter(it)
+            onFilterByBrand = { manufacturerName ->
+                viewModel.setManufacturerFilter(manufacturerName)
             },
-            onFilterByFavorite = {
-                viewModel.setFavoriteFilter(it)
+            onFilterByFavorite = { isFavorite ->
+                viewModel.setFavoriteFilter(isFavorite)
             },
             onSortByRecent = {
                 viewModel.setSortOrder(orderAsc = false)

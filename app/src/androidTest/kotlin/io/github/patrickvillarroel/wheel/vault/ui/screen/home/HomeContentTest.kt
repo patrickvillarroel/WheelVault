@@ -15,6 +15,7 @@ import androidx.test.core.app.ApplicationProvider
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.VideoNews
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderCallbacks
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HomeCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertTrue

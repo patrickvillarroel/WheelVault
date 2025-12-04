@@ -1,20 +1,7 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.selection
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -48,17 +35,23 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuButtonHea
 @Composable
 fun ExchangeCarSelection(
     availableCars: List<CarItem>,
-    carsInActiveTrades: List<CarItem> = emptyList(),
+    carsInActiveTrades: List<CarItem>,
     onCarClick: (CarItem) -> Unit,
-    modifier: Modifier = Modifier
+    headerCallbacks: HeaderCallbacks,
+    modifier: Modifier = Modifier,
 ) {
     Scaffold(
         modifier = modifier,
         topBar = {
-            CarSelectionHeader(onHomeClick = {}, headerCallbacks = HeaderCallbacks.default)
+            CarSelectionHeader(onHomeClick = headerCallbacks.onHomeClick, headerCallbacks = headerCallbacks)
         },
     ) { paddingValues ->
-        LazyColumn(Modifier.padding(paddingValues).fillMaxSize().padding(start = 15.dp, top = 7.dp, end = 15.dp)) {
+        LazyColumn(
+            Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .padding(start = 15.dp, top = 7.dp, end = 15.dp),
+        ) {
             // Sección de carros disponibles
             if (availableCars.isNotEmpty()) {
                 item {
@@ -67,7 +60,7 @@ fun ExchangeCarSelection(
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 3.dp)
+                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 3.dp),
                     )
                 }
                 items(availableCars, key = { it.id }) { item ->
@@ -90,7 +83,7 @@ fun ExchangeCarSelection(
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.outline,
-                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 3.dp)
+                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 3.dp),
                     )
                 }
                 items(carsInActiveTrades, key = { it.id }) { item ->
@@ -108,28 +101,28 @@ fun ExchangeCarSelection(
                                 .padding(3.dp)
                                 .fillMaxWidth(),
                             colors = CardDefaults.cardColors(
-                                containerColor = Color.Black.copy(alpha = 0.5f)
+                                containerColor = Color.Black.copy(alpha = 0.5f),
                             ),
-                            shape = RoundedCornerShape(20.dp)
+                            shape = RoundedCornerShape(20.dp),
                         ) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(16.dp),
                                 horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Lock,
                                     contentDescription = null,
                                     tint = Color.White,
-                                    modifier = Modifier.size(20.dp)
+                                    modifier = Modifier.size(20.dp),
                                 )
                                 Text(
                                     text = " En solicitud activa",
                                     style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White
+                                    color = Color.White,
                                 )
                             }
                         }
@@ -144,30 +137,19 @@ fun ExchangeCarSelection(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Text(
                             text = "No tienes carros disponibles para intercambiar",
                             style = MaterialTheme.typography.bodyLarge,
                             textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.outline
+                            color = MaterialTheme.colorScheme.outline,
                         )
                     }
                 }
             }
         }
     }
-}
-
-// Mantener compatibilidad con versión anterior
-@Composable
-fun ExchangeCarSelection(carResults: List<CarItem>, onCarClick: (CarItem) -> Unit, modifier: Modifier = Modifier) {
-    ExchangeCarSelection(
-        availableCars = carResults,
-        carsInActiveTrades = emptyList(),
-        onCarClick = onCarClick,
-        modifier = modifier
-    )
 }
 
 @Composable
@@ -188,7 +170,8 @@ private fun CarSelectionHeader(
                     bottomStart = 30.dp,
                     bottomEnd = 30.dp,
                 ),
-            ).windowInsetsPadding(WindowInsets.statusBars),
+            )
+            .windowInsetsPadding(WindowInsets.statusBars),
     ) {
         MenuButtonHeader(headerCallbacks)
         Text(
@@ -196,14 +179,18 @@ private fun CarSelectionHeader(
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.ExtraBold,
             style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(start = 70.dp, end = 70.dp, top = 40.dp, bottom = 40.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(start = 70.dp, end = 70.dp, top = 40.dp, bottom = 40.dp)
+                .fillMaxWidth(),
         )
         AssistChip(
             onClick = onHomeClick,
             label = { Icon(Icons.Filled.Home, stringResource(R.string.home), tint = Color.White) },
             colors = AssistChipDefaults.assistChipColors(containerColor = Color(0xFF1D1B20)),
             border = AssistChipDefaults.assistChipBorder(enabled = true, borderColor = Color(0xFF1D1B20)),
-            modifier = Modifier.align(Alignment.BottomStart).padding(start = 30.dp),
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(start = 30.dp),
         )
     }
 }
@@ -225,7 +212,12 @@ private fun ExchangeCarSelectionPreview() {
             imageUrl = EmptyImage,
         )
     }
-    ExchangeCarSelection(carResults = carResults, onCarClick = {})
+    ExchangeCarSelection(
+        availableCars = carResults,
+        carsInActiveTrades = emptyList(),
+        onCarClick = {},
+        headerCallbacks = HeaderCallbacks.default,
+    )
 }
 
 @Preview

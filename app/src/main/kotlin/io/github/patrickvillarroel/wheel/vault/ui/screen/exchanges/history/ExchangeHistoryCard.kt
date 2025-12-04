@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -28,12 +28,10 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.TradeProposal
+import kotlin.time.Instant
 
 @Composable
-fun ExchangeHistoryCard(
-    trade: TradeProposal.CurrentTradeStatus,
-    modifier: Modifier = Modifier,
-) {
+fun ExchangeHistoryCard(trade: TradeProposal.CurrentTradeStatus, modifier: Modifier = Modifier) {
     val isSuccessful = trade.currentStatus == TradeProposal.TradeEventType.ACCEPTED ||
         trade.currentStatus == TradeProposal.TradeEventType.COMPLETED
 
@@ -147,16 +145,12 @@ private fun CarThumbnail(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun getStatusText(status: TradeProposal.TradeEventType): String {
-    return when (status) {
-        TradeProposal.TradeEventType.ACCEPTED -> stringResource(R.string.exchange_status_accepted)
-        TradeProposal.TradeEventType.REJECTED -> stringResource(R.string.exchange_status_rejected)
-        TradeProposal.TradeEventType.CANCELLED -> stringResource(R.string.exchange_status_cancelled)
-        TradeProposal.TradeEventType.COMPLETED -> stringResource(R.string.exchange_status_completed)
-        else -> stringResource(R.string.exchange_status_proposed)
-    }
+private fun getStatusText(status: TradeProposal.TradeEventType): String = when (status) {
+    TradeProposal.TradeEventType.ACCEPTED -> stringResource(R.string.exchange_status_accepted)
+    TradeProposal.TradeEventType.REJECTED -> stringResource(R.string.exchange_status_rejected)
+    TradeProposal.TradeEventType.CANCELLED -> stringResource(R.string.exchange_status_cancelled)
+    TradeProposal.TradeEventType.COMPLETED -> stringResource(R.string.exchange_status_completed)
+    else -> stringResource(R.string.exchange_status_proposed)
 }
 
-private fun formatDate(instant: kotlin.time.Instant): String {
-    return instant.toString().take(10)
-}
+private fun formatDate(instant: Instant): String = instant.toString().take(10)

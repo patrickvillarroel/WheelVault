@@ -1,5 +1,6 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.confirmation
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -18,27 +19,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.ChangeCircle
 import androidx.compose.material.icons.filled.Sync
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FabPosition
-import androidx.compose.material3.FilledIconButton
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SecondaryTabRow
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -50,16 +35,19 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import co.touchlab.kermit.Logger
 import coil3.compose.AsyncImage
 import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BackTextButton
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuHeader
-import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarDetail
 import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.component.ConfirmationDialog
+import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
+
+private val logger = Logger.withTag("ExchangeConfirmCar")
 
 @Composable
 fun ExchangeConfirmCar(
@@ -72,17 +60,14 @@ fun ExchangeConfirmCar(
     message: String? = null,
     isRespondingToOffer: Boolean = false,
 ) {
-    // Log para debugging
-    co.touchlab.kermit.Logger.withTag("ExchangeConfirmCar").d {
-        "offeredCar: id=${offeredCar.id}, brand=${offeredCar.brand}, model=${offeredCar.model}"
-    }
-    co.touchlab.kermit.Logger.withTag("ExchangeConfirmCar").d {
-        "requestedCar: id=${requestedCar.id}, brand=${requestedCar.brand}, model=${requestedCar.model}"
-    }
-
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
-    var showConfirmationDialog by remember { mutableStateOf(false) }
+    var showConfirmationDialog by rememberSaveable { mutableStateOf(false) }
     val tabs = listOf(stringResource(R.string.offered_car), stringResource(R.string.requested_car))
+    // Log para debugging
+    logger.d {
+        "offeredCar: id=${offeredCar.id}, brand=${offeredCar.brand}, model=${offeredCar.model}\n" +
+            "requestedCar: id=${requestedCar.id}, brand=${requestedCar.brand}, model=${requestedCar.model}"
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -92,16 +77,19 @@ fun ExchangeConfirmCar(
             }
         },
         floatingActionButton = {
-            ExchangeActionButtons(onAcceptClick = {
-                co.touchlab.kermit.Logger.withTag("ExchangeConfirmCar").d {
-                    "Accept clicked - showing confirmation dialog"
-                }
-                showConfirmationDialog = true
-            }, onCancelClick = {
-                co.touchlab.kermit.Logger.withTag("ExchangeConfirmCar").d { "Cancel clicked" }
-                showConfirmationDialog = false
-                onCancelClick()
-            })
+            ExchangeActionButtons(
+                onAcceptClick = {
+                    logger.d { "Accept clicked - showing confirmation dialog" }
+                    @Suppress("ASSIGNED_VALUE_IS_NEVER_READ")
+                    showConfirmationDialog = true
+                },
+                onCancelClick = {
+                    logger.d { "Cancel clicked" }
+                    @Suppress("ASSIGNED_VALUE_IS_NEVER_READ")
+                    showConfirmationDialog = false
+                    onCancelClick()
+                },
+            )
         },
         floatingActionButtonPosition = FabPosition.Center,
     ) { paddingValues ->
@@ -136,12 +124,12 @@ fun ExchangeConfirmCar(
 
             // Usar AnimatedContent para cambiar entre los dos autos
             item(key = "car_details_animated") {
-                androidx.compose.animation.AnimatedContent(
+                AnimatedContent(
                     targetState = selectedTabIndex,
                     label = "car_details_transition",
                 ) { tabIndex ->
                     val carToShow = if (tabIndex == 0) offeredCar else requestedCar
-                    co.touchlab.kermit.Logger.withTag("ExchangeConfirmCar").d {
+                    logger.d {
                         "Showing tab $tabIndex - car: id=${carToShow.id}, brand=${carToShow.brand}, model=${carToShow.model}"
                     }
                     Column {
@@ -196,13 +184,13 @@ fun ExchangeConfirmCar(
                     },
                 ),
                 onDismissRequest = {
-                    co.touchlab.kermit.Logger.withTag("ExchangeConfirmCar").d { "Confirmation dialog dismissed" }
+                    logger.d { "Confirmation dialog dismissed" }
+                    @Suppress("ASSIGNED_VALUE_IS_NEVER_READ")
                     showConfirmationDialog = false
                 },
                 onConfirm = {
-                    co.touchlab.kermit.Logger.withTag("ExchangeConfirmCar").d {
-                        "Confirmation dialog confirmed - calling onAcceptClick()"
-                    }
+                    logger.d { "Confirmation dialog confirmed - calling onAcceptClick()" }
+                    @Suppress("ASSIGNED_VALUE_IS_NEVER_READ")
                     showConfirmationDialog = false
                     onAcceptClick()
                 },
@@ -323,6 +311,7 @@ private fun ExchangeTabs(
                             fontWeight = FontWeight.Bold,
                         )
                     },
+                    selectedContentColor = MaterialTheme.colorScheme.surfaceTint,
                     unselectedContentColor = Color.Gray,
                 )
             }
@@ -343,7 +332,7 @@ private fun ExchangeActionButtons(onAcceptClick: () -> Unit, onCancelClick: () -
     ) {
         ActionButton(
             onClick = {
-                co.touchlab.kermit.Logger.withTag("ExchangeActionButtons").d { "Cancel button clicked" }
+                logger.d(tag = "ExchangeActionButtons") { "Cancel button clicked" }
                 onCancelClick()
             },
             icon = Icons.Filled.Cancel,
@@ -354,7 +343,7 @@ private fun ExchangeActionButtons(onAcceptClick: () -> Unit, onCancelClick: () -
 
         ActionButton(
             onClick = {
-                co.touchlab.kermit.Logger.withTag("ExchangeActionButtons").d { "Accept/Confirm button clicked" }
+                logger.d(tag = "ExchangeActionButtons") { "Accept/Confirm button clicked" }
                 onAcceptClick()
             },
             icon = Icons.Filled.Sync,
@@ -410,7 +399,7 @@ private fun ActionButton(
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun ExchangeConfirmCarPreview() {
     val offeredCar = CarItem(
@@ -435,11 +424,13 @@ private fun ExchangeConfirmCarPreview() {
     )
     val callbacks = HeaderBackCallbacks.default
 
-    ExchangeConfirmCar(
-        offeredCar = offeredCar,
-        requestedCar = requestedCar,
-        callbacks = callbacks,
-        onAcceptClick = {},
-        onCancelClick = {},
-    )
+    WheelVaultTheme {
+        ExchangeConfirmCar(
+            offeredCar = offeredCar,
+            requestedCar = requestedCar,
+            callbacks = callbacks,
+            onAcceptClick = {},
+            onCancelClick = {},
+        )
+    }
 }

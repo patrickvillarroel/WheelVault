@@ -39,15 +39,17 @@ fun ExchangeScreen(
     }
 
     ExchangeContent(
+        uiState = uiState,
         topBarState = topBarState,
         searchQuery = searchQuery,
-        uiState = uiState,
         manufacturerList = brandsNames,
         onLoadMore = { exchangeViewModel.loadMoreCars() },
+        onTradeHistoryClick = { callbacks.onTradeHistoryClick() },
         callbacks = GarageCallbacks(
             onHomeClick = callbacks.onHomeClick,
-            onSearchQueryChange = {
-                searchQuery = it
+            onSearchQueryChange = { newSearchQuery ->
+                @Suppress("ASSIGNED_VALUE_IS_NEVER_READ")
+                searchQuery = newSearchQuery
             },
             onSearchClick = {
                 garageViewModel.search(searchQuery)
@@ -62,7 +64,10 @@ fun ExchangeScreen(
                 garageViewModel.fetchAll(true)
                 brandViewModel.fetchNames(true)
             },
-            onUiStateChange = { topBarState = it },
+            onUiStateChange = { newTopBarState ->
+                @Suppress("ASSIGNED_VALUE_IS_NEVER_READ")
+                topBarState = newTopBarState
+            },
             headersCallbacks = HeaderCallbacks(
                 onProfileClick = callbacks.onProfileClick,
                 onGarageClick = {},
@@ -70,12 +75,13 @@ fun ExchangeScreen(
                 onStatisticsClick = {},
                 onExchangesClick = callbacks.onExchangesClick,
                 onNotificationsClick = callbacks.onNotificationsClick,
+                onHomeClick = callbacks.onHomeClick,
             ),
-            onFilterByBrand = {
-                garageViewModel.filterByManufacturer(it)
+            onFilterByBrand = { manufacturerName ->
+                garageViewModel.filterByManufacturer(manufacturerName)
             },
-            onFilterByFavorite = {
-                if (it) garageViewModel.fetchFavorites() else garageViewModel.fetchAll(true)
+            onFilterByFavorite = { isFavoriteFilterEnabled ->
+                if (isFavoriteFilterEnabled) garageViewModel.fetchFavorites() else garageViewModel.fetchAll(true)
             },
             onSortByRecent = {
                 garageViewModel.fetchAll(force = true, orderAsc = false)

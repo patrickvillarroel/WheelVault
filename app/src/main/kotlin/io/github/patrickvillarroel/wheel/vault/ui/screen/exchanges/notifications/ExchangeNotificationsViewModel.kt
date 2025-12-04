@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.uuid.Uuid
 
 class ExchangeNotificationsViewModel(
     private val tradeRepository: TradeRepository,
@@ -56,16 +57,14 @@ class ExchangeNotificationsViewModel(
                 logger.d { "Received: ${receivedProposals.size}, Sent: ${sentProposals.size}" }
 
                 // Cache de carros para evitar cargar el mismo carro múltiples veces
-                val carsCache = mutableMapOf<kotlin.uuid.Uuid, CarItem?>()
+                val carsCache = mutableMapOf<Uuid, CarItem?>()
 
-                suspend fun getCar(carId: kotlin.uuid.Uuid): CarItem? {
-                    return carsCache.getOrPut(carId) {
-                        try {
-                            carsRepository.fetch(carId)
-                        } catch (e: Exception) {
-                            logger.w { "Failed to load car $carId: ${e.message}" }
-                            null
-                        }
+                suspend fun getCar(carId: Uuid): CarItem? = carsCache.getOrPut(carId) {
+                    try {
+                        carsRepository.fetch(carId)
+                    } catch (e: Exception) {
+                        logger.w { "Failed to load car $carId: ${e.message}" }
+                        null
                     }
                 }
 
@@ -78,7 +77,7 @@ class ExchangeNotificationsViewModel(
                         TradeNotification(
                             trade = trade,
                             offeredCar = offeredCar,
-                            requestedCar = requestedCar
+                            requestedCar = requestedCar,
                         )
                     } else {
                         logger.w { "Missing cars for trade ${trade.tradeGroupId}" }
@@ -86,6 +85,7 @@ class ExchangeNotificationsViewModel(
                     }
                 }
 
+                // FIXME separate loading of send and received
                 val sentWithCars = sentProposals.mapNotNull { trade ->
                     val offeredCar = getCar(trade.offeredCarId)
                     val requestedCar = getCar(trade.requestedCarId)
@@ -94,7 +94,7 @@ class ExchangeNotificationsViewModel(
                         TradeNotification(
                             trade = trade,
                             offeredCar = offeredCar,
-                            requestedCar = requestedCar
+                            requestedCar = requestedCar,
                         )
                     } else {
                         logger.w { "Missing cars for trade ${trade.tradeGroupId}" }
@@ -102,7 +102,9 @@ class ExchangeNotificationsViewModel(
                     }
                 }
 
-                logger.d { "Loaded ${carsCache.size} unique cars (${carsCache.values.count { it != null }} successful)" }
+                logger.d {
+                    "Loaded ${carsCache.size} unique cars (${carsCache.values.count { it != null }} successful)"
+                }
 
                 _notificationsState.update {
                     NotificationsUiState.Success(
@@ -118,15 +120,13 @@ class ExchangeNotificationsViewModel(
         }
     }
 
-    private fun getCurrentUserId(): String {
-        return supabaseClient.auth.currentUserOrNull()?.id ?: ""
-    }
+    private fun getCurrentUserId(): String = supabaseClient.auth.currentUserOrNull()?.id ?: ""
 
     @Immutable
     data class TradeNotification(
         @Stable val trade: TradeProposal.CurrentTradeStatus,
         @Stable val offeredCar: CarItem,
-        @Stable val requestedCar: CarItem
+        @Stable val requestedCar: CarItem,
     )
 
     sealed interface NotificationsUiState {

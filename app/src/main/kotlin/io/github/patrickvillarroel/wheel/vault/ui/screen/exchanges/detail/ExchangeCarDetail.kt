@@ -151,7 +151,7 @@ private fun ExchangeCarDetailContentPreview() {
     )
     val callbacks = HeaderBackCallbacks.default
 
-    SharedTransitionScope {
+    SharedTransitionScope { modifier ->
         AnimatedVisibility(true) {
             ExchangeCarDetailContent(
                 sharedTransitionScope = this@SharedTransitionScope,
@@ -160,7 +160,7 @@ private fun ExchangeCarDetailContentPreview() {
                 requestText = "Busco porsche rallyE color verde, si es STH mejor.",
                 callbacks = callbacks,
                 onExchangeClick = {},
-                modifier = it,
+                modifier = modifier,
             )
         }
     }

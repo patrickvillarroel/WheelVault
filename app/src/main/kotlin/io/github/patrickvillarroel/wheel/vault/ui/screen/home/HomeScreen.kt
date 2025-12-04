@@ -8,13 +8,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.paging.compose.collectAsLazyPagingItems
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderCallbacks
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HomeCallbacks
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.uuid.Uuid
 
 @Composable
 fun HomeScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    callbacks: HomeNavCallbacks,
+    onAddClick: () -> Unit,
+    onSearchClick: () -> Unit,
+    onBrandClick: (Uuid) -> Unit,
+    onCarClick: (Uuid) -> Unit,
+    callbacks: HeaderCallbacks,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = koinViewModel(),
 ) {
@@ -30,9 +37,9 @@ fun HomeScreen(
         news = news,
         recentCars = recentCars,
         info = HomeCallbacks(
-            onAddClick = callbacks.onAddClick,
-            onSearchClick = callbacks.onSearchClick,
-            onBrandClick = callbacks.onBrandClick,
+            onAddClick = onAddClick,
+            onSearchClick = onSearchClick,
+            onBrandClick = onBrandClick,
             onNewsClick = { video ->
                 val rawIntent = Intent(Intent.ACTION_VIEW, video.link.toUri())
                 val youtubeIntent = rawIntent.clone() as Intent
@@ -45,13 +52,13 @@ fun HomeScreen(
                     context.startActivity(rawIntent)
                 }
             },
-            onCarClick = callbacks.onCarClick,
+            onCarClick = onCarClick,
             onRefresh = {
                 brands.refresh()
                 recentCars.refresh()
                 news.refresh()
             },
-            headersCallbacks = callbacks.headerCallbacks,
+            headersCallbacks = callbacks,
         ),
         modifier = modifier,
     )

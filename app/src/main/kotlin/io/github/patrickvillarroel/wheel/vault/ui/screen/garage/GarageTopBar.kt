@@ -80,8 +80,14 @@ private fun TopBarPreview() {
         GarageTopBar(
             uiState,
             searchQuery = searchQuery,
-            onSearchQueryChange = { searchQuery = it },
-            onStateChange = { uiState = it },
+            onSearchQueryChange = { query ->
+                @Suppress("ASSIGNED_VALUE_IS_NEVER_READ")
+                searchQuery = query
+            },
+            onStateChange = { newUiState ->
+                @Suppress("ASSIGNED_VALUE_IS_NEVER_READ")
+                uiState = newUiState
+            },
             onSearch = {},
             topBar = GarageCallbacks.FilterBar.default,
             manufacturerList = BrandViewModel.manufacturerList,

@@ -13,9 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class ExchangeHistoryViewModel(
-    private val tradeRepository: TradeRepository,
-) : ViewModel() {
+class ExchangeHistoryViewModel(private val tradeRepository: TradeRepository) : ViewModel() {
     companion object {
         private val logger = Logger.withTag("ExchangeHistoryViewModel")
     }
@@ -49,9 +47,7 @@ class ExchangeHistoryViewModel(
         data object Loading : HistoryUiState
 
         @Immutable
-        data class Success(
-            val completedTrades: List<TradeProposal.CurrentTradeStatus>,
-        ) : HistoryUiState
+        data class Success(val completedTrades: List<TradeProposal.CurrentTradeStatus>) : HistoryUiState
 
         data object Error : HistoryUiState
     }

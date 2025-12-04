@@ -12,7 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.CarViewModel
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.CarErrorScreen
+import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.ExchangeViewModel
 import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.selection.ExchangeCarSelectionViewModel.CarsUiState.Error
 import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.selection.ExchangeCarSelectionViewModel.CarsUiState.Loading
 import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.selection.ExchangeCarSelectionViewModel.CarsUiState.Success
@@ -21,9 +23,10 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ExchangeCarSelectionScreen(
     onCarClick: (CarItem) -> Unit,
+    headerCallbacks: HeaderCallbacks,
     modifier: Modifier = Modifier,
     viewModel: ExchangeCarSelectionViewModel = koinViewModel(),
-    exchangeViewModel: io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.ExchangeViewModel = org.koin.compose.koinInject(),
+    exchangeViewModel: ExchangeViewModel = koinViewModel(),
 ) {
     val car by viewModel.carsState.collectAsStateWithLifecycle()
 
@@ -35,11 +38,12 @@ fun ExchangeCarSelectionScreen(
         when (state) {
             Loading -> Scaffold(
                 Modifier.fillMaxSize(),
-            ) {
-                LoadingIndicator(Modifier.padding(it).fillMaxSize())
+            ) { paddingValues ->
+                LoadingIndicator(Modifier.padding(paddingValues).fillMaxSize())
             }
 
             Error -> CarErrorScreen(CarViewModel.CarDetailUiState.Error)
+
             is Success -> ExchangeCarSelection(
                 availableCars = state.availableCars,
                 carsInActiveTrades = state.carsInActiveTrades,
@@ -49,6 +53,7 @@ fun ExchangeCarSelectionScreen(
                     // Navegar a la siguiente pantalla
                     onCarClick(selectedCar)
                 },
+                headerCallbacks = headerCallbacks,
                 modifier = modifier,
             )
         }

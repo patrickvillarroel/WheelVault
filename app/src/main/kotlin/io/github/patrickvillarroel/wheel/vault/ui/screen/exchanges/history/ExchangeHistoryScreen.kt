@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -67,13 +68,11 @@ fun ExchangeHistoryScreen(
 
                 is ExchangeHistoryViewModel.HistoryUiState.Success -> {
                     if (state.completedTrades.isEmpty()) {
-                        EmptyHistoryContent(
-                            modifier = Modifier.fillMaxSize(),
-                        )
+                        EmptyHistoryContent(modifier = Modifier.fillMaxSize())
                     } else {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
-                            contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
+                            contentPadding = PaddingValues(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             items(
@@ -92,10 +91,7 @@ fun ExchangeHistoryScreen(
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            text = stringResource(
-                                R.string.error_loading_of,
-                                stringResource(R.string.exchange_history),
-                            ),
+                            text = stringResource(R.string.error_loading_of, stringResource(R.string.exchange_history)),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.error,
                         )

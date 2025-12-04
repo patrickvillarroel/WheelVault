@@ -226,8 +226,7 @@ class TradeSupabaseDataSource(
         return history.map { it.toDomain() }
     }
 
-    override suspend fun getAvailableCarsForTrade(): List<CarItem> =
-        carSupabaseDataSource.getCarsForTrade()
+    override suspend fun getAvailableCarsForTrade(): List<CarItem> = carSupabaseDataSource.getCarsForTrade()
 
     override suspend fun getActiveTradesForCar(carId: Uuid): List<TradeProposal.CurrentTradeStatus> {
         val trades = supabase.from("current_trade_status")

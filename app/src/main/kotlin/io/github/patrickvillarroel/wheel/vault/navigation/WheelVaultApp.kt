@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSerializable
 import androidx.compose.runtime.setValue
@@ -33,6 +34,7 @@ import androidx.navigationevent.NavigationEvent
 import co.touchlab.kermit.Logger
 import io.github.patrickvillarroel.wheel.vault.BuildConfig
 import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
+import io.github.patrickvillarroel.wheel.vault.navigation.NavigationKeys.*
 import io.github.patrickvillarroel.wheel.vault.ui.screen.camera.CameraLensScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.brand.BrandDetailScreen
@@ -41,11 +43,13 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.detail.car.edit.CarEdit
 import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.confirmation.ExchangeConfirmCarScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.detail.ExchangeCarDetailScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.garage.ExchangeScreen
+import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.history.ExchangeHistoryScreen
+import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.notifications.ExchangeNotificationsScreen
+import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.notifications.TradeProposalDetailScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.offer.ExchangeCarOfferScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.selection.ExchangeCarSelectionScreen
-import io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageCallbacks
+import io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageCallbacks.Partial
 import io.github.patrickvillarroel.wheel.vault.ui.screen.garage.GarageScreen
-import io.github.patrickvillarroel.wheel.vault.ui.screen.home.HomeNavCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.home.HomeScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.login.LoginScreen
 import io.github.patrickvillarroel.wheel.vault.ui.screen.login.LoginWithEmailScreen
@@ -58,6 +62,7 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.splash.SplashScreen
 import org.koin.compose.viewmodel.koinActivityViewModel
 
 /** Entry point of app with navigation */
+@Suppress("SENSELESS_COMPARISON") // BuildConfig have constants, so it's fine, change for build types
 @Composable
 fun WheelVaultApp(
     modifier: Modifier = Modifier,
@@ -71,12 +76,12 @@ fun WheelVaultApp(
     val backStack = rememberSerializable(
         serializer = NavBackStackSerializer(elementSerializer = NavigationKeys.serializer()),
     ) {
-        NavBackStack(NavigationKeys.Splash)
+        NavBackStack(Splash)
     }
     var isSplashDone by rememberSaveable { mutableStateOf(false) }
 
     // prevent exceptions with empty navigation, this trigger recomposition
-    if (backStack.isEmpty()) backStack += NavigationKeys.Home
+    if (backStack.isEmpty()) backStack += Home
 
     LaunchedEffect(Unit) {
         onboardingViewModel.reloadOnboardingState()
@@ -87,14 +92,14 @@ fun WheelVaultApp(
 
         when (session) {
             is SessionUiStatus.Authenticated -> {
-                if (backStack.lastOrNull() is NavigationKeys.LoginWithEmailAndPassword ||
-                    backStack.lastOrNull() is NavigationKeys.Login ||
-                    backStack.lastOrNull() is NavigationKeys.Splash ||
-                    backStack.lastOrNull() is NavigationKeys.Onboarding
+                if (backStack.lastOrNull() is LoginWithEmailAndPassword ||
+                    backStack.lastOrNull() is Login ||
+                    backStack.lastOrNull() is Splash ||
+                    backStack.lastOrNull() is Onboarding
                 ) {
                     Snapshot.withMutableSnapshot {
-                        if (!backStack.contains(NavigationKeys.Home)) backStack += NavigationKeys.Home
-                        backStack.removeAll { it !is NavigationKeys.Home }
+                        if (!backStack.contains(Home)) backStack += Home
+                        backStack.removeAll { it !is Home }
                     }
                 }
             }
@@ -104,13 +109,26 @@ fun WheelVaultApp(
             -> {
                 Snapshot.withMutableSnapshot {
                     onboardingViewModel.reloadOnboardingState()
-                    if (!backStack.contains(NavigationKeys.Login)) backStack += NavigationKeys.Login
-                    backStack.removeAll { it !is NavigationKeys.Login }
+                    if (!backStack.contains(Login)) backStack += Login
+                    backStack.removeAll { it !is Login }
                 }
             }
 
             SessionUiStatus.Initializing -> Unit
         }
+    }
+
+    val headerCallbacks = remember {
+        HeaderBackCallbacks(
+            onBackClick = { backStack.removeLastOrNull() },
+            onProfileClick = { backStack += Profile },
+            onGarageClick = { backStack += Garage() },
+            onFavoritesClick = { backStack += Garage(favorites = true) },
+            onStatisticsClick = { backStack += Garage(statistics = true) },
+            onExchangesClick = { backStack += Exchanges() },
+            onNotificationsClick = { backStack += ExchangeNotifications },
+            onHomeClick = { backStack.removeAllOrAdd(Home) },
+        )
     }
 
     SharedTransitionLayout {
@@ -126,174 +144,134 @@ fun WheelVaultApp(
             popTransitionSpec = { ContentTransform(slideInHorizontally(), slideOutHorizontally { it }) },
         ) { key ->
             when (key) {
-                is NavigationKeys.Splash -> route(
+                is Splash -> route(
                     key,
                     transitionSpec = { ContentTransform(slideInVertically { -it }, slideOutVertically { it }) },
                     popTransitionSpec = { ContentTransform(slideInVertically { it }, slideOutVertically { -it }) },
                 ) {
                     SplashScreen(onVideoFinish = {
                         if (onboardingState is OnboardingViewModel.OnboardingUiState.Uncompleted) {
-                            backStack += NavigationKeys.Onboarding
+                            backStack += Onboarding
                             return@SplashScreen
                         }
                         isSplashDone = true
                     })
                 }
 
-                is NavigationKeys.Login -> route(key) {
+                is Login -> route(key) {
                     LoginScreen(
                         onLoginSuccess = {
                             Snapshot.withMutableSnapshot {
-                                backStack += NavigationKeys.Home
-                                backStack -= NavigationKeys.Login
+                                backStack += Home
+                                backStack -= Login
                             }
                         },
-                        onLoginWithEmail = {
-                            backStack += NavigationKeys.LoginWithEmailAndPassword(isMagicLink = true)
-                        },
+                        onLoginWithEmail = { backStack += LoginWithEmailAndPassword(isMagicLink = true) },
                         onLoginWithEmailAndPasswordClick = {
-                            backStack += NavigationKeys.LoginWithEmailAndPassword(isRegister = false)
+                            backStack += LoginWithEmailAndPassword(isRegister = false)
                         },
-                        onRegisterClick = {
-                            backStack += NavigationKeys.LoginWithEmailAndPassword(isRegister = true)
-                        },
+                        onRegisterClick = { backStack += LoginWithEmailAndPassword(isRegister = true) },
                     )
                 }
 
-                is NavigationKeys.LoginWithEmailAndPassword -> route(key) {
+                is LoginWithEmailAndPassword -> route(key) {
                     val (isRegister, isMagicLink) = key
                     LoginWithEmailScreen(
                         isRegister = isRegister,
                         isMagicLink = isMagicLink,
                         onLoginSuccess = {
                             Snapshot.withMutableSnapshot {
-                                backStack += NavigationKeys.Home
+                                backStack += Home
                                 backStack -= key
                             }
                         },
                     )
                 }
 
-                is NavigationKeys.Onboarding -> route(key) {
+                is Onboarding -> route(key) {
                     OnboardingScreen(onFinish = {
                         isSplashDone = true
-                        backStack -= NavigationKeys.Onboarding
+                        backStack -= Onboarding
                     })
                 }
 
-                is NavigationKeys.Home -> route(key) {
+                is Home -> route(key) {
                     HomeScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
-                        callbacks = HomeNavCallbacks(
-                            onAddClick = { backStack += NavigationKeys.AddCamera },
-                            onSearchClick = { backStack += NavigationKeys.Garage("") },
-                            onBrandClick = { backStack += NavigationKeys.BrandDetail(it) },
-                            onGarageClick = { backStack += NavigationKeys.Garage() },
-                            onCarClick = { backStack += NavigationKeys.CarDetail(it) },
-                            onFavoritesClick = { backStack += NavigationKeys.Garage(favorites = true) },
-                            onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
-                            onProfileClick = { backStack += NavigationKeys.Profile },
-                            onExchangesClick = { backStack += NavigationKeys.Exchanges() },
-                        ),
+                        onAddClick = { backStack += AddCamera },
+                        onSearchClick = { backStack += Garage("") },
+                        onBrandClick = { backStack += BrandDetail(it) },
+                        onCarClick = { backStack += CarDetail(it) },
+                        callbacks = headerCallbacks,
                     )
                 }
 
-                is NavigationKeys.AddCamera -> route(key) {
+                is AddCamera -> route(key) {
                     CameraLensScreen(
                         onBack = { backStack.removeLastOrNull() },
                         onAddDetail = { carModel, _ ->
                             Snapshot.withMutableSnapshot {
-                                backStack += NavigationKeys.CarEdit(model = carModel, fromCamera = true)
-                                backStack -= NavigationKeys.AddCamera
+                                backStack += CarEdit(model = carModel, fromCamera = true)
+                                backStack -= AddCamera
                             }
                         },
                         viewModel = koinActivityViewModel(),
                     )
                 }
 
-                is NavigationKeys.BrandDetail -> route(key) {
+                is BrandDetail -> route(key) {
                     BrandDetailScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
                         brandId = key.id,
-                        headerBackCallbacks = HeaderBackCallbacks(
-                            onBackClick = { backStack.removeLastOrNull() },
-                            onProfileClick = { backStack += NavigationKeys.Profile },
-                            onGarageClick = { backStack += NavigationKeys.Garage() },
-                            onFavoritesClick = { backStack += NavigationKeys.Garage(favorites = true) },
-                            onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
-                            onExchangesClick = { backStack += NavigationKeys.Exchanges() },
-                        ),
-                        onAddClick = { backStack += NavigationKeys.AddCamera },
-                        onCarClick = { backStack += NavigationKeys.CarDetail(it) },
+                        headerBackCallbacks = headerCallbacks,
+                        onAddClick = { backStack += AddCamera },
+                        onCarClick = { backStack += CarDetail(it) },
                     )
                 }
 
-                is NavigationKeys.Garage -> route(key) {
+                is Garage -> route(key) {
                     val (query, favorites) = key
                     GarageScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
                         query = query ?: "",
                         favorites = favorites,
-                        callbacks = GarageCallbacks.Partial(
-                            onHomeClick = { backStack.removeAllOrAdd(NavigationKeys.Home) },
-                            onCarClick = { backStack += NavigationKeys.CarDetail(it) },
-                            onAddClick = { backStack += NavigationKeys.AddCamera },
-                            onProfileClick = { backStack += NavigationKeys.Profile },
-                            onExchangesClick = { backStack += NavigationKeys.Exchanges() },
+                        callbacks = Partial(
+                            onHomeClick = { backStack.removeAllOrAdd(Home) },
+                            onCarClick = { backStack += CarDetail(it) },
+                            onAddClick = { backStack += AddCamera },
+                            onProfileClick = { backStack += Profile },
+                            onExchangesClick = { backStack += Exchanges() },
+                            onTradeHistoryClick = { backStack += ExchangesHistory },
+                            onNotificationsClick = { backStack += ExchangeNotifications },
                         ),
                     )
                 }
 
-                is NavigationKeys.CarDetail -> route(key) {
+                is CarDetail -> route(key) {
                     CarDetailScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
                         carId = key.id,
                         onEditClick = { backStack += it.toCarEdit() },
-                        headerBackCallbacks = HeaderBackCallbacks(
-                            onBackClick = { backStack.removeLastOrNull() },
-                            onProfileClick = { backStack += NavigationKeys.Profile },
-                            onGarageClick = { backStack += NavigationKeys.Garage() },
-                            onFavoritesClick = { backStack += NavigationKeys.Garage(favorites = true) },
-                            onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
-                            onExchangesClick = { backStack += NavigationKeys.Exchanges() },
-                        ),
+                        headerBackCallbacks = headerCallbacks,
                     )
                 }
 
-                is NavigationKeys.CarEdit -> route(key) {
+                is CarEdit -> route(key) {
                     CarEditScreen(
                         partialCarItem = key.toCarPartial(),
                         fromCamera = key.fromCamera,
-                        headersBackCallbacks = HeaderBackCallbacks(
-                            onBackClick = { backStack.removeLastOrNull() },
-                            onProfileClick = { backStack += NavigationKeys.Profile },
-                            onGarageClick = { backStack += NavigationKeys.Garage() },
-                            onFavoritesClick = { backStack += NavigationKeys.Garage(favorites = true) },
-                            onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
-                            onExchangesClick = { backStack += NavigationKeys.Exchanges() },
-                        ),
+                        headersBackCallbacks = headerCallbacks,
                         cameraViewModel = koinActivityViewModel(),
                     )
                 }
 
-                is NavigationKeys.Profile -> route(key) {
-                    ProfileScreen(
-                        backCallbacks = HeaderBackCallbacks(
-                            onProfileClick = {},
-                            onBackClick = { backStack.removeLastOrNull() },
-                            onGarageClick = { backStack += NavigationKeys.Garage() },
-                            onFavoritesClick = { backStack += NavigationKeys.Garage(favorites = true) },
-                            onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
-                            onExchangesClick = { backStack += NavigationKeys.Exchanges() },
-                        ),
-                    )
-                }
+                is Profile -> route(key) { ProfileScreen(backCallbacks = headerCallbacks) }
 
-                is NavigationKeys.Exchanges -> route(key) {
+                is Exchanges -> route(key) {
                     if (!BuildConfig.ENABLE_TRADING) {
                         navigationLogger.e {
                             "Exchanges not available and reached in navigation routes. Query='${key.query}'"
@@ -301,19 +279,19 @@ fun WheelVaultApp(
                     }
                     ExchangeScreen(
                         query = key.query ?: "",
-                        callbacks = GarageCallbacks.Partial(
-                            onHomeClick = { backStack.removeAllOrAdd(NavigationKeys.Home) },
-                            onCarClick = { backStack += NavigationKeys.ExchangeCarDetail(it) },
-                            onAddClick = { backStack += NavigationKeys.AddCamera },
-                            onProfileClick = { backStack += NavigationKeys.Profile },
+                        callbacks = Partial(
+                            onHomeClick = { backStack.removeAllOrAdd(Home) },
+                            onCarClick = { backStack += ExchangeCarDetail(it) },
+                            onAddClick = { backStack += AddCamera },
+                            onProfileClick = { backStack += Profile },
                             onExchangesClick = {},
-
-                            onNotificationsClick = { backStack += NavigationKeys.ExchangeNotifications },
+                            onNotificationsClick = { backStack += ExchangeNotifications },
+                            onTradeHistoryClick = { backStack += ExchangesHistory },
                         ),
                     )
                 }
 
-                is NavigationKeys.ExchangeCarDetail -> route(key) {
+                is ExchangeCarDetail -> route(key) {
                     if (!BuildConfig.ENABLE_TRADING) {
                         navigationLogger.e {
                             "Exchanges not available and reached in navigation routes. CarId='${key.id}'"
@@ -323,31 +301,24 @@ fun WheelVaultApp(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
                         carId = key.id,
-                        onExchangeCarClick = { backStack += NavigationKeys.ExchangeCarSelection },
-                        headerBackCallbacks = HeaderBackCallbacks(
-                            onProfileClick = { backStack += NavigationKeys.Profile },
-                            onBackClick = { backStack.removeLastOrNull() },
-                            onGarageClick = { backStack += NavigationKeys.Garage() },
-                            onFavoritesClick = { backStack += NavigationKeys.Garage(favorites = true) },
-                            onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
-                            onExchangesClick = { backStack += NavigationKeys.Exchanges() },
-                            onNotificationsClick = { backStack += NavigationKeys.ExchangeNotifications },
-                        ),
+                        onExchangeCarClick = { backStack += ExchangeCarSelection },
+                        headerBackCallbacks = headerCallbacks,
                     )
                 }
 
-                is NavigationKeys.ExchangeCarSelection -> route(key) {
+                is ExchangeCarSelection -> route(key) {
                     if (!BuildConfig.ENABLE_TRADING) {
                         navigationLogger.e {
                             "Exchanges not available and reached in navigation routes for car selection."
                         }
                     }
                     ExchangeCarSelectionScreen(
-                        onCarClick = { backStack += NavigationKeys.ExchangeCarOffer(it.id) },
+                        onCarClick = { backStack += ExchangeCarOffer(it.id) },
+                        headerCallbacks = headerCallbacks,
                     )
                 }
 
-                is NavigationKeys.ExchangeCarOffer -> route(key) {
+                is ExchangeCarOffer -> route(key) {
                     if (!BuildConfig.ENABLE_TRADING) {
                         navigationLogger.e {
                             "Exchanges not available and reached in navigation routes. Offers of CarId='${key.id}'"
@@ -356,21 +327,12 @@ fun WheelVaultApp(
                     ExchangeCarOfferScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this,
-                        carId = key.id,
-                        onExchangeTemporalClick = { backStack += NavigationKeys.ExchangeConfirmation(it) },
-                        headerCallbacks = HeaderBackCallbacks(
-                            onProfileClick = { backStack += NavigationKeys.Profile },
-                            onBackClick = { backStack.removeLastOrNull() },
-                            onGarageClick = { backStack += NavigationKeys.Garage() },
-                            onFavoritesClick = { backStack += NavigationKeys.Garage(favorites = true) },
-                            onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
-                            onExchangesClick = { backStack += NavigationKeys.Exchanges() },
-                            onNotificationsClick = { backStack += NavigationKeys.ExchangeNotifications },
-                        ),
+                        onExchangeTemporalClick = { backStack += ExchangeConfirmation(it) },
+                        headerCallbacks = headerCallbacks,
                     )
                 }
 
-                is NavigationKeys.ExchangeConfirmation -> route(key) {
+                is ExchangeConfirmation -> route(key) {
                     if (!BuildConfig.ENABLE_TRADING) {
                         navigationLogger.e {
                             "Exchanges not available and reached in navigation routes. Confirm of CarId='${key.id}'"
@@ -378,59 +340,42 @@ fun WheelVaultApp(
                     }
                     ExchangeConfirmCarScreen(
                         requestCarId = key.id,
-                        headerBackCallbacks = HeaderBackCallbacks(
-                            onProfileClick = { backStack += NavigationKeys.Profile },
-                            onBackClick = { backStack.removeLastOrNull() },
-                            onGarageClick = { backStack += NavigationKeys.Garage() },
-                            onFavoritesClick = { backStack += NavigationKeys.Garage(favorites = true) },
-                            onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
-                            onExchangesClick = { backStack += NavigationKeys.Exchanges() },
-                            onNotificationsClick = { backStack += NavigationKeys.ExchangeNotifications },
-                        ),
+                        headerBackCallbacks = headerCallbacks,
                     )
                 }
 
-                NavigationKeys.ExchangeNotifications -> route(key) {
+                ExchangeNotifications -> route(key) {
                     if (!BuildConfig.ENABLE_TRADING) {
                         navigationLogger.e {
                             "Exchanges not available and reached in navigation routes. Notifications"
                         }
                     }
-                    io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.notifications.ExchangeNotificationsScreen(
-                        headerCallbacks = HeaderBackCallbacks(
-                            onProfileClick = { backStack += NavigationKeys.Profile },
-                            onBackClick = { backStack.removeLastOrNull() },
-                            onGarageClick = { backStack += NavigationKeys.Garage() },
-                            onFavoritesClick = { backStack += NavigationKeys.Garage(favorites = true) },
-                            onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
-                            onExchangesClick = {},
-                        ),
+                    ExchangeNotificationsScreen(
+                        headerCallbacks = headerCallbacks,
                         onTradeClick = { notification ->
-                            backStack += NavigationKeys.TradeProposalDetail(notification.trade.tradeGroupId)
+                            backStack += TradeProposalDetail(notification.trade.tradeGroupId)
                         },
                     )
                 }
 
-                is NavigationKeys.TradeProposalDetail -> route(key) {
+                is TradeProposalDetail -> route(key) {
                     if (!BuildConfig.ENABLE_TRADING) {
                         navigationLogger.e {
                             "Exchanges not available and reached in navigation routes. Trade Detail: ${key.tradeGroupId}"
                         }
                     }
-                    io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.notifications.TradeProposalDetailScreen(
+                    TradeProposalDetailScreen(
                         tradeGroupId = key.tradeGroupId,
-                        headerCallbacks = HeaderBackCallbacks(
-                            onProfileClick = { backStack += NavigationKeys.Profile },
-                            onBackClick = { backStack.removeLastOrNull() },
-                            onGarageClick = { backStack += NavigationKeys.Garage() },
-                            onFavoritesClick = { backStack += NavigationKeys.Garage(favorites = true) },
-                            onStatisticsClick = { backStack += NavigationKeys.Garage(statistics = true) },
-                            onExchangesClick = { backStack += NavigationKeys.Exchanges() },
-                        ),
-                        onTradeActionCompleted = {
-                            backStack.removeLastOrNull()
-                        },
+                        headerCallbacks = headerCallbacks,
+                        onTradeActionFinish = { backStack.removeLastOrNull() },
                     )
+                }
+
+                ExchangesHistory -> route(key) {
+                    if (!BuildConfig.ENABLE_TRADING) {
+                        navigationLogger.e { "Exchanges not available and reached in navigation routes. History" }
+                    }
+                    ExchangeHistoryScreen(headerCallbacks = headerCallbacks)
                 }
             }
         }
@@ -439,11 +384,11 @@ fun WheelVaultApp(
 
 private val navigationLogger = Logger.withTag("WheelVault Nav3")
 
-/** Extension function to convert a [CarItem] to a [NavigationKeys.CarEdit] */
+/** Extension function to convert a [CarItem] to a [CarEdit] */
 private fun CarItem.toCarEdit() = this.toBuilder().toCarEdit()
 
-/** Extension function to convert a [CarItem.Builder] to a [NavigationKeys.CarEdit] */
-private fun CarItem.Builder.toCarEdit() = NavigationKeys.CarEdit(
+/** Extension function to convert a [CarItem.Builder] to a [CarEdit] */
+private fun CarItem.Builder.toCarEdit() = CarEdit(
     model = this.model,
     brand = this.brand,
     year = this.year,
@@ -457,8 +402,8 @@ private fun CarItem.Builder.toCarEdit() = NavigationKeys.CarEdit(
     id = this.id,
 )
 
-/** Extension function to convert a [NavigationKeys.CarEdit] to [CarItem.Builder] */
-private fun NavigationKeys.CarEdit.toCarPartial() = CarItem.Builder(
+/** Extension function to convert a [CarEdit] to [CarItem.Builder] */
+private fun CarEdit.toCarPartial() = CarItem.Builder(
     model = this.model,
     brand = this.brand,
     year = this.year,

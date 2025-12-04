@@ -44,6 +44,9 @@ sealed class NavigationKeys : NavKey {
     @Serializable
     data class Exchanges(val query: String? = null) : NavigationKeys()
 
+    @Serializable
+    data object ExchangesHistory : NavigationKeys()
+
     /** Refers to [io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.detail.ExchangeCarDetailScreen] */
     @Serializable
     data class ExchangeCarDetail(val id: Uuid) : NavigationKeys()

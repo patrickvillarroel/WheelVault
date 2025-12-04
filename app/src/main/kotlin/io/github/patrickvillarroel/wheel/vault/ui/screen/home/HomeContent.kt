@@ -42,6 +42,7 @@ import io.github.patrickvillarroel.wheel.vault.R
 import io.github.patrickvillarroel.wheel.vault.domain.model.VideoNews
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BrandCard
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.CarCard
+import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HomeCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.RaceDivider
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.VideoCardPreview
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
@@ -77,10 +78,12 @@ fun HomeContent(
             PullToRefreshBox(
                 isRefreshing,
                 onRefresh = {
+                    @Suppress("ASSIGNED_VALUE_IS_NEVER_READ")
                     isRefreshing = true
                     info.onRefresh()
                     coroutineScope.launch {
                         delay(800)
+                        @Suppress("ASSIGNED_VALUE_IS_NEVER_READ")
                         isRefreshing = false
                     }
                 },

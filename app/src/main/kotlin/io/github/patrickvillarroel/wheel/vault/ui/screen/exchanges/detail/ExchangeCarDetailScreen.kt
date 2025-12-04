@@ -40,10 +40,12 @@ fun ExchangeCarDetailScreen(
         when (state) {
             CarViewModel.CarDetailUiState.Idle, CarViewModel.CarDetailUiState.Loading -> Scaffold(
                 Modifier.fillMaxSize(),
-            ) {
-                LoadingIndicator(Modifier.padding(it).fillMaxSize())
+            ) { paddingValues ->
+                LoadingIndicator(Modifier.padding(paddingValues).fillMaxSize())
             }
+
             CarViewModel.CarDetailUiState.NotFound, CarViewModel.CarDetailUiState.Error -> CarErrorScreen(state)
+
             is CarViewModel.CarDetailUiState.Success -> {
                 ExchangeCarDetailContent(
                     sharedTransitionScope = sharedTransitionScope,

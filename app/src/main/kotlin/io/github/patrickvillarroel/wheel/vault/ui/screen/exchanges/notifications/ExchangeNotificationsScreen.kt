@@ -4,13 +4,13 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
@@ -18,10 +18,12 @@ import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -32,13 +34,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.patrickvillarroel.wheel.vault.R
-import io.github.patrickvillarroel.wheel.vault.domain.model.TradeProposal
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BackTextButton
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuHeader
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExchangeNotificationsScreen(
     headerCallbacks: HeaderBackCallbacks,
@@ -48,7 +48,7 @@ fun ExchangeNotificationsScreen(
 ) {
     val uiState by viewModel.notificationsState.collectAsStateWithLifecycle()
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
-    var isRefreshing by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    var isRefreshing by rememberSaveable { mutableStateOf(false) }
 
     // Solo cargar la primera vez, no en cada recomposición
     LaunchedEffect(Unit) {
@@ -110,18 +110,18 @@ fun ExchangeNotificationsScreen(
                                 modifier = Modifier.fillMaxSize(),
                             )
                         } else {
-                            androidx.compose.material3.pulltorefresh.PullToRefreshBox(
+                            PullToRefreshBox(
                                 isRefreshing = isRefreshing,
                                 onRefresh = {
                                     isRefreshing = true
                                     viewModel.loadNotifications(forceRefresh = true)
                                     isRefreshing = false
                                 },
-                                modifier = Modifier.fillMaxSize()
+                                modifier = Modifier.fillMaxSize(),
                             ) {
                                 LazyColumn(
                                     modifier = Modifier.fillMaxSize(),
-                                    contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
+                                    contentPadding = PaddingValues(16.dp),
                                     verticalArrangement = Arrangement.spacedBy(12.dp),
                                 ) {
                                     items(trades, key = { it.trade.tradeGroupId.toString() }) { notification ->

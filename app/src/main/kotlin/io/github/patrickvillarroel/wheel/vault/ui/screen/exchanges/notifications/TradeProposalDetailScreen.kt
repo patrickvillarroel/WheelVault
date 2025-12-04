@@ -1,16 +1,7 @@
 package io.github.patrickvillarroel.wheel.vault.ui.screen.exchanges.notifications
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -28,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,17 +37,20 @@ import io.github.patrickvillarroel.wheel.vault.ui.screen.component.BackTextButto
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.MenuHeader
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Clock
+import kotlin.time.Instant
 import kotlin.uuid.Uuid
 
 @Composable
 fun TradeProposalDetailScreen(
     tradeGroupId: Uuid,
     headerCallbacks: HeaderBackCallbacks,
-    onTradeActionCompleted: () -> Unit,
+    onTradeActionFinish: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TradeProposalDetailViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val onTradeActionCompletedLatest by rememberUpdatedState(onTradeActionFinish)
 
     LaunchedEffect(tradeGroupId) {
         viewModel.loadTradeProposal(tradeGroupId)
@@ -104,7 +99,7 @@ fun TradeProposalDetailScreen(
 
                 is TradeProposalDetailViewModel.TradeDetailUiState.ActionCompleted -> {
                     LaunchedEffect(Unit) {
-                        onTradeActionCompleted()
+                        onTradeActionCompletedLatest()
                     }
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -112,8 +107,13 @@ fun TradeProposalDetailScreen(
                     ) {
                         Text(
                             text = when (state.action) {
-                                TradeProposalDetailViewModel.TradeAction.ACCEPTED -> stringResource(R.string.exchange_status_accepted)
-                                TradeProposalDetailViewModel.TradeAction.REJECTED -> stringResource(R.string.exchange_status_rejected)
+                                TradeProposalDetailViewModel.TradeAction.ACCEPTED -> stringResource(
+                                    R.string.exchange_status_accepted,
+                                )
+
+                                TradeProposalDetailViewModel.TradeAction.REJECTED -> stringResource(
+                                    R.string.exchange_status_rejected,
+                                )
                             },
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.primary,
@@ -161,7 +161,7 @@ private fun TradeProposalDetailContent(
         )
 
         if (trade.isPending && trade.originalExpiresAt != null) {
-            val now = kotlin.time.Clock.System.now()
+            val now = Clock.System.now()
             val timeLeft = trade.originalExpiresAt - now
             if (timeLeft.isPositive()) {
                 val hoursLeft = timeLeft.inWholeHours
@@ -206,7 +206,7 @@ private fun TradeProposalDetailContent(
             CarDetailCard(
                 car = offeredCar,
                 label = "Auto ofrecido",
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
 
             Icon(
@@ -219,7 +219,7 @@ private fun TradeProposalDetailContent(
             CarDetailCard(
                 car = requestedCar,
                 label = "Auto solicitado",
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
         }
 
@@ -281,21 +281,17 @@ private fun TradeProposalDetailContent(
 }
 
 @Composable
-private fun CarDetailCard(
-    car: CarItem,
-    label: String,
-    modifier: Modifier = Modifier
-) {
+private fun CarDetailCard(car: CarItem, label: String, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
         )
 
         Card(
@@ -319,7 +315,7 @@ private fun CarDetailCard(
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Text(
                 text = "${car.brand} ${car.model}",
@@ -337,6 +333,4 @@ private fun CarDetailCard(
     }
 }
 
-private fun formatDate(instant: kotlin.time.Instant): String {
-    return instant.toString().take(10)
-}
+private fun formatDate(instant: Instant): String = instant.toString().take(10)
