@@ -5,6 +5,7 @@ import io.github.patrickvillarroel.wheel.vault.data.datasource.image.ImageReposi
 import io.github.patrickvillarroel.wheel.vault.data.datasource.room.BrandRoomDataSource
 import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.BrandSupabaseDataSource
 import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
+import io.github.patrickvillarroel.wheel.vault.domain.model.CachePolicy
 import io.github.patrickvillarroel.wheel.vault.domain.model.PagedSource
 import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
 import kotlinx.coroutines.async
@@ -29,9 +30,9 @@ class BrandRepositoryImpl(
     override suspend fun fetchAllNames(forceRefresh: Boolean): List<String> = SyncMediator.fetchList(
         forceRefresh = forceRefresh,
         localFetch = { room.fetchAllNames() },
-        remoteFetch = { room.fetchAllNames() },
-        saveRemote = { _ ->
-            /* TODO */
+        remoteFetch = { supabase.fetchAllNames(forceRefresh) },
+        saveRemote = { names ->
+            // Names are derived from brands, so sync brands instead
         },
     )
 
@@ -43,7 +44,6 @@ class BrandRepositoryImpl(
             launch {
                 remoteImages.forEach { (id) ->
                     imageHelper.downloadImage(supabase.buildImageRequest(id))?.let { imageBytes ->
-                        // TODO save partial data into room database
                         imageRepository.saveImage("$id.png", imageBytes)
                     }
                 }

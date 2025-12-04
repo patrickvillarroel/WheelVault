@@ -19,6 +19,10 @@ fun Brand.toEntity() = BrandEntity(
     name = this.name,
     description = this.description,
     createdAt = this.createdAt?.toEpochMilliseconds(),
+    updatedAt = System.currentTimeMillis(),
+    syncStatus = SyncStatus.SYNCED,
+    lastSyncedAt = System.currentTimeMillis(),
+    isDeleted = false,
 )
 
 fun CarEntity.toDomain(images: Set<Any>) = CarItem(
@@ -46,4 +50,8 @@ fun CarItem.toEntity(userId: String?) = CarEntity(
     description = this.description,
     category = this.category,
     userId = userId,
+    updatedAt = System.currentTimeMillis(),
+    syncStatus = SyncStatus.PENDING,
+    lastSyncedAt = null,
+    isDeleted = false,
 )

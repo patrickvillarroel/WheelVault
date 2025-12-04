@@ -4,20 +4,24 @@ import androidx.room.Room
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.storage.storage
 import io.github.patrickvillarroel.wheel.vault.BuildConfig
+import io.github.patrickvillarroel.wheel.vault.data.BrandRepositoryImpl
 import io.github.patrickvillarroel.wheel.vault.data.CarRepositoryImpl
 import io.github.patrickvillarroel.wheel.vault.data.GetVideosNewsUseCaseImpl
 import io.github.patrickvillarroel.wheel.vault.data.UpdateOnboardingStateUseCaseImpl
 import io.github.patrickvillarroel.wheel.vault.data.UpdateOnboardingStateUseCaseImpl.Companion.dataStore
 import io.github.patrickvillarroel.wheel.vault.data.datasource.image.CacheImageDataSource
 import io.github.patrickvillarroel.wheel.vault.data.datasource.image.ImageDownloadHelper
+import io.github.patrickvillarroel.wheel.vault.data.datasource.image.ImageRepository
 import io.github.patrickvillarroel.wheel.vault.data.datasource.room.AppDatabase
 import io.github.patrickvillarroel.wheel.vault.data.datasource.room.BrandRoomDataSource
 import io.github.patrickvillarroel.wheel.vault.data.datasource.room.CarRoomDataSource
 import io.github.patrickvillarroel.wheel.vault.data.datasource.room.GetVideoNewsRoomDataSource
+import io.github.patrickvillarroel.wheel.vault.data.datasource.room.Migrations
 import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.BrandSupabaseDataSource
 import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.CarSupabaseDataSource
 import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.GetVideoNewsSupabaseDataSource
 import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.TradeSupabaseDataSource
+import io.github.patrickvillarroel.wheel.vault.data.mediator.CarOfflineFirstMediator
 import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
 import io.github.patrickvillarroel.wheel.vault.domain.repository.CarsRepository
 import io.github.patrickvillarroel.wheel.vault.domain.repository.TradeRepository
@@ -77,28 +81,41 @@ val dataModule = module {
         }
     } onClose { httpClient -> httpClient?.close() }
 
-    // TODO can be a good o bad idea use coil3 disk cache as local data source of images
+    // Image management
     factory { CacheImageDataSource(androidContext()) }
-    // factory { MediaStoreImageDataSource(androidContext()) }
-    // factory { ImageRepository(get(), get()) }
-
+    factory { ImageRepository(get()) }
     factory { ImageDownloadHelper(get(), get<SupabaseClient>().storage) }
 
+    // Room Database with migration
     single<AppDatabase> {
         Room.databaseBuilder<AppDatabase>(androidContext(), "wheel_vault")
-            .fallbackToDestructiveMigration(true)
+            .addMigrations(*Migrations.ALL) // Apply migrations instead of destructive fallback
             .build()
     }
     single { androidContext().dataStore }
 
-    factory { BrandRoomDataSource(get<AppDatabase>().brandDao(), get()) }
-    factory { CarRoomDataSource(get<AppDatabase>().carDao(), get()) }
-    // TODO change to impl when sync mediator and room is ready
-    factory<BrandRepository> { BrandSupabaseDataSource(get(), androidContext()) }
-    // factory<BrandRepository> { BrandRepositoryImpl(get(), get(), get(), get()) }
+    // DAOs
+    single { get<AppDatabase>().brandDao() }
+    single { get<AppDatabase>().carDao() }
+    single { get<AppDatabase>().carImageDao() }
+    single { get<AppDatabase>().newsDao() }
 
+    // Room Data Sources
+    factory { BrandRoomDataSource(get(), get()) }
+    factory { CarRoomDataSource(get(), get()) }
+    factory { GetVideoNewsRoomDataSource(get(), get()) }
+
+    // Supabase Data Sources
+    factory { BrandSupabaseDataSource(get(), androidContext()) }
     factory { CarSupabaseDataSource(get(), androidContext()) }
-    factory<CarsRepository> { CarRepositoryImpl(get()) }
+    factory { GetVideoNewsSupabaseDataSource(get(), androidContext()) }
+
+    // Mediators
+    factory { CarOfflineFirstMediator(get()) }
+
+    // Repositories with offline-first sync
+    factory<BrandRepository> { BrandRepositoryImpl(get(), get(), get(), get()) }
+    factory<CarsRepository> { CarRepositoryImpl(get(), get(), get()) }
 
     factory<TradeRepository> { TradeSupabaseDataSource(get(), get()) }
 

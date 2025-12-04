@@ -116,4 +116,59 @@ interface CarDao {
 
     @Delete
     suspend fun deleteCar(car: CarEntity): Int
+
+    // ========== Sync-related queries ==========
+
+    /**
+     * Fetches all cars with a specific sync status.
+     */
+    @Query("SELECT * FROM cars WHERE sync_status = :status AND is_deleted = 0 ORDER BY created_at DESC")
+    suspend fun fetchBySyncStatus(status: io.github.patrickvillarroel.wheel.vault.data.entity.SyncStatus): List<CarEntity>
+
+    /**
+     * Fetches all cars that need to be synced (PENDING status).
+     */
+    @Query("SELECT * FROM cars WHERE sync_status = 'PENDING' AND is_deleted = 0")
+    suspend fun fetchPendingSync(): List<CarEntity>
+
+    /**
+     * Fetches all cars marked for deletion.
+     */
+    @Query("SELECT * FROM cars WHERE is_deleted = 1")
+    suspend fun fetchDeleted(): List<CarEntity>
+
+    /**
+     * Updates only the sync status and last synced timestamp for a car.
+     */
+    @Query(
+        """
+        UPDATE cars
+        SET sync_status = :syncStatus,
+            last_synced_at = :lastSyncedAt
+        WHERE id_remote = :idRemote
+    """,
+    )
+    suspend fun updateSyncStatus(
+        idRemote: String,
+        syncStatus: io.github.patrickvillarroel.wheel.vault.data.entity.SyncStatus,
+        lastSyncedAt: Long,
+    )
+
+    /**
+     * Soft deletes a car by marking is_deleted flag and setting PENDING status.
+     */
+    @Query("UPDATE cars SET is_deleted = 1, sync_status = 'PENDING', updated_at = :timestamp WHERE id_remote = :idRemote")
+    suspend fun softDelete(idRemote: String, timestamp: Long = System.currentTimeMillis())
+
+    /**
+     * Permanently deletes cars marked as deleted after successful sync.
+     */
+    @Query("DELETE FROM cars WHERE is_deleted = 1 AND sync_status = 'SYNCED'")
+    suspend fun purgeSyncedDeleted(): Int
+
+    /**
+     * Inserts or replaces multiple cars (for batch sync).
+     */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(cars: List<CarEntity>)
 }

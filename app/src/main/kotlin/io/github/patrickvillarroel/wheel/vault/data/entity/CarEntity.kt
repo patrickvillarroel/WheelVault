@@ -14,6 +14,8 @@ import kotlin.uuid.Uuid
         Index("category"),
         Index("year"),
         Index("id_remote", unique = true),
+        Index("sync_status"),
+        Index("last_synced_at"),
     ],
 )
 class CarEntity(
@@ -37,7 +39,36 @@ class CarEntity(
     @ColumnInfo(name = "user_id")
     val userId: String? = null,
 
-    // FIXME
+    /**
+     * Remote ID from Supabase. This is the source of truth for synchronization.
+     * Should be set once when entity is created and never changed.
+     */
     @ColumnInfo(name = "id_remote")
-    val idRemote: String = Uuid.random().toString(),
+    val idRemote: String,
+
+    /**
+     * Last time this entity was modified (locally or from remote).
+     * Used for Last Write Wins (LWW) conflict resolution.
+     */
+    @ColumnInfo(name = "updated_at", defaultValue = "CURRENT_TIMESTAMP")
+    val updatedAt: Long? = null,
+
+    /**
+     * Synchronization status with remote server.
+     */
+    @ColumnInfo(name = "sync_status", defaultValue = "PENDING")
+    val syncStatus: SyncStatus = SyncStatus.PENDING,
+
+    /**
+     * Last time this entity was successfully synced with remote.
+     * Used to determine if cached data is stale.
+     */
+    @ColumnInfo(name = "last_synced_at")
+    val lastSyncedAt: Long? = null,
+
+    /**
+     * Soft delete flag. If true, entity should be deleted from remote on next sync.
+     */
+    @ColumnInfo(name = "is_deleted", defaultValue = "0")
+    val isDeleted: Boolean = false,
 )
