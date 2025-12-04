@@ -7,7 +7,7 @@ android-minSdk = "26"
 android-targetSdk = "36"
 
 # https://developer.android.com/jetpack/androidx/releases/activity
-androidx-activity-compose = "1.12.0"
+androidx-activity-compose = "1.12.1"
 
 # https://developer.android.com/jetpack/androidx/releases/camera
 androidx-camera = "1.5.2"
