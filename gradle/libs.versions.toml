@@ -39,7 +39,7 @@ coil = "3.3.0"
 dotenv-gradle = "4.0.0"
 
 # https://developer.android.com/jetpack/androidx/releases/compose-ui
-google-fonts-compose = "1.9.5"
+google-fonts-compose = "1.10.0"
 
 # https://developers.google.com/identity/android-credential-manager/releases
 google-identity-googleid = "1.1.1"
