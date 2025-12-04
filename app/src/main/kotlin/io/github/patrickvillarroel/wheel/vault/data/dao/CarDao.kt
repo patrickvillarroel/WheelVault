@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import io.github.patrickvillarroel.wheel.vault.data.entity.CarEntity
+import io.github.patrickvillarroel.wheel.vault.data.entity.SyncStatus
 
 @Dao
 interface CarDao {
@@ -123,7 +124,7 @@ interface CarDao {
      * Fetches all cars with a specific sync status.
      */
     @Query("SELECT * FROM cars WHERE sync_status = :status AND is_deleted = 0 ORDER BY created_at DESC")
-    suspend fun fetchBySyncStatus(status: io.github.patrickvillarroel.wheel.vault.data.entity.SyncStatus): List<CarEntity>
+    suspend fun fetchBySyncStatus(status: SyncStatus): List<CarEntity>
 
     /**
      * Fetches all cars that need to be synced (PENDING status).
@@ -148,16 +149,14 @@ interface CarDao {
         WHERE id_remote = :idRemote
     """,
     )
-    suspend fun updateSyncStatus(
-        idRemote: String,
-        syncStatus: io.github.patrickvillarroel.wheel.vault.data.entity.SyncStatus,
-        lastSyncedAt: Long,
-    )
+    suspend fun updateSyncStatus(idRemote: String, syncStatus: SyncStatus, lastSyncedAt: Long)
 
     /**
      * Soft deletes a car by marking is_deleted flag and setting PENDING status.
      */
-    @Query("UPDATE cars SET is_deleted = 1, sync_status = 'PENDING', updated_at = :timestamp WHERE id_remote = :idRemote")
+    @Query(
+        "UPDATE cars SET is_deleted = 1, sync_status = 'PENDING', updated_at = :timestamp WHERE id_remote = :idRemote",
+    )
     suspend fun softDelete(idRemote: String, timestamp: Long = System.currentTimeMillis())
 
     /**
