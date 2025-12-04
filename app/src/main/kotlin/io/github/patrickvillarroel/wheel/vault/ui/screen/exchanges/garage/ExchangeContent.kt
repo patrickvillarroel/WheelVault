@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -97,28 +98,13 @@ fun ExchangeContent(
                     },
                     Modifier.fillMaxSize().padding(paddingValues),
                 ) {
-                    val carResults = state.cars
                     Column(Modifier.fillMaxSize()) {
-                        // Banner distintivo para exchanges
-                        ExchangeBanner(
-                            modifier = Modifier.padding(
-                                start = 16.dp,
-                                end = 16.dp,
-                                top = 16.dp,
-                                bottom = 5.dp,
-                            ),
-                        )
-                        ExchangeHistoryBanner(
-                            onTradeHistoryClick,
-                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 5.dp),
-                        )
-
                         Text(
                             text = stringResource(R.string.exchange),
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.SemiBold,
                             modifier = Modifier
-                                .padding(start = 20.dp, bottom = 10.dp)
+                                .padding(start = 20.dp, bottom = 10.dp, top = 10.dp)
                                 .drawBehind {
                                     val underlineHeight = 1.dp.toPx()
                                     val y = size.height
@@ -137,7 +123,16 @@ fun ExchangeContent(
                             horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
                             verticalArrangement = Arrangement.spacedBy(10.dp),
                         ) {
-                            items(carResults, key = { it.id }) { car ->
+                            // Banner distintivo para exchanges
+                            item(span = { GridItemSpan(maxLineSpan) }) {
+                                ExchangeBanner()
+                            }
+
+                            item(span = { GridItemSpan(maxLineSpan) }) {
+                                ExchangeHistoryBanner(onTradeHistoryClick)
+                            }
+
+                            items(state.cars, key = { it.id }) { car ->
                                 ExchangeCarCard(
                                     image = car.imageUrl,
                                     name = car.model,
