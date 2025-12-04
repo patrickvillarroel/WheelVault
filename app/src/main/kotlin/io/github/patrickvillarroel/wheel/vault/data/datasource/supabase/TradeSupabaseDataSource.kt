@@ -1,5 +1,6 @@
 package io.github.patrickvillarroel.wheel.vault.data.datasource.supabase
 
+import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
@@ -17,26 +18,29 @@ import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 import kotlin.uuid.Uuid
 
-@Serializable
-private data class CarValidationData(
-    @SerialName("user_id") val userId: String,
-    @SerialName("available_for_trade") val availableForTrade: Boolean,
-)
-
 class TradeSupabaseDataSource(
     private val supabase: SupabaseClient,
     private val carSupabaseDataSource: CarSupabaseDataSource,
 ) : TradeRepository {
+    companion object {
+        private val logger = Logger.withTag("TradeSupabaseDataSource")
+    }
+
+    @Serializable
+    private data class CarValidationData(
+        @SerialName("user_id") val userId: String,
+        @SerialName("available_for_trade") val availableForTrade: Boolean,
+    )
+
     override suspend fun createTradeProposal(
         offeredCarId: Uuid,
         requestedCarId: Uuid,
         message: String?,
         expirationHours: Int,
     ): TradeProposal {
-        val currentUserId = supabase.auth.currentUserOrNull()?.id
-            ?: throw IllegalStateException("User not authenticated")
+        val currentUserId = requireNotNull(supabase.auth.currentUserOrNull()?.id) { "User not authenticated" }
 
-        co.touchlab.kermit.Logger.withTag("TradeSupabaseDataSource").d {
+        logger.d {
             "Creating trade proposal - currentUserId: $currentUserId, offeredCarId: $offeredCarId, requestedCarId: $requestedCarId"
         }
 
@@ -50,15 +54,19 @@ class TradeSupabaseDataSource(
                 }
                 .decodeSingle<CarValidationData>()
         } catch (e: Exception) {
+            logger.e(e) { "Error al obtener el auto ofrecido" }
             throw IllegalStateException("El auto que intentas ofrecer no existe o no está disponible", e)
         }
 
-        co.touchlab.kermit.Logger.withTag("TradeSupabaseDataSource").d {
+        logger.d {
             "Offered car found - user_id: ${offeredCar.userId}, available_for_trade: ${offeredCar.availableForTrade}"
         }
 
         // Validar que el auto ofrecido es tuyo
         if (offeredCar.userId != currentUserId) {
+            logger.e {
+                "El auto que intentas ofrecer no es tuyo. User ID: ${offeredCar.userId}, currentUserId: $currentUserId"
+            }
             throw IllegalStateException("El auto que intentas ofrecer no es tuyo")
         }
 
@@ -80,7 +88,7 @@ class TradeSupabaseDataSource(
             throw IllegalStateException("El auto solicitado no existe", e)
         }
 
-        co.touchlab.kermit.Logger.withTag("TradeSupabaseDataSource").d {
+        logger.d {
             "Requested car found - user_id: ${requestedCar.userId}, available_for_trade: ${requestedCar.availableForTrade}"
         }
 
@@ -88,11 +96,17 @@ class TradeSupabaseDataSource(
 
         // Validar que el auto solicitado está disponible para intercambio
         if (!requestedCar.availableForTrade) {
+            logger.e {
+                "El auto solicitado no está disponible para intercambio. Requested car ID $requestedCarId of User ID: ${requestedCar.userId}"
+            }
             throw IllegalStateException("El auto solicitado no está disponible para intercambio")
         }
 
         // Validar que no estás intercambiando contigo mismo
         if (ownerId == currentUserId) {
+            logger.e {
+                "No puedes intercambiar con tus propios autos. User ID: $currentUserId. Cars: $offeredCarId, $requestedCarId"
+            }
             throw IllegalStateException("No puedes intercambiar con tus propios autos")
         }
 
@@ -110,9 +124,7 @@ class TradeSupabaseDataSource(
             "created_by" to currentUserId,
         )
 
-        co.touchlab.kermit.Logger.withTag("TradeSupabaseDataSource").d {
-            "Inserting trade proposal with data: $dataToInsert"
-        }
+        logger.d { "Inserting trade proposal with data: $dataToInsert" }
 
         // Insertar en trade_proposals (event-sourcing)
         val proposal = try {
@@ -122,15 +134,11 @@ class TradeSupabaseDataSource(
                 }
                 .decodeSingle<TradeProposalObj>()
         } catch (e: Exception) {
-            co.touchlab.kermit.Logger.withTag("TradeSupabaseDataSource").e(e) {
-                "Failed to insert trade proposal. Error: ${e.message}"
-            }
+            logger.e(e) { "Failed to insert trade proposal" }
             throw e
         }
 
-        co.touchlab.kermit.Logger.withTag("TradeSupabaseDataSource").d {
-            "Trade proposal created successfully: ${proposal.id}"
-        }
+        logger.d { "Trade proposal created successfully: ${proposal.id}" }
 
         return proposal.toDomain()
     }
