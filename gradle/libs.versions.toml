@@ -10,7 +10,7 @@ android-targetSdk = "36"
 androidx-activity-compose = "1.12.0"
 
 # https://developer.android.com/jetpack/androidx/releases/camera
-androidx-camera = "1.5.1"
+androidx-camera = "1.5.2"
 
 # https://developer.android.com/jetpack/androidx/releases/credentials
 androidx-credentials = "1.5.0"
