@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "io.github.patrickvillarroel"
-version = "0.4.0"
+version = "0.5.0"
 
 kotlin {
     compilerOptions {
@@ -39,7 +39,7 @@ android {
         applicationId = "$group.wheel.vault"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 12
+        versionCode = 13
         versionName = version.toString()
 
         testInstrumentationRunner = "io.github.patrickvillarroel.wheel.vault.integration.util.KoinTestRunner"
@@ -196,6 +196,7 @@ dependencies {
     androidTestImplementation(libs.koin.test)
     androidTestImplementation(libs.koin.test.junit4)
     androidTestImplementation(libs.androidx.room.testing)
+
     debugImplementation(platform(libs.compose.bom))
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
