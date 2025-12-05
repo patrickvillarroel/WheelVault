@@ -13,6 +13,7 @@ import io.github.patrickvillarroel.wheel.vault.domain.model.CarItem
 import io.github.patrickvillarroel.wheel.vault.ui.screen.component.HeaderBackCallbacks
 import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 import org.junit.Assert.assertTrue
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -23,6 +24,7 @@ class CarDetailContentTest {
 
     private val context = ApplicationProvider.getApplicationContext<android.content.Context>()
 
+    @Ignore("Needs to reconfigure activity application with compose test rule")
     @Test
     fun carDetailContent_displaysCarInformation() {
         // Given

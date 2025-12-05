@@ -25,4 +25,7 @@ interface NewsDao {
 
     @Query("DELETE FROM news WHERE id = :id")
     suspend fun deleteById(id: String)
+
+    @Query("DELETE FROM news")
+    suspend fun deleteAll()
 }

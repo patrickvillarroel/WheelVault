@@ -34,4 +34,7 @@ interface BrandDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAllBrands(brands: List<BrandEntity>)
+
+    @Query("DELETE FROM brands")
+    suspend fun deleteAll()
 }

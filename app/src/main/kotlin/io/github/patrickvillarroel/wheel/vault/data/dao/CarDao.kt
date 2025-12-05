@@ -18,95 +18,100 @@ interface CarDao {
     @Query(
         """
         SELECT * FROM cars
-        WHERE model LIKE '%' || :query || '%'
+        WHERE (model LIKE '%' || :query || '%'
            OR brand LIKE '%' || :query || '%'
            OR manufacturer LIKE '%' || :query || '%'
            OR category LIKE '%' || :query || '%'
-           OR description LIKE '%' || :query || '%'
+           OR description LIKE '%' || :query || '%')
+           AND is_deleted = 0
         ORDER BY created_at DESC
     """,
     )
     suspend fun search(query: String): List<CarEntity>
 
-    @Query("SELECT * FROM cars ORDER BY created_at DESC")
+    @Query("SELECT * FROM cars WHERE is_deleted = 0 ORDER BY created_at DESC")
     suspend fun fetchAllOrderByCreatedDesc(): List<CarEntity>
 
-    @Query("SELECT * FROM cars ORDER BY created_at ASC")
+    @Query("SELECT * FROM cars WHERE is_deleted = 0 ORDER BY created_at ASC")
     suspend fun fetchAllOrderByCreatedAsc(): List<CarEntity>
 
-    @Query("SELECT * FROM cars WHERE isFavorite = 1 ORDER BY created_at DESC")
+    @Query("SELECT * FROM cars WHERE isFavorite = 1 AND is_deleted = 0 ORDER BY created_at DESC")
     suspend fun fetchFavoritesOrderByCreatedDesc(): List<CarEntity>
 
-    @Query("SELECT * FROM cars WHERE isFavorite = 1 ORDER BY created_at ASC")
+    @Query("SELECT * FROM cars WHERE isFavorite = 1 AND is_deleted = 0 ORDER BY created_at ASC")
     suspend fun fetchFavoritesOrderByCreatedAsc(): List<CarEntity>
 
-    @Query("SELECT * FROM cars WHERE id = :id LIMIT 1")
+    @Query("SELECT * FROM cars WHERE id = :id AND is_deleted = 0 LIMIT 1")
     suspend fun fetchById(id: String): CarEntity?
 
-    @Query("SELECT * FROM cars WHERE model = :model ORDER BY created_at DESC")
+    @Query("SELECT * FROM cars WHERE model = :model AND is_deleted = 0 ORDER BY created_at DESC")
     suspend fun fetchByModel(model: String): List<CarEntity>
 
-    @Query("SELECT * FROM cars WHERE model = :model AND isFavorite = 1 ORDER BY created_at DESC")
+    @Query("SELECT * FROM cars WHERE model = :model AND isFavorite = 1 AND is_deleted = 0 ORDER BY created_at DESC")
     suspend fun fetchFavoritesByModel(model: String): List<CarEntity>
 
-    @Query("SELECT * FROM cars WHERE year = :year ORDER BY created_at DESC")
+    @Query("SELECT * FROM cars WHERE year = :year AND is_deleted = 0 ORDER BY created_at DESC")
     suspend fun fetchByYear(year: Int): List<CarEntity>
 
-    @Query("SELECT * FROM cars WHERE year = :year AND isFavorite = 1 ORDER BY created_at DESC")
+    @Query("SELECT * FROM cars WHERE year = :year AND isFavorite = 1 AND is_deleted = 0 ORDER BY created_at DESC")
     suspend fun fetchFavoritesByYear(year: Int): List<CarEntity>
 
-    @Query("SELECT * FROM cars WHERE manufacturer = :manufacturer ORDER BY created_at DESC")
+    @Query("SELECT * FROM cars WHERE manufacturer = :manufacturer AND is_deleted = 0 ORDER BY created_at DESC")
     suspend fun fetchByManufacturer(manufacturer: String): List<CarEntity>
 
-    @Query("SELECT * FROM cars WHERE manufacturer = :manufacturer AND isFavorite = 1 ORDER BY created_at DESC")
+    @Query(
+        "SELECT * FROM cars WHERE manufacturer = :manufacturer AND isFavorite = 1 AND is_deleted = 0 ORDER BY created_at DESC",
+    )
     suspend fun fetchFavoritesByManufacturer(manufacturer: String): List<CarEntity>
 
-    @Query("SELECT * FROM cars WHERE brand = :brand ORDER BY created_at DESC")
+    @Query("SELECT * FROM cars WHERE brand = :brand AND is_deleted = 0 ORDER BY created_at DESC")
     suspend fun fetchByBrand(brand: String): List<CarEntity>
 
-    @Query("SELECT * FROM cars WHERE brand = :brand AND isFavorite = 1 ORDER BY created_at DESC")
+    @Query("SELECT * FROM cars WHERE brand = :brand AND isFavorite = 1 AND is_deleted = 0 ORDER BY created_at DESC")
     suspend fun fetchFavoritesByBrand(brand: String): List<CarEntity>
 
-    @Query("SELECT * FROM cars WHERE category = :category ORDER BY created_at DESC")
+    @Query("SELECT * FROM cars WHERE category = :category AND is_deleted = 0 ORDER BY created_at DESC")
     suspend fun fetchByCategory(category: String): List<CarEntity>
 
-    @Query("SELECT * FROM cars WHERE category = :category AND isFavorite = 1 ORDER BY created_at DESC")
+    @Query(
+        "SELECT * FROM cars WHERE category = :category AND isFavorite = 1 AND is_deleted = 0 ORDER BY created_at DESC",
+    )
     suspend fun fetchFavoritesByCategory(category: String): List<CarEntity>
 
-    @Query("SELECT COUNT(*) FROM cars")
+    @Query("SELECT COUNT(*) FROM cars WHERE is_deleted = 0")
     suspend fun count(): Int
 
-    @Query("SELECT COUNT(*) FROM cars WHERE isFavorite = 1")
+    @Query("SELECT COUNT(*) FROM cars WHERE isFavorite = 1 AND is_deleted = 0")
     suspend fun countFavorites(): Int
 
-    @Query("SELECT COUNT(*) FROM cars WHERE model = :model")
+    @Query("SELECT COUNT(*) FROM cars WHERE model = :model AND is_deleted = 0")
     suspend fun countByModel(model: String): Int
 
-    @Query("SELECT COUNT(*) FROM cars WHERE model = :model AND isFavorite = 1")
+    @Query("SELECT COUNT(*) FROM cars WHERE model = :model AND isFavorite = 1 AND is_deleted = 0")
     suspend fun countFavoritesByModel(model: String): Int
 
-    @Query("SELECT COUNT(*) FROM cars WHERE year = :year")
+    @Query("SELECT COUNT(*) FROM cars WHERE year = :year AND is_deleted = 0")
     suspend fun countByYear(year: Int): Int
 
-    @Query("SELECT COUNT(*) FROM cars WHERE year = :year AND isFavorite = 1")
+    @Query("SELECT COUNT(*) FROM cars WHERE year = :year AND isFavorite = 1 AND is_deleted = 0")
     suspend fun countFavoritesByYear(year: Int): Int
 
-    @Query("SELECT COUNT(*) FROM cars WHERE manufacturer = :manufacturer")
+    @Query("SELECT COUNT(*) FROM cars WHERE manufacturer = :manufacturer AND is_deleted = 0")
     suspend fun countByManufacturer(manufacturer: String): Int
 
-    @Query("SELECT COUNT(*) FROM cars WHERE manufacturer = :manufacturer AND isFavorite = 1")
+    @Query("SELECT COUNT(*) FROM cars WHERE manufacturer = :manufacturer AND isFavorite = 1 AND is_deleted = 0")
     suspend fun countFavoritesByManufacturer(manufacturer: String): Int
 
-    @Query("SELECT COUNT(*) FROM cars WHERE brand = :brand")
+    @Query("SELECT COUNT(*) FROM cars WHERE brand = :brand AND is_deleted = 0")
     suspend fun countByBrand(brand: String): Int
 
-    @Query("SELECT COUNT(*) FROM cars WHERE brand = :brand AND isFavorite = 1")
+    @Query("SELECT COUNT(*) FROM cars WHERE brand = :brand AND isFavorite = 1 AND is_deleted = 0")
     suspend fun countFavoritesByBrand(brand: String): Int
 
-    @Query("SELECT COUNT(*) FROM cars WHERE category = :category")
+    @Query("SELECT COUNT(*) FROM cars WHERE category = :category AND is_deleted = 0")
     suspend fun countByCategory(category: String): Int
 
-    @Query("SELECT COUNT(*) FROM cars WHERE category = :category AND isFavorite = 1")
+    @Query("SELECT COUNT(*) FROM cars WHERE category = :category AND isFavorite = 1 AND is_deleted = 0")
     suspend fun countFavoritesByCategory(category: String): Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -117,6 +122,9 @@ interface CarDao {
 
     @Delete
     suspend fun deleteCar(car: CarEntity): Int
+
+    @Query("DELETE FROM cars")
+    suspend fun deleteAll()
 
     // ========== Sync-related queries ==========
 
