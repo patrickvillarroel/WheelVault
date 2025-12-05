@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,11 +29,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import io.github.patrickvillarroel.wheel.vault.R
+import io.github.patrickvillarroel.wheel.vault.ui.theme.WheelVaultTheme
 
 @Composable
 fun TradeAvailabilityButton(isAvailableForTrade: Boolean, onToggle: () -> Unit, modifier: Modifier = Modifier) {
@@ -46,7 +50,7 @@ fun TradeAvailabilityButton(isAvailableForTrade: Boolean, onToggle: () -> Unit, 
         targetValue = if (isAvailableForTrade) {
             MaterialTheme.colorScheme.primaryContainer
         } else {
-            MaterialTheme.colorScheme.surface
+            Color.Transparent
         },
         animationSpec = tween(300),
         label = "container_color",
@@ -81,7 +85,11 @@ fun TradeAvailabilityButton(isAvailableForTrade: Boolean, onToggle: () -> Unit, 
                                 shape = CircleShape,
                             )
                         } else {
-                            Modifier
+                            Modifier.border(
+                                width = 2.dp,
+                                color = LocalContentColor.current,
+                                shape = CircleShape,
+                            )
                         },
                     ),
                 colors = IconButtonDefaults.filledIconButtonColors(
@@ -135,6 +143,28 @@ fun TradeAvailabilityButton(isAvailableForTrade: Boolean, onToggle: () -> Unit, 
             color = contentColor,
             textAlign = TextAlign.Center,
             maxLines = 2,
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun TradeAvailabilityButtonAvailablePreview() {
+    WheelVaultTheme {
+        TradeAvailabilityButton(
+            isAvailableForTrade = true,
+            onToggle = {},
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun TradeAvailabilityButtonUnavailablePreview() {
+    WheelVaultTheme {
+        TradeAvailabilityButton(
+            isAvailableForTrade = false,
+            onToggle = {},
         )
     }
 }
