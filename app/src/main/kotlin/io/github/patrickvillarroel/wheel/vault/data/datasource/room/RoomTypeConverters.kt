@@ -21,7 +21,7 @@ class RoomTypeConverters {
     @TypeConverter
     fun toSyncStatus(value: String): SyncStatus = try {
         SyncStatus.valueOf(value)
-    } catch (e: IllegalArgumentException) {
+    } catch (_: IllegalArgumentException) {
         // Fallback to PENDING if invalid value
         SyncStatus.PENDING
     }
