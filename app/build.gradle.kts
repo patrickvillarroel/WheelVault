@@ -42,7 +42,7 @@ android {
         versionCode = 12
         versionName = version.toString()
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "io.github.patrickvillarroel.wheel.vault.integration.util.KoinTestRunner"
 
         val supabaseUrl = env.fetch("SUPABASE_URL", "")
         val supabaseAnonKey = env.fetch("SUPABASE_ANON_KEY", "")
@@ -188,7 +188,11 @@ dependencies {
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.mockk.android)
-
+    androidTestImplementation(platform(libs.koin.bom))
+    androidTestImplementation(libs.koin.compose.viewmodel)
+    androidTestImplementation(libs.koin.test)
+    androidTestImplementation(libs.koin.test.junit4)
+    androidTestImplementation(libs.androidx.room.testing)
     debugImplementation(platform(libs.compose.bom))
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
