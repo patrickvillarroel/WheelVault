@@ -14,6 +14,7 @@ import coil3.network.ktor3.KtorNetworkFetcherFactory
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.coil.coil3
+import io.github.patrickvillarroel.wheel.vault.data.datasource.image.StorageItemKeyer
 import io.github.patrickvillarroel.wheel.vault.di.wheelVaultModule
 import io.ktor.client.HttpClient
 import org.koin.android.ext.koin.androidContext
@@ -48,9 +49,13 @@ class MainApplication :
                     override fun display(level: KoinLoggerLevel, msg: MESSAGE) {
                         when (level) {
                             KoinLoggerLevel.DEBUG -> logger.d(msg)
+
                             KoinLoggerLevel.INFO -> logger.i(msg)
+
                             KoinLoggerLevel.WARNING -> logger.w(msg)
+
                             KoinLoggerLevel.ERROR -> logger.e(msg)
+
                             KoinLoggerLevel.NONE -> {
                                 // do nothing
                             }
@@ -81,6 +86,7 @@ class MainApplication :
                     cacheStrategy = { CacheControlCacheStrategy() },
                 ),
             )
+            add(StorageItemKeyer())
         }
         .logger(
             if (BuildConfig.DEBUG) {
