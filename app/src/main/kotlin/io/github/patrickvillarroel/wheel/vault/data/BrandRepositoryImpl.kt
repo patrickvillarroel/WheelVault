@@ -5,7 +5,6 @@ import io.github.patrickvillarroel.wheel.vault.data.datasource.image.ImageReposi
 import io.github.patrickvillarroel.wheel.vault.data.datasource.room.BrandRoomDataSource
 import io.github.patrickvillarroel.wheel.vault.data.datasource.supabase.BrandSupabaseDataSource
 import io.github.patrickvillarroel.wheel.vault.domain.model.Brand
-import io.github.patrickvillarroel.wheel.vault.domain.model.CachePolicy
 import io.github.patrickvillarroel.wheel.vault.domain.model.PagedSource
 import io.github.patrickvillarroel.wheel.vault.domain.repository.BrandRepository
 import kotlinx.coroutines.async
@@ -31,7 +30,7 @@ class BrandRepositoryImpl(
         forceRefresh = forceRefresh,
         localFetch = { room.fetchAllNames() },
         remoteFetch = { supabase.fetchAllNames(forceRefresh) },
-        saveRemote = { names ->
+        saveRemote = { _ ->
             // Names are derived from brands, so sync brands instead
         },
     )
@@ -51,9 +50,8 @@ class BrandRepositoryImpl(
         },
     )
 
-    override fun fetchAllImagesPaged(): PagedSource<Int, Pair<Uuid, Any>> {
-        TODO("Not yet implemented")
-    }
+    // TODO brands images is not ready yet
+    override fun fetchAllImagesPaged(): PagedSource<Int, Pair<Uuid, Any>> = supabase.fetchAllImagesPaged()
 
     override suspend fun fetchAll(forceRefresh: Boolean): List<Brand> = SyncMediator.fetchList(
         localFetch = { room.fetchAll(forceRefresh) },
