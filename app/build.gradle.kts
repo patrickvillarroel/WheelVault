@@ -71,6 +71,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            enableAndroidTestCoverage = true
+        }
         release {
             val doMinify = project.hasProperty("minify") && project.property("minify") == "true"
             val doShrink = project.hasProperty("shrink") && project.property("shrink") == "true"
