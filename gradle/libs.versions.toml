@@ -1,6 +1,6 @@
 [versions]
 # https://developer.android.com/build/releases/gradle-plugin
-android-agp = "8.13.1"
+android-agp = "8.13.2"
 
 # https://developer.android.com/tools/releases/platforms
 android-minSdk = "26"
