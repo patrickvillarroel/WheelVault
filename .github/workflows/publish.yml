@@ -59,7 +59,7 @@ jobs:
           ./gradlew assembleRelease -Pminify=true -Pshrink=true
 
       - name: Save APK artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: app-release
           path: app/build/outputs/apk/release/*.apk
